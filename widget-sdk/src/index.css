@@ -1,0 +1,39 @@
+:root {
+  --bw-primary: #2563eb;
+  --bw-primary-fg: #ffffff;
+  --bw-bg: #ffffff;
+  --bw-fg: #0f172a;
+  --bw-border: #e2e8f0;
+  --bw-radius: 1rem;
+  --bw-shadow: 0 20px 25px -5px rgba(29, 28, 28, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  --bw-accent: #f59e0b;
+  --bw-padding: 1.75rem;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f1f5f9;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 200vh; /* Just for testing scroll behavior */
+}
+
+/* User controls widget positioning and button size here */
+bw-widget {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 9999;
+  
+  /* Adaptive Trigger Button Size */
+  --bw-trigger-size: 64px; 
+}
+
+@media (max-width: 480px) {
+  bw-widget {
+    bottom: 16px;
+    left: 16px;
+    --bw-trigger-size: 56px;
+  }
+}

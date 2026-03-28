@@ -41,6 +41,8 @@ export const buttonStyles = css`
     box-shadow: var(--bw-button-shadow);
     position: relative;
     overflow: hidden;
+    white-space: normal; /* Allow text wrapping */
+    word-break: break-word; /* Prevent long words from breaking layout */
   }
 
   .button:focus-visible {
@@ -77,8 +79,9 @@ export const buttonStyles = css`
   }
 
   .button--circle {
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     padding: 0;
   }
@@ -95,4 +98,15 @@ export const buttonStyles = css`
     height: 2rem;
     margin-bottom: 0.25rem;
   }
+
+  @media (max-width: 480px) {
+    .button {
+      padding: 1rem 1.25rem;
+      font-size: 1rem;
+    }
+    .button--vertical {
+      padding: 1.75rem 1rem;
+    }
+  }
+
 `;

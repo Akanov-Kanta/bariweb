@@ -155,6 +155,82 @@ export const widgetStyles = css`
     margin-top: 1rem;
   }
 
+  .ai-beta-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 0.5rem;
+  }
+
+  .ai-beta-btn {
+    border: 1px solid var(--bw-border);
+    border-radius: 10px;
+    background: var(--bw-bg);
+    color: var(--bw-fg);
+    font: inherit;
+    font-weight: 600;
+    padding: 0.75rem 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    text-align: left;
+  }
+
+  .ai-beta-btn:hover {
+    background: #f4f4f5;
+    transform: translateY(-1px);
+  }
+
+  .ai-beta-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .ai-status {
+    margin-top: 0.9rem;
+    font-size: 0.875rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 10px;
+    border: 1px solid var(--bw-border);
+    background: #fafafa;
+  }
+
+  .ai-status--loading {
+    background: #fef9c3;
+    border-color: #facc15;
+  }
+
+  .ai-status--success {
+    background: #dcfce7;
+    border-color: #4ade80;
+  }
+
+  .ai-status--error {
+    background: #fee2e2;
+    border-color: #f87171;
+  }
+
+  .ai-result {
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: #fafafa;
+    border: 1px solid var(--bw-border);
+    border-radius: 10px;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.8rem;
+    line-height: 1.35;
+  }
+
+  .ai-request-id {
+    margin: 0.5rem 0 0;
+    font-size: 0.75rem;
+    opacity: 0.8;
+    overflow-wrap: anywhere;
+  }
+
   /* Footer */
   .footer-content {
     display: flex;

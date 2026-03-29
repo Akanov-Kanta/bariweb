@@ -2,5 +2,11 @@
 # Install with: pip install -r requirements.txt
 # Then run:     playwright install chromium
 
-# Browser automation for DOM extraction
+# Browser automation for DOM extraction (Step 1)
 playwright>=1.40.0
+
+# HTTP requests for the embeddings API (Step 3)
+requests>=2.28.0
+
+# Numerical operations for vector search (Step 3)
+numpy>=1.24.0

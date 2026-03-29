@@ -68,3 +68,20 @@ OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "results")
 
 # Directory where enriched JSON results are saved (Step 2 output).
 ENRICHED_OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "results_enriched")
+
+# Directory where vector index files are saved (Step 3 output).
+INDEX_OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "index")
+
+# ---------------------------------------------------------------------------
+# Embeddings settings (Step 3)
+# ---------------------------------------------------------------------------
+
+# The API key must be set in the environment variable.
+# NEVER hardcode it here or in any source file.
+# Export it before running:  export ALEM_EMBEDDINGS_API_KEY=sk-...
+ALEM_EMBEDDINGS_BASE_URL = os.environ.get(
+    "ALEM_EMBEDDINGS_BASE_URL", "https://llm.alem.ai/v1"
+)
+ALEM_EMBEDDINGS_MODEL = os.environ.get(
+    "ALEM_EMBEDDINGS_MODEL", "text-1024"
+)

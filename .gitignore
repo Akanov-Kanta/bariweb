@@ -16,6 +16,8 @@ __pycache__/
 
 # RAG Pipeline output
 rag-pipeline/results/*.json
+rag-pipeline/results_enriched/*.json
+rag-pipeline/index/*.json
 
 # Secrets
 .env

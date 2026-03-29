@@ -1,0 +1,6 @@
+# RAG Pipeline — Python Dependencies
+# Install with: pip install -r requirements.txt
+# Then run:     playwright install chromium
+
+# Browser automation for DOM extraction
+playwright>=1.40.0

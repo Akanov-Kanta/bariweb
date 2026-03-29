@@ -7,6 +7,16 @@
 # Dependencies
 node_modules/
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+
+# RAG Pipeline output
+rag-pipeline/results/*.json
+
 # Secrets
 .env
 .env.*

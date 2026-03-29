@@ -1,0 +1,52 @@
+{
+  "source_url": "https://example.com",
+  "raw_source": "/Users/nazarakanov/development/decentra/arifalta/rag-pipeline/results/example_com_root_2026-03-29T11-40-28.json",
+  "enriched_at": "2026-03-29T13:02:53.708788+00:00",
+  "element_count": 1,
+  "pipeline_version": "step2-heuristic-v1",
+  "elements": [
+    {
+      "element_id": "ce9ac5b7ff3fc907",
+      "page_url": "https://example.com",
+      "tag": "a",
+      "text": "Learn more",
+      "normalized_text": "learn more",
+      "label_text": null,
+      "aria_label": null,
+      "placeholder": null,
+      "title": null,
+      "alt": null,
+      "href": "https://iana.org/domains/example",
+      "role": null,
+      "input_type": null,
+      "selector": "a",
+      "xpath": "/html[1]/body[1]/div[1]/p[2]/a[1]",
+      "is_clickable": true,
+      "is_form_control": false,
+      "raw_context": "Learn more",
+      "context_summary": "Context: Learn more Points to: domains / example.",
+      "action_type": "navigate",
+      "candidate_intents": [
+        "go to this page",
+        "open this link",
+        "navigate to this section",
+        "click the \"Learn more\" link"
+      ],
+      "keywords": [
+        "learn",
+        "more",
+        "go to",
+        "open",
+        "navigate",
+        "view",
+        "перейти",
+        "domains",
+        "example"
+      ],
+      "semantic_text": "Link \"Learn more\". Used for navigation. Leads to: domains / example. Context: Learn more Points to: domains / example.",
+      "retrieval_text": "Learn more learn more Link navigate navigation learn more go to open navigate view перейти domains example domains / example Context: Learn more Points to: domains / example.",
+      "confidence_hint": "medium",
+      "notes": ""
+    }
+  ]
+}

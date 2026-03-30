@@ -37,6 +37,7 @@ def login(
         key="access_token",
         value=access_token,
         httponly=True,
+        path="/",
         secure=True,  # Mandatory for samesite="none"
         samesite="none",
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
@@ -71,6 +72,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
 def logout(response: Response):
     response.delete_cookie(
         key="access_token",
+        path="/",
         httponly=True,
         secure=True,
         samesite="none",

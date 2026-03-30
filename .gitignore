@@ -6,7 +6,10 @@
 
 # Dependencies
 node_modules/
+venv/
 
 # Secrets
 .env
-.env.*
+.env.local
+.env.dev
+.env.prod

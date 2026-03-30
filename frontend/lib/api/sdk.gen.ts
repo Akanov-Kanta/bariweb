@@ -38,7 +38,11 @@ export class Auth {
      */
     public static me<ThrowOnError extends boolean = false>(options?: Options<MeData, ThrowOnError>) {
         return (options?.client ?? client).get<MeResponses, unknown, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    in: 'cookie',
+                    name: 'access_token',
+                    type: 'apiKey'
+                }],
             url: '/auth/users/me',
             ...options
         });
@@ -70,7 +74,11 @@ export class Auth {
      */
     public static verifyToken<ThrowOnError extends boolean = false>(options?: Options<VerifyTokenData, ThrowOnError>) {
         return (options?.client ?? client).get<VerifyTokenResponses, unknown, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    in: 'cookie',
+                    name: 'access_token',
+                    type: 'apiKey'
+                }],
             url: '/auth/verify',
             ...options
         });
@@ -83,7 +91,11 @@ export class Organizations {
      */
     public static registerClient<ThrowOnError extends boolean = false>(options: Options<RegisterClientData, ThrowOnError>) {
         return (options.client ?? client).post<RegisterClientResponses, RegisterClientErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    in: 'cookie',
+                    name: 'access_token',
+                    type: 'apiKey'
+                }],
             url: '/clients/register',
             ...options,
             headers: {
@@ -98,7 +110,11 @@ export class Organizations {
      */
     public static getMyClients<ThrowOnError extends boolean = false>(options?: Options<GetMyClientsData, ThrowOnError>) {
         return (options?.client ?? client).get<GetMyClientsResponses, unknown, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    in: 'cookie',
+                    name: 'access_token',
+                    type: 'apiKey'
+                }],
             url: '/clients/my',
             ...options
         });

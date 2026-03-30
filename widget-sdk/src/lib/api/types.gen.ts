@@ -29,20 +29,6 @@ export type HttpValidationError = {
 };
 
 /**
- * Token
- */
-export type Token = {
-    /**
-     * Access Token
-     */
-    access_token: string;
-    /**
-     * Token Type
-     */
-    token_type?: string;
-};
-
-/**
  * UserCreate
  */
 export type UserCreate = {
@@ -136,10 +122,8 @@ export type LoginResponses = {
     /**
      * Successful Response
      */
-    200: Token;
+    200: unknown;
 };
-
-export type LoginResponse = LoginResponses[keyof LoginResponses];
 
 export type MeData = {
     body?: never;

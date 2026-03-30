@@ -5,7 +5,7 @@ from typing import Generator, Annotated
 from jose import jwt
 from jose.exceptions import JWTError
 from fastapi import Depends, HTTPException, status, Request
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import APIKeyCookie
 from pydantic import ValidationError
 from sqlmodel import Session, select
 
@@ -15,8 +15,8 @@ from app.features.auth.schemas import User
 from app.core.config import settings
 from app.core.database import get_db
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login/access-token")
-TokenDep = Annotated[str, Depends(oauth2_scheme)]
+cookie_scheme = APIKeyCookie(name="access_token")
+TokenDep = Annotated[str, Depends(cookie_scheme)]
 
 
 def get_current_user(

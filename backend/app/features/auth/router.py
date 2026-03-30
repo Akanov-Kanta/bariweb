@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlmodel import Session, select
 from datetime import timedelta
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 
 from app.features.auth.models import UserCreate, UserRead, Token, UserLogin
 from app.features.auth.schemas import User
@@ -13,9 +12,10 @@ from app.core.security import verify_password, create_access_token, get_password
 auth_router = APIRouter(tags=["auth"])
 
 
-@auth_router.post("/login", response_model=Token)
+@auth_router.post("/login")
 def login(
     user_in: UserLogin, 
+    response: Response,
     db: Session = Depends(get_db),
 ):
     stmt = select(User).where(User.email == user_in.email)
@@ -33,7 +33,16 @@ def login(
         expires_delta=access_token_expires,
     )
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=True,  # Mandatory for samesite="none"
+        samesite="none",
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    )
+
+    return {"detail": "Login successful", "user": UserRead.model_validate(user)}
 
 
 @auth_router.get("/users/me", response_model=UserRead)
@@ -59,11 +68,14 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
 
 
 @auth_router.post("/logout")
-def logout():
-    response = JSONResponse(content={"detail": "Successfully logged out"})
-    # Ensure cookie name matches what frontend might use
-    response.delete_cookie("access_token")
-    return response
+def logout(response: Response):
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        secure=True,
+        samesite="none",
+    )
+    return {"detail": "Successfully logged out"}
 
 
 @auth_router.get("/verify", response_model=UserRead)

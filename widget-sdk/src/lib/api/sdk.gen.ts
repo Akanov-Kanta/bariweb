@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetMyClientsData, GetMyClientsResponses, LoginAccessTokenData, LoginAccessTokenErrors, LoginAccessTokenResponses, LogoutData, LogoutResponses, ReadCurrentUserData, ReadCurrentUserResponses, RegisterClientData, RegisterClientErrors, RegisterClientResponses, RegisterUserData, RegisterUserErrors, RegisterUserResponses, VerifyTokenData, VerifyTokenResponses } from './types.gen';
+import type { GetMyClientsData, GetMyClientsResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutResponses, MeData, MeResponses, RegisterClientData, RegisterClientErrors, RegisterClientResponses, RegisterData, RegisterErrors, RegisterResponses, VerifyTokenData, VerifyTokenResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -18,71 +18,89 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
     meta?: Record<string, unknown>;
 };
 
-/**
- * Login Access Token
- */
-export const loginAccessToken = <ThrowOnError extends boolean = false>(options: Options<LoginAccessTokenData, ThrowOnError>) => (options.client ?? client).post<LoginAccessTokenResponses, LoginAccessTokenErrors, ThrowOnError>({
-    url: '/auth/login',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
+export class Auth {
+    /**
+     * Login
+     */
+    public static login<ThrowOnError extends boolean = false>(options: Options<LoginData, ThrowOnError>) {
+        return (options.client ?? client).post<LoginResponses, LoginErrors, ThrowOnError>({
+            url: '/auth/login',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
     }
-});
-
-/**
- * Read Current User
- */
-export const readCurrentUser = <ThrowOnError extends boolean = false>(options?: Options<ReadCurrentUserData, ThrowOnError>) => (options?.client ?? client).get<ReadCurrentUserResponses, unknown, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/auth/users/me',
-    ...options
-});
-
-/**
- * Register User
- */
-export const registerUser = <ThrowOnError extends boolean = false>(options: Options<RegisterUserData, ThrowOnError>) => (options.client ?? client).post<RegisterUserResponses, RegisterUserErrors, ThrowOnError>({
-    url: '/auth/users/',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
+    
+    /**
+     * Me
+     */
+    public static me<ThrowOnError extends boolean = false>(options?: Options<MeData, ThrowOnError>) {
+        return (options?.client ?? client).get<MeResponses, unknown, ThrowOnError>({
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/auth/users/me',
+            ...options
+        });
     }
-});
-
-/**
- * Logout
- */
-export const logout = <ThrowOnError extends boolean = false>(options?: Options<LogoutData, ThrowOnError>) => (options?.client ?? client).post<LogoutResponses, unknown, ThrowOnError>({ url: '/auth/logout', ...options });
-
-/**
- * Verify Token
- */
-export const verifyToken = <ThrowOnError extends boolean = false>(options?: Options<VerifyTokenData, ThrowOnError>) => (options?.client ?? client).get<VerifyTokenResponses, unknown, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/auth/verify',
-    ...options
-});
-
-/**
- * Register Client
- */
-export const registerClient = <ThrowOnError extends boolean = false>(options: Options<RegisterClientData, ThrowOnError>) => (options.client ?? client).post<RegisterClientResponses, RegisterClientErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/clients/register',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
+    
+    /**
+     * Register
+     */
+    public static register<ThrowOnError extends boolean = false>(options: Options<RegisterData, ThrowOnError>) {
+        return (options.client ?? client).post<RegisterResponses, RegisterErrors, ThrowOnError>({
+            url: '/auth/users/',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
     }
-});
+    
+    /**
+     * Logout
+     */
+    public static logout<ThrowOnError extends boolean = false>(options?: Options<LogoutData, ThrowOnError>) {
+        return (options?.client ?? client).post<LogoutResponses, unknown, ThrowOnError>({ url: '/auth/logout', ...options });
+    }
+    
+    /**
+     * Verify Token
+     */
+    public static verifyToken<ThrowOnError extends boolean = false>(options?: Options<VerifyTokenData, ThrowOnError>) {
+        return (options?.client ?? client).get<VerifyTokenResponses, unknown, ThrowOnError>({
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/auth/verify',
+            ...options
+        });
+    }
+}
 
-/**
- * Get My Clients
- */
-export const getMyClients = <ThrowOnError extends boolean = false>(options?: Options<GetMyClientsData, ThrowOnError>) => (options?.client ?? client).get<GetMyClientsResponses, unknown, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/clients/my',
-    ...options
-});
+export class Organizations {
+    /**
+     * Register Client
+     */
+    public static registerClient<ThrowOnError extends boolean = false>(options: Options<RegisterClientData, ThrowOnError>) {
+        return (options.client ?? client).post<RegisterClientResponses, RegisterClientErrors, ThrowOnError>({
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/clients/register',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
+     * Get My Clients
+     */
+    public static getMyClients<ThrowOnError extends boolean = false>(options?: Options<GetMyClientsData, ThrowOnError>) {
+        return (options?.client ?? client).get<GetMyClientsResponses, unknown, ThrowOnError>({
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/clients/my',
+            ...options
+        });
+    }
+}

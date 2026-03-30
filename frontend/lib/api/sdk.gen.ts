@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetMyClientsData, GetMyClientsResponses, LoginAccessTokenData, LoginAccessTokenErrors, LoginAccessTokenResponses, LogoutData, LogoutResponses, ReadCurrentUserData, ReadCurrentUserResponses, RegisterClientData, RegisterClientErrors, RegisterClientResponses, RegisterUserData, RegisterUserErrors, RegisterUserResponses, VerifyTokenData, VerifyTokenResponses } from './types.gen';
+import type { GetMyClientsData, GetMyClientsResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutResponses, MeData, MeResponses, RegisterClientData, RegisterClientErrors, RegisterClientResponses, RegisterData, RegisterErrors, RegisterResponses, VerifyTokenData, VerifyTokenResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -20,10 +20,10 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 
 export class Auth {
     /**
-     * Login Access Token
+     * Login
      */
-    public static loginAccessToken<ThrowOnError extends boolean = false>(options: Options<LoginAccessTokenData, ThrowOnError>) {
-        return (options.client ?? client).post<LoginAccessTokenResponses, LoginAccessTokenErrors, ThrowOnError>({
+    public static login<ThrowOnError extends boolean = false>(options: Options<LoginData, ThrowOnError>) {
+        return (options.client ?? client).post<LoginResponses, LoginErrors, ThrowOnError>({
             url: '/auth/login',
             ...options,
             headers: {
@@ -34,10 +34,10 @@ export class Auth {
     }
     
     /**
-     * Read Current User
+     * Me
      */
-    public static readCurrentUser<ThrowOnError extends boolean = false>(options?: Options<ReadCurrentUserData, ThrowOnError>) {
-        return (options?.client ?? client).get<ReadCurrentUserResponses, unknown, ThrowOnError>({
+    public static me<ThrowOnError extends boolean = false>(options?: Options<MeData, ThrowOnError>) {
+        return (options?.client ?? client).get<MeResponses, unknown, ThrowOnError>({
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/auth/users/me',
             ...options
@@ -45,10 +45,10 @@ export class Auth {
     }
     
     /**
-     * Register User
+     * Register
      */
-    public static registerUser<ThrowOnError extends boolean = false>(options: Options<RegisterUserData, ThrowOnError>) {
-        return (options.client ?? client).post<RegisterUserResponses, RegisterUserErrors, ThrowOnError>({
+    public static register<ThrowOnError extends boolean = false>(options: Options<RegisterData, ThrowOnError>) {
+        return (options.client ?? client).post<RegisterResponses, RegisterErrors, ThrowOnError>({
             url: '/auth/users/',
             ...options,
             headers: {

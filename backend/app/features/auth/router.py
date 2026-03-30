@@ -14,7 +14,7 @@ auth_router = APIRouter(tags=["auth"])
 
 
 @auth_router.post("/login", response_model=Token)
-def login_access_token(
+def login(
     user_in: UserLogin, 
     db: Session = Depends(get_db),
 ):
@@ -37,12 +37,12 @@ def login_access_token(
 
 
 @auth_router.get("/users/me", response_model=UserRead)
-def read_current_user(current_user: User = Depends(get_current_user)):
+def me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
 @auth_router.post("/users/", response_model=UserRead)
-def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
+def register(user_in: UserCreate, db: Session = Depends(get_db)):
     stmt = select(User).where(User.email == user_in.email)
     user = db.exec(stmt).first()
     if user:

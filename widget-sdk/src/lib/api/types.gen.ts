@@ -116,71 +116,71 @@ export type ValidationError = {
     };
 };
 
-export type LoginAccessTokenData = {
+export type LoginData = {
     body: UserLogin;
     path?: never;
     query?: never;
     url: '/auth/login';
 };
 
-export type LoginAccessTokenErrors = {
+export type LoginErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type LoginAccessTokenError = LoginAccessTokenErrors[keyof LoginAccessTokenErrors];
+export type LoginError = LoginErrors[keyof LoginErrors];
 
-export type LoginAccessTokenResponses = {
+export type LoginResponses = {
     /**
      * Successful Response
      */
     200: Token;
 };
 
-export type LoginAccessTokenResponse = LoginAccessTokenResponses[keyof LoginAccessTokenResponses];
+export type LoginResponse = LoginResponses[keyof LoginResponses];
 
-export type ReadCurrentUserData = {
+export type MeData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/auth/users/me';
 };
 
-export type ReadCurrentUserResponses = {
+export type MeResponses = {
     /**
      * Successful Response
      */
     200: UserRead;
 };
 
-export type ReadCurrentUserResponse = ReadCurrentUserResponses[keyof ReadCurrentUserResponses];
+export type MeResponse = MeResponses[keyof MeResponses];
 
-export type RegisterUserData = {
+export type RegisterData = {
     body: UserCreate;
     path?: never;
     query?: never;
     url: '/auth/users/';
 };
 
-export type RegisterUserErrors = {
+export type RegisterErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type RegisterUserError = RegisterUserErrors[keyof RegisterUserErrors];
+export type RegisterError = RegisterErrors[keyof RegisterErrors];
 
-export type RegisterUserResponses = {
+export type RegisterResponses = {
     /**
      * Successful Response
      */
     200: UserRead;
 };
 
-export type RegisterUserResponse = RegisterUserResponses[keyof RegisterUserResponses];
+export type RegisterResponse = RegisterResponses[keyof RegisterResponses];
 
 export type LogoutData = {
     body?: never;

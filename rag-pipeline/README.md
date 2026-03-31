@@ -1,7 +1,7 @@
-# RAG Pipeline — DOM Extraction & Semantic Enrichment
+# RAG Pipeline — DOM Extraction, Enrichment, Embeddings & Retrieval API
 
 This module is the **RAG-engineering** component of the Autonomous Digital Inclusion Proxy.  
-It gives the AI agent "vision" over website structure by extracting, normalizing, enriching, and indexing DOM elements.
+It gives the AI agent "vision" over website structure by extracting, normalizing, enriching, embedding, and retrieving interactive DOM elements through a REST API.
 
 ## Current Status
 
@@ -9,9 +9,9 @@ It gives the AI agent "vision" over website structure by extracting, normalizing
 |------|-------------|--------|
 | **Step 1** | DOM Extraction Foundation | ✅ Complete |
 | **Step 2** | Semantic Enrichment & Retrieval Preparation | ✅ Complete |
-| **Step 3** | Embedding Generation | 🔲 Next |
-| **Step 4** | Vector Indexing (Milvus) | 🔲 Planned |
-| **Step 5** | Retrieval API & Orchestrator Integration | 🔲 Planned |
+| **Step 3** | Embedding Generation & Vector Indexing | ✅ Complete |
+| **Step 4** | Retrieval API Service Layer | ✅ Complete |
+| **Step 5** | Milvus / RAGFlow Integration | 🔲 Next |
 
 ---
 
@@ -32,7 +32,13 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
-### 3. Run Step 1 — Extract DOM from a page
+### 3. Set the embeddings API key
+
+```bash
+export ALEM_EMBEDDINGS_API_KEY=sk-...
+```
+
+### 4. Run Step 1 — Extract DOM from a page
 
 ```bash
 python main.py https://example.com
@@ -40,19 +46,51 @@ python main.py https://example.com
 
 Output: `results/<filename>.json`
 
-### 4. Run Step 2 — Enrich extracted records
+### 5. Run Step 2 — Enrich extracted records
 
 ```bash
-# Enrich a single file
-python enrich.py results/example_com_root_2026-03-29T11-40-28.json
-
-# Enrich multiple files
 python enrich.py results/*.json
 ```
 
 Output: `results_enriched/<filename>_enriched.json`
 
-### 5. Run tests
+### 6. Run Step 3 — Build vector index
+
+```bash
+python demo_index.py
+```
+
+Output: `index/combined_index.json`
+
+### 7. Run Step 4 — Start the retrieval API
+
+```bash
+python run_server.py
+```
+
+API docs: http://localhost:8000/docs
+
+### 8. Query the API
+
+```bash
+# Health check
+curl http://localhost:8000/health
+
+# Semantic search
+curl -X POST http://localhost:8000/search \
+  -H "Content-Type: application/json" \
+  -d '{"query": "search Wikipedia", "top_k": 3}'
+
+# Look up a specific element
+curl http://localhost:8000/elements/<element_id>
+
+# Reindex enriched files
+curl -X POST http://localhost:8000/index \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### 9. Run tests
 
 ```bash
 pip install pytest pytest-asyncio
@@ -66,6 +104,8 @@ python -m pytest tests/ -v
 ```
 rag-pipeline/
 ├── config.py                          # Central configuration
+├── requirements.txt                   # Python dependencies
+├── run_server.py                      # API server launcher
 │
 ├── extraction/                        # Step 1: DOM extraction
 │   ├── browser.py                     # Playwright page loading & lifecycle
@@ -82,17 +122,91 @@ rag-pipeline/
 │   ├── intent_resolver.py             # Candidate user intent derivation
 │   └── pipeline.py                    # Enrichment pipeline orchestrator
 │
+├── embeddings/                        # Step 3: Embedding & indexing
+│   ├── text_builder.py                # Builds embedding text from enriched records
+│   ├── client.py                      # Alem embeddings API client
+│   ├── schema.py                      # IndexedRecord dataclass
+│   ├── indexer.py                     # Indexing pipeline (embed → store)
+│   └── retriever.py                   # Semantic search service
+│
+├── vectorstore/                       # Pluggable vector storage
+│   ├── base.py                        # Abstract interface + SearchResult
+│   └── local_store.py                 # MVP backend (NumPy cosine similarity)
+│
+├── api/                               # Step 4: REST API service
+│   ├── schemas.py                     # Pydantic request/response models
+│   ├── service.py                     # RetrievalService business logic
+│   ├── routes.py                      # FastAPI route handlers
+│   └── app.py                         # Application factory
+│
 ├── output/                            # Output handling
 │   └── saver.py                       # Save records to JSON files
 │
 ├── main.py                            # CLI entry — Step 1 (extraction)
 ├── enrich.py                          # CLI entry — Step 2 (enrichment)
-├── requirements.txt                   # Python dependencies
+├── demo_index.py                      # CLI entry — Step 3 (indexing)
+├── demo_search.py                     # CLI entry — Step 3 (search demo)
+│
 ├── results/                           # Step 1 output (raw JSON)
 ├── results_enriched/                  # Step 2 output (enriched JSON)
-└── tests/                             # Test suite
+├── index/                             # Step 3 output (vector index)
+│
+└── tests/                             # Test suite (70 tests)
     ├── test_extractor.py              # Step 1 tests
-    └── test_enrichment.py             # Step 2 tests
+    ├── test_enrichment.py             # Step 2 tests
+    ├── test_step3.py                  # Step 3 tests
+    └── test_step4.py                  # Step 4 tests
+```
+
+---
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/health` | Service status, record count, backend name |
+| `POST` | `/search` | Semantic search over indexed DOM elements |
+| `POST` | `/index` | Index enriched JSON files into the vector store |
+| `GET` | `/elements/{element_id}` | Get full metadata for a specific element |
+
+### Search Request
+
+```json
+{
+  "query": "find contacts",
+  "top_k": 5,
+  "min_score": 0.5,
+  "action_type": "contact",
+  "page_url": "https://example.com",
+  "tag": "a"
+}
+```
+
+All fields except `query` are optional.
+
+### Search Response
+
+```json
+{
+  "query": "find contacts",
+  "top_k": 5,
+  "total_matches": 1,
+  "search_time_ms": 920.0,
+  "matches": [
+    {
+      "element_id": "el_104",
+      "page_url": "/contacts",
+      "selector": "a.contact-link",
+      "tag": "a",
+      "action_type": "contact",
+      "semantic_text": "Link to the contacts or support page.",
+      "confidence_hint": "high",
+      "score": 0.92,
+      "href": "/contacts",
+      "keywords": ["contact", "support", "email"]
+    }
+  ]
+}
 ```
 
 ---
@@ -108,49 +222,18 @@ Each enriched element has this structure:
   "tag": "button",
   "text": "Sign In",
   "normalized_text": "sign in",
-  "label_text": null,
-  "aria_label": null,
-  "placeholder": null,
-  "title": null,
-  "alt": null,
-  "href": null,
-  "role": null,
-  "input_type": null,
+  "action_type": "login",
+  "candidate_intents": ["log into my account", "sign in to the website"],
+  "keywords": ["sign", "login", "sign in", "log in", "authentication"],
+  "semantic_text": "Button \"Sign In\". Used for authentication / login.",
+  "retrieval_text": "Sign In sign in Button login authentication...",
+  "confidence_hint": "high",
   "selector": "#btn-login",
-  "xpath": "/html/body/form/button",
   "is_clickable": true,
   "is_form_control": false,
-  "raw_context": "Login to your account",
-  "context_summary": "Context: Login to your account",
-  "action_type": "login",
-  "candidate_intents": [
-    "log into my account",
-    "sign in to the website",
-    "enter my credentials",
-    "access my account",
-    "press the \"Sign In\" button"
-  ],
-  "keywords": ["sign", "login", "sign in", "log in", "enter account", "authentication"],
-  "semantic_text": "Button \"Sign In\". Used for authentication / login. Context: Login to your account",
-  "retrieval_text": "Sign In sign in Button login authentication / login sign login sign in log in enter account authentication Context: Login to your account",
-  "confidence_hint": "high",
-  "notes": ""
+  "context_summary": "Context: Login to your account"
 }
 ```
-
-### Key Enriched Fields
-
-| Field | Purpose |
-|-------|---------|
-| `action_type` | Heuristic classification (login, search, contact, etc.) |
-| `semantic_text` | Human-readable description for future embeddings |
-| `retrieval_text` | Dense text for search indexing |
-| `candidate_intents` | Phrases a user might say to trigger this element |
-| `keywords` | Expanded keyword / synonym list |
-| `confidence_hint` | Heuristic confidence level (low/medium/high) |
-| `context_summary` | Where the element lives on the page |
-| `is_clickable` | Whether the user can click this element |
-| `is_form_control` | Whether this is a form field to fill in |
 
 ---
 
@@ -177,8 +260,10 @@ Each enriched element has this structure:
 
 ---
 
-## Element Types Extracted
+## Environment Variables
 
-- `<button>`, `<a>`, `<input>`, `<textarea>`, `<select>`
-- `<form>`, `<label>`
-- Any element with `aria-label`, `role`, `placeholder`, `title`, or `alt` attributes
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `ALEM_EMBEDDINGS_API_KEY` | Yes | — | API key for the Alem embeddings service |
+| `ALEM_EMBEDDINGS_BASE_URL` | No | `https://llm.alem.ai/v1` | Embeddings API base URL |
+| `ALEM_EMBEDDINGS_MODEL` | No | `text-1024` | Embedding model name |

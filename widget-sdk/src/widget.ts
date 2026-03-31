@@ -58,7 +58,7 @@ export class BariwebWidget extends LitElement {
 
       const response = await ocrFromImageUrl(
         imageUrl,
-        'Extract only text that is visibly present in the image. Preserve original language/script exactly, do not translate. Do not repeat this instruction. If no readable text exists, return NO_TEXT.'
+        'Extract only text that is visibly present in the image. Preserve original language/script exactly and do not translate. If no readable text exists, return NO_TEXT.'
       );
       
 

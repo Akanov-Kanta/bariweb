@@ -31,7 +31,7 @@ type TranscribeDecision = {
   debug: DebugMeta;
 };
 
-const OCR_CACHE_VERSION = 'ocr:v2';
+const OCR_CACHE_VERSION = 'ocr:v3';
 const STT_CACHE_VERSION = 'stt:v2';
 
 const app = express();
@@ -574,7 +574,7 @@ async function runOcrWithRetry(
       prompt: prompts[index]
     });
 
-    const normalized = normalizeOcrText(raw);
+    const normalized = normalizeOcrText(raw, prompts[index]);
     if (normalized.accept) {
       return {
         text: normalized.text,
@@ -591,22 +591,27 @@ async function runOcrWithRetry(
   };
 }
 
-function normalizeOcrText(input: string): { accept: boolean; text: string } {
+function normalizeOcrText(input: string, prompt: string): { accept: boolean; text: string } {
   const text = input.trim();
   if (!text) {
     return { accept: false, text: '' };
   }
 
-  const lowered = text.toLowerCase();
+  const stripped = stripPromptEcho(text, prompt).trim();
+  if (!stripped) {
+    return { accept: false, text: '' };
+  }
+
+  const lowered = stripped.toLowerCase();
   if (lowered === 'no_text') {
     return { accept: false, text: '' };
   }
 
-  if (looksLikeInstructionEcho(text)) {
+  if (looksLikeInstructionEcho(stripped)) {
     return { accept: false, text: '' };
   }
 
-  return { accept: true, text };
+  return { accept: true, text: stripped };
 }
 
 function looksLikeInstructionEcho(text: string): boolean {
@@ -615,13 +620,16 @@ function looksLikeInstructionEcho(text: string): boolean {
   const highlySuspiciousPatterns = [
     'if the text is not a valid url',
     'return invalid_url',
-    'if the text is too long, return long_text'
+    'if the text is too long, return long_text',
+    'do not repeat this instruction',
+    'preserve the original language and script',
+    'do not translate'
   ];
 
   for (const pattern of highlySuspiciousPatterns) {
     if (lowered.includes(pattern)) {
       const occurrences = lowered.split(pattern).length - 1;
-      if (occurrences >= 2) {
+      if (occurrences >= 2 || (occurrences >= 1 && lowered.length < 240)) {
         return true;
       }
     }
@@ -649,6 +657,24 @@ function looksLikeInstructionEcho(text: string): boolean {
   }
 
   return maxRepeat >= 6 && maxRepeat / sentences.length >= 0.55;
+}
+
+function stripPromptEcho(text: string, prompt: string): string {
+  const promptLower = prompt.toLowerCase();
+  const lines = text
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const cleanedLines = lines.filter((line) => {
+    const lowered = line.toLowerCase();
+    if (lowered.length >= 8 && promptLower.includes(lowered)) {
+      return false;
+    }
+    return true;
+  });
+
+  return cleanedLines.join('\n').trim();
 }
 
 function validateConfig(): { ok: boolean; missing: string[] } {

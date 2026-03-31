@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Icons } from './lib/icons.ts';
 import { widgetStyles } from './widget.styles.ts';
-import { ApiRequestError, transcribeAudio } from './controllers/ai.controller.ts';
+import { ApiRequestError, transcribeAudio, type LanguageHint } from './controllers/ai.controller.ts';
 import { ocrFromImageUrl } from './controllers/scanner.controller.ts';
 import './components/button/button.js';
 import './components/card/card.js';
@@ -18,6 +18,7 @@ export class BariwebWidget extends LitElement {
   @state() private _aiStatus: AiStatus = 'idle';
   @state() private _aiResult = 'No AI requests yet.';
   @state() private _lastRequestId = '';
+  @state() private _voiceLanguage: LanguageHint = 'auto';
 
   private _toggle() {
     this._isOpen = !this._isOpen;
@@ -32,7 +33,7 @@ export class BariwebWidget extends LitElement {
       const audioBlob = await this._captureAudio(5_000);
       this._aiResult = 'Sending audio to STT...';
 
-      const response = await transcribeAudio(audioBlob, 'auto');
+      const response = await transcribeAudio(audioBlob, this._voiceLanguage);
 
       this._aiStatus = 'success';
       this._lastRequestId = response.requestId;
@@ -43,6 +44,10 @@ export class BariwebWidget extends LitElement {
       this._aiResult = message;
       this._lastRequestId = error instanceof ApiRequestError && error.requestId ? error.requestId : '';
     }
+  }
+
+  private _setVoiceLanguage(language: LanguageHint) {
+    this._voiceLanguage = language;
   }
 
   private async _handleOcrByUrl() {
@@ -269,9 +274,41 @@ export class BariwebWidget extends LitElement {
           </bw-accordion-item>
 
           <bw-accordion-item title="AI Beta: Voice + OCR">
+            <div class="ai-language-picker" role="group" aria-label="Speech language">
+              <span class="ai-language-label">STT language:</span>
+              <button
+                class="ai-lang-btn ${this._voiceLanguage === 'kk' ? 'active' : ''}"
+                @click=${() => this._setVoiceLanguage('kk')}
+                ?disabled=${isBusy}
+              >
+                Kazakh
+              </button>
+              <button
+                class="ai-lang-btn ${this._voiceLanguage === 'en' ? 'active' : ''}"
+                @click=${() => this._setVoiceLanguage('en')}
+                ?disabled=${isBusy}
+              >
+                English
+              </button>
+              <button
+                class="ai-lang-btn ${this._voiceLanguage === 'ru' ? 'active' : ''}"
+                @click=${() => this._setVoiceLanguage('ru')}
+                ?disabled=${isBusy}
+              >
+                Russian
+              </button>
+              <button
+                class="ai-lang-btn ${this._voiceLanguage === 'auto' ? 'active' : ''}"
+                @click=${() => this._setVoiceLanguage('auto')}
+                ?disabled=${isBusy}
+              >
+                Auto detect
+              </button>
+            </div>
+
             <div class="ai-beta-actions">
               <button class="ai-beta-btn" @click=${this._handleVoiceCommand} ?disabled=${isBusy}>
-                Voice command (5s)
+                Voice command (5s) - ${this._voiceLanguage.toUpperCase()}
               </button>
               <button class="ai-beta-btn" @click=${this._handleOcrByUrl} ?disabled=${isBusy}>
                 OCR by image URL

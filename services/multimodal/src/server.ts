@@ -7,7 +7,7 @@ import type { CacheStore } from './cache/cache-store.js';
 import { MemoryTTLStore } from './cache/memory-ttl-store.js';
 import { hashBuffer, hashText, newRequestId } from './lib/crypto.js';
 
-type LanguageHint = 'kk' | 'en' | 'auto';
+type LanguageHint = 'kk' | 'en' | 'ru' | 'auto';
 type HealthState = 'ready' | 'degraded';
 
 type CachedResponse = {
@@ -32,7 +32,7 @@ type TranscribeDecision = {
 };
 
 const OCR_CACHE_VERSION = 'ocr:v3';
-const STT_CACHE_VERSION = 'stt:v2';
+const STT_CACHE_VERSION = 'stt:v3';
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -275,7 +275,7 @@ app.listen(config.port, () => {
 });
 
 function normalizeLanguageHint(value: unknown): LanguageHint {
-  if (value === 'kk' || value === 'en' || value === 'auto') {
+  if (value === 'kk' || value === 'en' || value === 'ru' || value === 'auto') {
     return value;
   }
   return 'auto';
@@ -304,6 +304,30 @@ async function transcribeWithRouting(
         selectedProvider: 'speech-to-text',
         candidatesTried: ['speech-to-text:en'],
         selectionReason: 'explicit_en_hint',
+        retryCount: 0
+      }
+    };
+  }
+
+  if (languageHint === 'ru') {
+    const russian = await transcribeWithAlem({
+      apiKey: config.sttGenericKey as string,
+      baseUrl: config.baseUrl,
+      model: 'speech-to-text',
+      audio: input.audio,
+      mimeType: input.mimeType,
+      fileName: input.fileName,
+      language: 'ru'
+    });
+
+    return {
+      text: russian,
+      provider: 'speech-to-text',
+      language: 'ru',
+      debug: {
+        selectedProvider: 'speech-to-text',
+        candidatesTried: ['speech-to-text:ru'],
+        selectionReason: 'explicit_ru_hint',
         retryCount: 0
       }
     };
@@ -480,7 +504,7 @@ function assessKazakhCandidate(text: string): { accept: boolean; reason: string;
     return { accept: false, reason: 'too_short', hasKazakhMarkers: false };
   }
 
-  const hasKazakhMarkers = /[әіңғүұқөһӘІҢҒҮҰҚӨҺ]/.test(trimmed);
+  const hasKazakhMarkers = /[\u04D8\u04D9\u0406\u0456\u04A2\u04A3\u0492\u0493\u04AE\u04AF\u04B0\u04B1\u049A\u049B\u04E8\u04E9\u04BA\u04BB]/.test(trimmed);
   return { accept: true, reason: 'kk_candidate_ok', hasKazakhMarkers };
 }
 

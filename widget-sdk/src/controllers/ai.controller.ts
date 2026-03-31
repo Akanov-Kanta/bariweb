@@ -1,4 +1,4 @@
-export type LanguageHint = 'kk' | 'en' | 'auto';
+export type LanguageHint = 'kk' | 'en' | 'ru' | 'auto';
 
 export type TranscribeResponse = {
   text: string;

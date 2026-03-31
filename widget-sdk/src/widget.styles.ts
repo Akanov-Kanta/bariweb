@@ -162,6 +162,49 @@ export const widgetStyles = css`
     margin-top: 0.5rem;
   }
 
+  .ai-language-picker {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 0.5rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .ai-language-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+
+  .ai-lang-btn {
+    border: 1px solid var(--bw-border);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--bw-fg);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.35rem 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ai-lang-btn:hover {
+    background: #f4f4f5;
+  }
+
+  .ai-lang-btn.active {
+    background: var(--bw-primary);
+    border-color: var(--bw-primary);
+    color: var(--bw-primary-fg);
+  }
+
+  .ai-lang-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
   .ai-beta-btn {
     border: 1px solid var(--bw-border);
     border-radius: 10px;

@@ -56,7 +56,19 @@ class RetrievalService:
             auto_load_index: If True and no store is provided, attempt to load
                              the latest index from disk on startup.
         """
-        self._store = store or LocalVectorStore()
+        # Choose vector store based on Step 5 config
+        if store is not None:
+            self._store = store
+        else:
+            if getattr(config, "USE_RAGFLOW", False):
+                from vectorstore.ragflow_milvus_store import RagflowMilvusStore
+                self._store = RagflowMilvusStore()
+            elif config.USE_MILVUS:
+                from vectorstore.milvus_store import MilvusVectorStore
+                self._store = MilvusVectorStore()
+            else:
+                self._store = LocalVectorStore()
+
         self._client: Optional[EmbeddingsClient] = None
         self._retriever: Optional[Retriever] = None
 

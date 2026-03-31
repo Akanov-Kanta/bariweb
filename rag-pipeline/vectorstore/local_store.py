@@ -70,6 +70,7 @@ class LocalVectorStore(VectorStoreBase):
         query_vector: List[float],
         top_k: int = 5,
         filters: Optional[Dict[str, Any]] = None,
+        query_text: Optional[str] = None,
     ) -> List[SearchResult]:
         """
         Brute-force cosine similarity search.

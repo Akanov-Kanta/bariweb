@@ -6,6 +6,10 @@ stay free of magic strings and numbers.
 """
 
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # ---------------------------------------------------------------------------
 # Browser / Playwright settings
@@ -85,3 +89,28 @@ ALEM_EMBEDDINGS_BASE_URL = os.environ.get(
 ALEM_EMBEDDINGS_MODEL = os.environ.get(
     "ALEM_EMBEDDINGS_MODEL", "text-1024"
 )
+ALEM_EMBEDDINGS_DIMENSION = 1024  # Assuming the text-1024 model produces 1024d vectors
+
+# ---------------------------------------------------------------------------
+# Project Backend Settings (Step 5 Integration)
+# ---------------------------------------------------------------------------
+
+# Set to True to enable Milvus backend integration
+USE_MILVUS = os.environ.get("USE_MILVUS", "false").lower() == "true"
+
+# Set to True to enable RAGFlow semantic retrieval coupled with Milvus
+USE_RAGFLOW = os.environ.get("USE_RAGFLOW", "false").lower() == "true"
+
+# Milvus Settings
+MILVUS_SERVER = os.environ.get("MILVUS_SERVER", "https://a1-milvus1.alem.ai")
+MILVUS_PORT = os.environ.get("MILVUS_PORT", "")
+MILVUS_USER = os.environ.get("MILVUS_USER", "")
+MILVUS_PASSWORD = os.environ.get("MILVUS_PASSWORD", "")
+MILVUS_DB = os.environ.get("MILVUS_DB", "default")
+MILVUS_COLLECTION = os.environ.get("MILVUS_COLLECTION", "arifalta_dom_elements")
+
+# RAGFlow Settings
+RAGFLOW_API_URL = os.environ.get("RAGFLOW_API_URL", "https://a1-ragflow1.alem.ai/api/v1")
+RAGFLOW_API_KEY = os.environ.get("RAGFLOW_API_KEY", "")
+RAGFLOW_DATASET_ID = os.environ.get("RAGFLOW_DATASET_ID", "")
+

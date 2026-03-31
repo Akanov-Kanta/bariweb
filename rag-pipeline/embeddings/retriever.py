@@ -101,6 +101,7 @@ class Retriever:
             query_vector=query_vector,
             top_k=top_k,
             filters=filters,
+            query_text=query,
         )
 
         elapsed = time.time() - start

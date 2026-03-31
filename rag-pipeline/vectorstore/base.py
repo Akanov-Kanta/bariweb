@@ -74,6 +74,7 @@ class VectorStoreBase(ABC):
         query_vector: List[float],
         top_k: int = 5,
         filters: Optional[Dict[str, Any]] = None,
+        query_text: Optional[str] = None,
     ) -> List[SearchResult]:
         """
         Search for the most similar records to a query vector.
@@ -82,6 +83,7 @@ class VectorStoreBase(ABC):
             query_vector: The embedding of the search query.
             top_k: Maximum number of results to return.
             filters: Optional metadata filters (e.g., page_url, action_type).
+            query_text: The original natural-language query used (for RAGFlow fallback).
 
         Returns:
             List of SearchResult objects sorted by similarity (descending).

@@ -136,17 +136,17 @@ export const landingTranslations: Record<string, any> = {
         vanilla: {
           title: "Установка для HTML / Vanilla",
           body: "Для статических сайтов и CMS (WordPress, Tilda) вставьте скрипт прямо перед закрывающимся тегом </head>:",
-          code: "<!-- AccessLayer Script -->\n<script src=\"https://cdn.accesslayer.kz/v2.js\" data-key=\"YOUR_API_KEY\"></script>"
+          code: "<!-- AccessLayer Script -->\n<script src=\"https://cdn.accesslayer.kz/v2.js\" client_id=\"YOUR_API_KEY\"></script>"
         },
         react: {
           title: "Установка для React / Next.js",
           body: "В Next.js мы рекомендуем использовать встроенный компонент next/script со стратегией beforeInteractive.",
-          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.accesslayer.kz/v2.js\" strategy=\"beforeInteractive\" data-key=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
+          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.accesslayer.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
         },
         vue: {
           title: "Установка для Vue / Nuxt",
           body: "Для Vue.js или Nuxt.js добавьте директиву в nuxt.config.ts или напрямую в index.html.",
-          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.accesslayer.kz/v2.js', 'data-key': 'YOUR_API_KEY' }]\n    }\n  }\n})"
+          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.accesslayer.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
         },
         config: {
           title: "Объект конфигурации",
@@ -303,17 +303,17 @@ export const landingTranslations: Record<string, any> = {
         vanilla: {
           title: "HTML / Vanilla үшін орнату",
           body: "Статикалық сайттар мен CMS (WordPress, Tilda) үшін скриптті </head> жабылатын тегінің алдына енгізіңіз:",
-          code: "<!-- AccessLayer Script -->\n<script src=\"https://cdn.accesslayer.kz/v2.js\" data-key=\"Сіздің_КІЛТІҢІЗ\"></script>"
+          code: "<!-- AccessLayer Script -->\n<script src=\"https://cdn.accesslayer.kz/v2.js\" client_id=\"Сіздің_КІЛТІҢІЗ\"></script>"
         },
         react: {
           title: "React / Next.js үшін орнату",
           body: "Next.js-те beforeInteractive стратегиясы бар кірістірілген next/script компонентін пайдалануды ұсынамыз.",
-          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.accesslayer.kz/v2.js\" strategy=\"beforeInteractive\" data-key=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
+          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.accesslayer.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
         },
         vue: {
           title: "Vue / Nuxt үшін орнату",
           body: "Vue.js немесе Nuxt.js үшін nuxt.config.ts файлында немесе тікелей index.html ішіне қосыңыз.",
-          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.accesslayer.kz/v2.js', 'data-key': 'YOUR_API_KEY' }]\n    }\n  }\n})"
+          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.accesslayer.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
         },
         config: {
           title: "Конфигурация объектісі",
@@ -470,17 +470,17 @@ export const landingTranslations: Record<string, any> = {
         vanilla: {
           title: "HTML / Vanilla Setup",
           body: "For static websites and CMS platforms (WordPress, Shopify), insert the script immediately preceding your closing </head> tag:",
-          code: "<!-- AccessLayer Script -->\n<script src=\"https://cdn.accesslayer.kz/v2.js\" data-key=\"YOUR_API_KEY\"></script>"
+          code: "<!-- AccessLayer Script -->\n<script src=\"https://cdn.accesslayer.kz/v2.js\" client_id=\"YOUR_API_KEY\"></script>"
         },
         react: {
           title: "React / Next.js Setup",
           body: "For Next.js implementations, utilize the native next/script component specifying a beforeInteractive loading strategy.",
-          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.accesslayer.kz/v2.js\" strategy=\"beforeInteractive\" data-key=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
+          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.accesslayer.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
         },
         vue: {
           title: "Vue / Nuxt Setup",
           body: "In Vue / Nuxt architectures, simply configure the directive dynamically inside nuxt.config.ts or globally in your index.html definition.",
-          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.accesslayer.kz/v2.js', 'data-key': 'YOUR_API_KEY' }]\n    }\n  }\n})"
+          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.accesslayer.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
         },
         config: {
           title: "Configuration Object",

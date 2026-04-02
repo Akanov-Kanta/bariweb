@@ -164,9 +164,9 @@ export default function PaymentPage() {
                     <p className="mb-10 text-neutral-400">
                       Мы отправили квитанцию и инструкции по установке на ваш email.
                     </p>
-                    <Link href="/docs" className="w-full">
+                    <Link href="/dashboard" className="w-full">
                       <MagneticButton className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-5 font-bold text-black transition-transform hover:scale-[1.02]">
-                        Перейти к интеграции <ArrowRight className="h-5 w-5" />
+                        Go to Dashboard <ArrowRight className="h-5 w-5" />
                       </MagneticButton>
                     </Link>
                   </motion.div>

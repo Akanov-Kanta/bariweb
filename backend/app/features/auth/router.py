@@ -38,8 +38,8 @@ def login(
         value=access_token,
         httponly=True,
         path="/",
-        secure=True,  # Mandatory for samesite="none"
-        samesite="none",
+        secure=settings.ENVIRONMENT != 'local',
+        samesite="lax",
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
@@ -74,8 +74,8 @@ def logout(response: Response):
         key="access_token",
         path="/",
         httponly=True,
-        secure=True,
-        samesite="none",
+        secure=settings.ENVIRONMENT != 'local',
+        samesite="lax",
     )
     return {"detail": "Successfully logged out"}
 

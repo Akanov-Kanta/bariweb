@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { landingTranslations } from "@/lib/i18n/landingTranslations";
 
-const SCRIPT_CODE = '<script src="cdn.accesslayer.kz/v2.js" data-key="YOUR_KEY"></script>';
+const SCRIPT_CODE = '<script src="cdn.accesslayer.kz/v2.js" client_id="YOUR_KEY"></script>';
 
 const typewriterVariants = {
   hidden: { opacity: 0 },
@@ -26,28 +26,28 @@ export default function IntegrationSection() {
   const t = landingTranslations[lang].integration;
 
   return (
-    <section className="flex flex-col items-center justify-center bg-[#080808] px-6 py-24 md:px-12">
+    <section className="section-container bg-[#080808]">
       <div className="w-full max-w-4xl text-center">
-        <h2 className="mb-6 text-4xl font-bold tracking-tight text-white md:text-5xl">
+        <h2 className="section-heading">
           {t.title1} <br />
-          <span className="text-lime-400">{t.title2}</span>
+          <span className="heading-accent">{t.title2}</span>
         </h2>
-        <p className="mb-12 text-lg text-neutral-400">
+        <p className="section-description mx-auto">
           {t.desc}
         </p>
 
         {/* macOS Terminal Mockup */}
-        <div className="mx-auto w-full overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow-2xl">
+        <div className="terminal-container mx-auto w-full">
           {/* Header */}
-          <div className="flex items-center gap-2 border-b border-neutral-800 bg-neutral-900 px-4 py-3">
-            <div className="h-3 w-3 rounded-full bg-red-500" />
-            <div className="h-3 w-3 rounded-full bg-yellow-500" />
-            <div className="h-3 w-3 rounded-full bg-green-500" />
-            <div className="ml-4 text-xs text-neutral-500">index.html</div>
+          <div className="terminal-header">
+            <div className="terminal-dot terminal-dot-red" />
+            <div className="terminal-dot terminal-dot-yellow" />
+            <div className="terminal-dot terminal-dot-green" />
+            <div className="ml-4 text-xs text-neutral-500 uppercase tracking-widest">index.html</div>
           </div>
           
           {/* Body */}
-          <div className="p-6 text-left font-mono text-sm md:text-base">
+          <div className="terminal-body text-left">
             <div className="mb-2 text-neutral-500">{"<head>"}</div>
             
             <div className="pl-4 text-lime-400">

@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 class User(SQLModel, table=True):
+    __tablename__: str = "users"
     id: Optional[uuid.UUID] = Field(
         default_factory=uuid.uuid4, 
         primary_key=True,

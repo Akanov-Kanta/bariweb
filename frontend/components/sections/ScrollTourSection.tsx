@@ -75,7 +75,7 @@ export default function ScrollTourSection() {
                     transition={{ duration: 0.4 }}
                     className="absolute left-0 top-1/2 -translate-y-1/2 w-full pr-12"
                   >
-                    <h2 className={`mb-4 text-4xl font-bold tracking-tight md:text-5xl ${step.color}`} 
+                    <h2 className={`mb-4 text-4xl font-bold tracking-tight md:text-5xl ${step.color === 'text-lime-400' ? 'heading-accent' : 'text-white'}`} 
                         dangerouslySetInnerHTML={{ __html: step.title }} 
                     />
                     <p className="text-lg text-neutral-400">
@@ -90,7 +90,7 @@ export default function ScrollTourSection() {
           {/* Right Column: Interactive Mockup */}
           <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/50 p-4">
             
-            <div className="relative h-full w-full overflow-hidden rounded-xl bg-[#EBEBEB] text-black shadow-2xl">
+            <div className="browser-mockup">
               
               {/* === Messy Phase (Step 1) === */}
               <div className="absolute inset-0 p-6 opacity-40">
@@ -128,13 +128,13 @@ export default function ScrollTourSection() {
 
                 <div className="flex-1 space-y-6">
                   {/* Balance Card */}
-                  <div className="w-full rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                  <div className="browser-card">
                     <h3 className="mb-1 text-sm font-medium text-neutral-500">{t.demoUI.balance}</h3>
                     <p className="text-3xl font-semibold">1 250 000 ₸</p>
                   </div>
 
                   {/* Payment Form (Where agent will type) */}
-                  <div className="w-full rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                  <div className="browser-card">
                     <h3 className="mb-4 text-sm font-semibold text-neutral-800">{t.demoUI.payTaxes}</h3>
                     <div className="space-y-4">
                       <div>
@@ -155,7 +155,7 @@ export default function ScrollTourSection() {
 
                 {/* The Scanning Line (Visible only during Step 2) */}
                 <motion.div
-                  className="absolute left-0 right-0 h-[2px] w-full bg-lime-400 shadow-[0_0_20px_4px_rgba(200,255,0,0.6)] z-20"
+                  className="scanner-line"
                   style={{ top: scannerY, opacity: activeStep === 2 ? 1 : 0 }}
                 />
 
@@ -166,9 +166,9 @@ export default function ScrollTourSection() {
                       initial={{ opacity: 0, y: 50, scale: 0.8 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 50 }}
-                      className="absolute bottom-6 right-6 z-30 flex items-center gap-3 rounded-full border border-neutral-200 bg-white p-2 shadow-xl"
+                      className="ai-widget"
                     >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-lime-400 text-black">
+                      <div className="ai-widget-icon">
                         {activeStep === 4 ? <CheckCircle2 className="h-5 w-5" /> : <Mic className="h-5 w-5 animate-pulse" />}
                       </div>
                       <div className="pr-4">

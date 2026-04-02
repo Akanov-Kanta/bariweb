@@ -33,19 +33,22 @@ export default function Navbar() {
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        "fixed left-0 right-0 top-0 z-40 flex items-center justify-between px-6 py-4 transition-colors duration-300 md:px-12",
-        scrolled ? "border-b border-neutral-800 bg-black/60 backdrop-blur-xl" : "bg-transparent border-b border-transparent"
+        "nav-container",
+        scrolled ? "nav-scrolled" : "bg-transparent border-b border-transparent"
       )}
     >
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-1 text-2xl font-bold tracking-tighter text-white">
+      <Link href="/" className="nav-logo">
         <span>Access</span>
-        <span className="text-lime-400">Layer</span>
+        <span className="heading-accent">Layer</span>
       </Link>
 
       <div className="flex items-center gap-6">
-        <Link href="/docs" className="text-sm font-medium text-neutral-300 transition-colors hover:text-white">
+        <Link href="/docs" className="nav-link">
           {t.docs}
+        </Link>
+        <Link href="/login" className="nav-link nav-link-accent">
+          Log In
         </Link>
         <LanguageSwitcher />
 
@@ -53,7 +56,7 @@ export default function Navbar() {
         <Link href="/#pricing">
           <MagneticButton
             intensity={20}
-            className="hidden md:block rounded-full bg-lime-400 px-6 py-3 text-sm font-semibold text-black transition-transform hover:scale-105"
+            className="hidden md:block btn-primary px-6 py-2.5 text-sm"
           >
             {t.embed}
           </MagneticButton>

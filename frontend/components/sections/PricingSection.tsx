@@ -17,17 +17,17 @@ export default function PricingSection() {
   const potentialSavings = Math.ceil(potentialPenalty * 0.95);
 
   return (
-    <section id="pricing" className="bg-[#080808] px-6 py-24 md:px-12">
+    <section id="pricing" className="section-container bg-[#080808]">
       <div className="mx-auto max-w-7xl">
         <div className="mb-16 text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-white md:text-5xl">
+          <h2 className="section-heading">
             {t.title1} <br />
-            <span className="text-lime-400">{t.title2}</span>
+            <span className="heading-accent">{t.title2}</span>
           </h2>
         </div>
 
         {/* Calculator */}
-        <div className="mx-auto mb-20 max-w-3xl rounded-3xl border border-neutral-800 bg-neutral-900/50 p-8 shadow-2xl">
+        <div className="price-card mx-auto mb-20 max-w-3xl">
           <h3 className="mb-6 text-xl font-semibold text-white">{t.calcTitle}</h3>
           <div className="mb-8">
             <label className="mb-4 flex justify-between text-sm text-neutral-400">
@@ -52,7 +52,7 @@ export default function PricingSection() {
             </div>
             <div className="text-right">
               <div className="text-sm text-neutral-500">{t.calcSavings}</div>
-              <div className="text-3xl font-bold text-lime-400">${potentialSavings.toLocaleString()}</div>
+              <div className="text-3xl font-bold heading-accent">${potentialSavings.toLocaleString()}</div>
             </div>
           </div>
         </div>
@@ -61,50 +61,50 @@ export default function PricingSection() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:items-center">
           
           {/* Starter */}
-          <div className="rounded-3xl border border-neutral-800 bg-neutral-900/40 p-8">
+          <div className="price-card">
             <h3 className="mb-2 text-xl font-medium text-white">Starter</h3>
             <div className="mb-6 text-4xl font-bold text-white">$299<span className="text-lg text-neutral-500">{t.mo}</span></div>
             <ul className="mb-8 space-y-4 text-neutral-400">
-              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-lime-400" /> До 10,000 визитов</li>
-              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-lime-400" /> Базовое сканирование</li>
-              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-lime-400" /> Отчеты об ошибках</li>
+              <li className="flex items-center gap-3"><Check className="h-5 w-5 heading-accent" /> До 10,000 визитов</li>
+              <li className="flex items-center gap-3"><Check className="h-5 w-5 heading-accent" /> Базовое сканирование</li>
+              <li className="flex items-center gap-3"><Check className="h-5 w-5 heading-accent" /> Отчеты об ошибках</li>
             </ul>
             <Link href="/payment" className="w-full">
-              <MagneticButton className="w-full rounded-full border border-neutral-700 bg-transparent py-3 font-medium text-white transition-colors hover:bg-neutral-800">
+              <MagneticButton className="btn-outline w-full">
                 {t.starter}
               </MagneticButton>
             </Link>
           </div>
 
           {/* Business (Highlighted) */}
-          <div className="relative rounded-3xl border border-lime-400/50 bg-[#0a1200] p-8 shadow-[0_0_40px_-10px_rgba(200,255,0,0.15)] md:-translate-y-4">
-            <div className="absolute -top-4 right-8 rounded-full bg-lime-400 px-3 py-1 text-xs font-bold text-black">{t.hit}</div>
+          <div className="price-card price-card-popular md:-translate-y-4">
+            <div className="badge-popular">{t.hit}</div>
             <h3 className="mb-2 text-xl font-medium text-white">Business</h3>
-            <div className="mb-6 text-4xl font-bold text-white">$1200<span className="text-lg text-lime-400/60">{t.mo}</span></div>
+            <div className="mb-6 text-4xl font-bold text-white">$1200<span className="text-lg heading-accent opacity-60">{t.mo}</span></div>
             <ul className="mb-8 space-y-4 text-neutral-300">
-              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-lime-400" /> До 500,000 визитов</li>
-              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-lime-400" /> Голосовой автопилот</li>
-              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-lime-400" /> SLA & Поддержка 24/7</li>
-              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-lime-400" /> Сертификат compliance</li>
+              <li className="flex items-center gap-3"><Check className="h-5 w-5 heading-accent" /> До 500,000 визитов</li>
+              <li className="flex items-center gap-3"><Check className="h-5 w-5 heading-accent" /> Голосовой автопилот</li>
+              <li className="flex items-center gap-3"><Check className="h-5 w-5 heading-accent" /> SLA & Поддержка 24/7</li>
+              <li className="flex items-center gap-3"><Check className="h-5 w-5 heading-accent" /> Сертификат compliance</li>
             </ul>
             <Link href="/payment" className="w-full">
-              <MagneticButton intensity={20} className="w-full rounded-full bg-lime-400 py-3 font-semibold text-black transition-transform hover:scale-105">
+              <MagneticButton intensity={20} className="btn-primary w-full shadow-lg">
                 {t.business}
               </MagneticButton>
             </Link>
           </div>
 
           {/* Enterprise */}
-          <div className="rounded-3xl border border-neutral-800 bg-neutral-900/40 p-8">
+          <div className="price-card">
             <h3 className="mb-2 text-xl font-medium text-white">Enterprise</h3>
             <div className="mb-6 text-4xl font-bold text-white">$3500<span className="text-lg text-neutral-500">{t.mo}</span></div>
             <ul className="mb-8 space-y-4 text-neutral-400">
-              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-lime-400" /> Анлим визиты</li>
-              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-lime-400" /> On-premise релиз</li>
-              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-lime-400" /> Кастомный ИИ-помощник</li>
+              <li className="flex items-center gap-3"><Check className="h-5 w-5 heading-accent" /> Анлим визиты</li>
+              <li className="flex items-center gap-3"><Check className="h-5 w-5 heading-accent" /> On-premise релиз</li>
+              <li className="flex items-center gap-3"><Check className="h-5 w-5 heading-accent" /> Кастомный ИИ-помощник</li>
             </ul>
             <Link href="/payment" className="w-full">
-              <MagneticButton className="w-full rounded-full border border-neutral-700 bg-transparent py-3 font-medium text-white transition-colors hover:bg-neutral-800">
+              <MagneticButton className="btn-outline w-full">
                 {t.enterprise}
               </MagneticButton>
             </Link>

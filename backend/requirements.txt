@@ -7,4 +7,5 @@ asyncpg
 greenlet
 pymilvus
 langfuse
-passlib
+passlib[bcrypt]
+bcrypt==4.3.0

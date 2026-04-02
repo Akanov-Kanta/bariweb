@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class UserBase(BaseModel):
+    model_config = {"from_attributes": True}
     email: str
 
 

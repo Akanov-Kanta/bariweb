@@ -13,14 +13,14 @@ export default function Footer() {
         
         {/* Brand */}
         <div className="col-span-2 lg:col-span-2">
-          <div className="mb-4 flex items-center gap-1 text-2xl font-bold tracking-tighter text-white">
+          <div className="nav-logo mb-4">
             <span>Access</span>
-            <span className="text-lime-400">Layer</span>
+            <span className="heading-accent">Layer</span>
           </div>
-          <p className="mb-6 max-w-xs text-sm">
+          <p className="mb-6 max-w-xs text-sm text-neutral-400">
             {t.desc}
           </p>
-          <div className="text-xs">
+          <div className="text-xs opacity-50 font-mono">
             © 2026 AccessLayer. Made in Kazakhstan.
           </div>
         </div>
@@ -29,28 +29,28 @@ export default function Footer() {
         <div>
           <h4 className="mb-4 text-white font-medium">{t.product}</h4>
           <ul className="space-y-2 text-sm">
-            <li><a href="#" className="hover:text-lime-400 transition-colors">Фичи</a></li>
-            <li><a href="#" className="hover:text-lime-400 transition-colors">Интеграция</a></li>
-            <li><a href="#" className="hover:text-lime-400 transition-colors">Цены</a></li>
-            <li><a href="#" className="hover:text-lime-400 transition-colors">Changelog</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">Фичи</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">Интеграция</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">Цены</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">Changelog</a></li>
           </ul>
         </div>
 
         <div>
           <h4 className="mb-4 text-white font-medium">{t.docs}</h4>
           <ul className="space-y-2 text-sm">
-            <li><a href="#" className="hover:text-lime-400 transition-colors">API Docs</a></li>
-            <li><a href="#" className="hover:text-lime-400 transition-colors">WCAG 2.1 Guide</a></li>
-            <li><a href="#" className="hover:text-lime-400 transition-colors">Калькулятор штрафов</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">API Docs</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">WCAG 2.1 Guide</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">Калькулятор штрафов</a></li>
           </ul>
         </div>
 
         <div>
           <h4 className="mb-4 text-white font-medium">{t.company}</h4>
           <ul className="space-y-2 text-sm">
-            <li><a href="#" className="hover:text-lime-400 transition-colors">О нас</a></li>
-            <li><a href="#" className="hover:text-lime-400 transition-colors">Блог</a></li>
-            <li><a href="#" className="hover:text-lime-400 transition-colors">Контакты</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">О нас</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">Блог</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">Контакты</a></li>
           </ul>
         </div>
 

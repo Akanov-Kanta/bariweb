@@ -22,9 +22,9 @@ export default function LanguageSwitcher() {
     <div className="relative">
       <button 
         onClick={toggleOpen}
-        className="flex items-center gap-2 rounded-full border border-neutral-800 bg-neutral-900/50 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
+        className="flex items-center gap-2 btn-outline px-4 py-2 text-xs"
       >
-        <Globe className="h-4 w-4 text-lime-400" />
+        <Globe className="h-4 w-4 heading-accent" />
         <span className="uppercase">{lang}</span>
       </button>
 
@@ -37,9 +37,9 @@ export default function LanguageSwitcher() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="absolute right-0 mt-2 w-32 z-50 overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900 shadow-2xl"
+              className="absolute right-0 mt-2 w-32 z-50 overflow-hidden glass-card p-1"
             >
-              <div className="flex flex-col p-2">
+              <div className="flex flex-col">
                 {langs.map((l) => (
                   <button
                     key={l.code}
@@ -47,9 +47,9 @@ export default function LanguageSwitcher() {
                       setLang(l.code);
                       setIsOpen(false);
                     }}
-                    className={`rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                    className={`rounded-xl px-3 py-2 text-left text-xs font-medium transition-all ${
                       lang === l.code 
-                        ? "bg-lime-400/10 text-lime-400" 
+                        ? "bg-lime-400/10 heading-accent" 
                         : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
                     }`}
                   >

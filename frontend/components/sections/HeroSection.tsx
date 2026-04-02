@@ -49,7 +49,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden">
+    <section className="section-container min-h-screen overflow-hidden">
       {/* Abstract Blob Background */}
       <div className="absolute left-1/2 top-1/2 -z-10 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 opacity-40">
         <motion.div
@@ -63,7 +63,7 @@ export default function HeroSection() {
             repeat: Infinity,
             ease: "linear",
           }}
-          className="h-full w-full bg-gradient-to-br from-lime-400 to-[#003311] opacity-60 blur-[100px]"
+          className="hero-blob h-full w-full"
         />
       </div>
 
@@ -74,7 +74,7 @@ export default function HeroSection() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-5xl font-extrabold leading-[1.1] tracking-tight text-white md:text-7xl lg:text-[90px]"
+          className="hero-title flex flex-wrap justify-center gap-x-4 gap-y-2 lg:gap-x-8"
           style={{ perspective: "1000px" }}
         >
           {TITLE_WORDS.map((word: string, i: number) => (
@@ -96,10 +96,10 @@ export default function HeroSection() {
         transition={{ delay: 1.5, duration: 1 }}
         className="absolute bottom-12 flex flex-col items-center gap-2"
       >
-        <div className="text-sm tracking-[0.2em] text-neutral-500 uppercase">
+        <div className="text-xs tracking-[0.3em] text-neutral-500 uppercase opacity-70">
           {t.deadline}
         </div>
-        <div className="font-mono text-xl text-lime-400">
+        <div className="font-mono text-xl heading-accent">
           {t.timeLeft} {timeLeft.days} {t.days} {timeLeft.hours} {t.hours}
         </div>
       </motion.div>

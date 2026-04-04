@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { Auth } from '@/lib/api/sdk.gen';
+import { Auth, Organizations } from '@/lib/api/sdk.gen';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, Users, ShieldCheck, Zap } from 'lucide-react';
 import { OverviewChart } from '@/components/OverviewChart';
@@ -7,51 +7,61 @@ import { OverviewChart } from '@/components/OverviewChart';
 export default async function DashboardOverview() {
   const cookieStore = await cookies();
   const token = cookieStore.get('access_token')?.value;
+  const cookieHeader = `access_token=${token}`;
   
-  // Call backend from Server Component using the extracted cookie
   let userData = null;
+  let clientsCount = 0;
+  
   try {
-    const res = await Auth.me({
-      headers: {
-        Cookie: `access_token=${token}`
-      }
-    });
-    if (!res.error) {
-      userData = res.data;
+    const [userRes, clientsRes] = await Promise.all([
+      Auth.me({ headers: { Cookie: cookieHeader } }),
+      Organizations.getMyClients({ headers: { Cookie: cookieHeader } })
+    ]);
+
+    if (!userRes.error) {
+      userData = userRes.data;
+    }
+    
+    if (!clientsRes.error && Array.isArray(clientsRes.data)) {
+      // Sum up domains from all clients or just count them
+      clientsRes.data.forEach((client: any) => {
+        if (client.allowed_domains) {
+          clientsCount += client.allowed_domains.split(',').filter(Boolean).length;
+        }
+      });
     }
   } catch (error) {
-    console.error('Failed to fetch user data', error);
+    console.error('Failed to fetch dashboard data', error);
   }
 
-  // Mock dashboard stats
   const stats = [
     {
+      title: 'Active Integrations',
+      value: clientsCount.toString(),
+      description: 'Domains whitelisted',
+      icon: Activity,
+      trend: 'Real-time',
+    },
+    {
       title: 'Sessions Used',
-      value: '12,450',
-      description: '/ 50,000 this month',
+      value: '0',
+      description: 'Monthly usage',
       icon: Users,
-      trend: '+12% from last month',
+      trend: 'New account',
     },
     {
       title: 'Accessibility Score',
-      value: '98%',
-      description: 'Excellent',
+      value: 'N/A',
+      description: 'Requires scan',
       icon: ShieldCheck,
-      trend: '+2% from last week',
-    },
-    {
-      title: 'Active Integrations',
-      value: '2',
-      description: 'Domains whitelisted',
-      icon: Activity,
-      trend: 'Stable',
+      trend: 'Pending',
     },
     {
       title: 'Avg. Load Impact',
       value: '< 50ms',
-      description: 'Widget performace',
+      description: 'Optimal',
       icon: Zap,
-      trend: 'Optimized',
+      trend: 'Verified',
     },
   ];
 
@@ -90,7 +100,9 @@ export default async function DashboardOverview() {
             <CardTitle>Usage Activity (Last 30 Days)</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <OverviewChart />
+            <div className="flex items-center justify-center h-[300px] text-zinc-600 italic">
+              No activity data available yet. Install the widget to see analytics.
+            </div>
           </CardContent>
         </Card>
       </div>

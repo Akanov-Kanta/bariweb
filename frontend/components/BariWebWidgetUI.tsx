@@ -6,7 +6,7 @@ import { X, Type, Contrast, Palette, MousePointer2, Volume2, Eye, Zap, Brain, Ch
 import { useState } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-export function BariWebWidgetUI({ onClose, forceMode }: { onClose?: () => void, forceMode?: "hidden-close" }) {
+export function BariwebWidgetUI({ onClose, forceMode }: { onClose?: () => void, forceMode?: "hidden-close" }) {
   const { t } = useLanguage();
   const w = t.widget;
   const [activeTab, setActiveTab] = useState<"ru" | "profiles">("ru");
@@ -165,7 +165,7 @@ export function BariWebWidgetUI({ onClose, forceMode }: { onClose?: () => void, 
               <path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zM21 9h-6v13h-2v-6h-2v6H9V9H3V7h18v2z"/>
             </svg>
           </div>
-          BariWeb
+          Bariweb
         </div>
         <div>
           Сделано в Казахстане 🇰🇿

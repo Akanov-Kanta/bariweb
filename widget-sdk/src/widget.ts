@@ -235,7 +235,7 @@ export class BariwebWidget extends LitElement {
           aria-label="BariWeb Accessibility & Chat"
         >
           <div slot="header" class="header-content">
-            <h2 class="header-title">BariWeb</h2>
+            <h2 class="header-title">BariWeb Инклюзия</h2>
             <button 
               class="close-btn" 
               @click=${this._toggle} 
@@ -244,46 +244,54 @@ export class BariwebWidget extends LitElement {
               ${Icons.close}
             </button>
           </div>
-
-          <!-- Tab Bar -->
-          <div class="tab-bar">
-            <div class="tab" ?active=${this._activeTab === 'chat'} @click=${() => this._setTab('chat')}>
-              💬 Ассистент
-            </div>
-            <div class="tab" ?active=${this._activeTab === 'a11y'} @click=${() => this._setTab('a11y')}>
-              ♿ Доступность
-            </div>
-          </div>
-
-          <!-- Chat Panel -->
-          <div class="tab-panel" ?active=${this._activeTab === 'chat'}>
-            ${this._renderChatTab()}
-          </div>
-
-          <!-- A11y Panel -->
-          <div class="tab-panel" ?active=${this._activeTab === 'a11y'}>
-            ${this._renderA11yTab()}
-          </div>
-
-          <div slot="footer" class="footer-content">
-            <div class="footer-brand">
-              ${Icons.accessibility} BariWeb
-            </div>
-            <span>Сделано в Казахстане 🇰🇿</span>
-          </div>
-        </bw-card>
-
-        <bw-button 
-          circle 
-          variant="primary" 
-          @click=${this._toggle}
-          class="trigger"
-          aria-expanded=${this._isOpen}
-          aria-label="Toggle BariWeb menu"
-        >
-          ${this._isOpen ? Icons.close : Icons.accessibility}
-        </bw-button>
-      </div>
-    `;
-  }
+ 
+           <!-- Tab Bar -->
+           <div class="tab-bar">
+             <div class="tab" ?active=${this._activeTab === 'chat'} @click=${() => this._setTab('chat')}>
+               💬 Ассистент
+             </div>
+             <div class="tab" ?active=${this._activeTab === 'a11y'} @click=${() => this._setTab('a11y')}>
+               ♿ Доступность
+             </div>
+           </div>
+ 
+           <!-- Panel Content -->
+           <div class="panel-body" style="flex: 1; overflow-y: auto;">
+             <div class="tab-panel" ?active=${this._activeTab === 'chat'}>
+               ${this._renderChatTab()}
+             </div>
+             <div class="tab-panel" ?active=${this._activeTab === 'a11y'}>
+               ${this._renderA11yTab()}
+             </div>
+           </div>
+ 
+           <bw-accordion-item title="Как это работает?">
+             <p>Этот виджет помогает адаптировать сайт под ваши нужды (увеличение текста, смена контрастности и др.).</p>
+           </bw-accordion-item>
+           
+           <bw-accordion-item title="О нас">
+             <p>BariWeb — лидер в области инклюзивных технологий в Казахстане.</p>
+           </bw-accordion-item>
+ 
+           <div slot="footer" class="footer-content">
+             <div class="footer-brand">
+               ${Icons.accessibility} Bariweb
+             </div>
+             <span>Сделано в Казахстане 🇰🇿</span>
+           </div>
+         </bw-card>
+ 
+         <bw-button 
+           circle 
+           variant="primary" 
+           @click=${this._toggle}
+           class="trigger"
+           aria-expanded=${this._isOpen}
+           aria-label="Toggle BariWeb menu"
+         >
+           ${this._isOpen ? Icons.close : Icons.accessibility}
+         </bw-button>
+       </div>
+     `;
+   }
 }

@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Trash2, Globe, Plus } from 'lucide-react';
-import { Organizations } from '@/lib/api/sdk.gen'; // we might use this
+import { Trash2, Globe, Plus, Copy, CheckCircle2, Zap } from 'lucide-react';
+import { Organizations } from '@/lib/api/sdk.gen';
 
 const domainSchema = z.object({
   domain: z.string().min(1, 'Domain is required').url('Must be a valid URL or hostname').or(
@@ -18,33 +18,106 @@ const domainSchema = z.object({
 
 type DomainFormValues = z.infer<typeof domainSchema>;
 
+interface ClientData {
+  id: string;
+  public_id: string;
+  name: string;
+  allowed_domains: string;
+}
+
 export default function SettingsPage() {
-  const [domains, setDomains] = useState<string[]>(['example.com', 'myapp.io']);
+  const [client, setClient] = useState<ClientData | null>(null);
+  const [domains, setDomains] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   const form = useForm<DomainFormValues>({
     resolver: zodResolver(domainSchema),
     defaultValues: { domain: '' },
   });
 
-  const onSubmit = async (data: DomainFormValues) => {
-    setError(null);
+  useEffect(() => {
+    fetchClient();
+  }, []);
+
+  const fetchClient = async () => {
     try {
-      // Mock API call
-      // await Organizations.registerClient({ body: { url: data.domain } });
-      
-      if (!domains.includes(data.domain)) {
-        setDomains([...domains, data.domain]);
+      const res = await Organizations.getMyClients();
+      if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+        const clientData = res.data[0] as ClientData;
+        setClient(clientData);
+        setDomains(clientData.allowed_domains ? clientData.allowed_domains.split(',').map(d => d.trim()).filter(Boolean) : []);
       }
-      form.reset();
-    } catch (err: any) {
-      setError(err.message || 'Failed to add domain');
+    } catch (err) {
+      console.error('Failed to fetch client', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const removeDomain = (domainToRemove: string) => {
-    setDomains(domains.filter(d => d !== domainToRemove));
+  const onSubmit = async (data: DomainFormValues) => {
+    setError(null);
+    try {
+      const newDomains = [...domains, data.domain];
+      const domainsString = newDomains.join(',');
+
+      if (client) {
+        // Update existing client
+        await Organizations.updateClient({
+          path: { client_id: client.id },
+          body: { domains: domainsString }
+        });
+        setDomains(newDomains);
+      } else {
+        // Register new client
+        const res = await Organizations.registerClient({
+          body: {
+            name: data.domain, // Use domain as name for now
+            domains: data.domain
+          }
+        });
+        if (res.data && (res.data as any).client) {
+          const newClient = (res.data as any).client;
+          setClient(newClient);
+          setDomains([data.domain]);
+        }
+      }
+      form.reset();
+    } catch (err: any) {
+      setError(err.message || 'Failed to save domain');
+    }
   };
+
+  const removeDomain = async (domainToRemove: string) => {
+    if (!client) return;
+    
+    setError(null);
+    const newDomains = domains.filter(d => d !== domainToRemove);
+    const domainsString = newDomains.join(',');
+
+    try {
+      await Organizations.updateClient({
+        path: { client_id: client.id },
+        body: { domains: domainsString }
+      });
+      setDomains(newDomains);
+    } catch (err: any) {
+      setError(err.message || 'Failed to remove domain');
+    }
+  };
+
+  const copyClientId = () => {
+    if (client?.public_id) {
+      navigator.clipboard.writeText(client.public_id);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-64 text-zinc-500">Loading settings...</div>;
+  }
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -55,11 +128,35 @@ export default function SettingsPage() {
         </p>
       </div>
 
+      {client && (
+        <Card className="border-blue-500/20 bg-blue-500/5">
+          <CardHeader>
+            <CardTitle className="text-blue-400 flex items-center gap-2">
+              <Zap className="h-5 w-5" />
+              Your Client ID
+            </CardTitle>
+            <CardDescription className="text-zinc-400">
+              This is your unique identifier for the Bariweb widget. Keep it safe.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <div className="bg-zinc-950 border border-zinc-800 rounded-md px-4 py-2 font-mono text-zinc-200 flex-1">
+                {client.public_id}
+              </div>
+              <Button variant="outline" size="icon" onClick={copyClientId}>
+                {copied ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Whitelisted Domains</CardTitle>
           <CardDescription>
-            The AccessLayer widget will ONLY load on domains listed below. Attempts to load the widget on unauthorized domains will be blocked.
+            The Bariweb widget will ONLY load on domains listed below. Attempts to load the widget on unauthorized domains will be blocked.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

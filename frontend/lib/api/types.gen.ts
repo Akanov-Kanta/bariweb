@@ -232,3 +232,15 @@ export type GetMyClientsResponses = {
      */
     200: unknown;
 };
+
+export type UpdateClientData = {
+    body: {
+        name?: string;
+        domains?: string;
+    };
+    path: {
+        client_id: string;
+    };
+    query?: never;
+    url: '/clients/{client_id}';
+};

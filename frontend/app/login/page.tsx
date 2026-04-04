@@ -146,7 +146,7 @@ export default function LoginPage() {
                   {form.formState.isSubmitting ? 'Authenticating...' : 'Sign In to Dashboard'}
                 </Button>
                 <div className="text-center text-sm text-neutral-500">
-                  New to AccessLayer?{' '}
+                  New to Bariweb?{' '}
                   <Link className="text-lime-400 hover:underline font-medium" href="/register">
                     Create personal account
                   </Link>

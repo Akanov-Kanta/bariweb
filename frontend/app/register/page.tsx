@@ -78,7 +78,7 @@ export default function RegisterPage() {
           <Card className="border-neutral-800 bg-neutral-900/50 shadow-2xl backdrop-blur-xl">
             <CardHeader className="space-y-1 pb-8 text-center">
               <CardTitle className="text-3xl font-bold tracking-tight text-white italic">
-                Join <span className="text-lime-400">AccessLayer</span>
+                Join <span className="text-lime-400">Bariweb</span>
               </CardTitle>
               <CardDescription className="text-neutral-400">
                 Unlock full compliance & AI-powered accessibility for your site

@@ -28,9 +28,9 @@ export class BariwebWidget extends LitElement {
     try {
       this._aiStatus = 'loading';
       this._lastRequestId = '';
-      this._aiResult = 'Recording audio for 5 seconds...';
+      this._aiResult = 'Recording... speak now. I will stop after you finish speaking.';
 
-      const audioBlob = await this._captureAudio(5_000);
+      const audioBlob = await this._captureAudio();
       this._aiResult = 'Sending audio to STT...';
 
       const response = await transcribeAudio(audioBlob, this._voiceLanguage);
@@ -78,12 +78,22 @@ export class BariwebWidget extends LitElement {
     }
   }
 
-  private async _captureAudio(durationMs: number): Promise<Blob> {
+  private async _captureAudio(): Promise<Blob> {
     if (!navigator.mediaDevices?.getUserMedia) {
       throw new Error('Your browser does not support microphone capture.');
     }
 
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const audioContext = new AudioContext();
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    const source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+    const timeDomainData = new Uint8Array(analyser.fftSize);
+
+    const maxRecordingMs = 30_000;
+    const silenceDurationMs = 1_200;
+    const silenceRmsThreshold = 0.02;
 
     try {
       const mimeTypeCandidates = [
@@ -106,10 +116,66 @@ export class BariwebWidget extends LitElement {
         }
       });
 
+      let speechDetected = false;
+      let speechStartedAt = 0;
+      let lastSpeechAt = 0;
+      let stopRequested = false;
+      const recordingStartedAt = performance.now();
+
+      const stopRecorder = () => {
+        if (stopRequested || recorder.state !== 'recording') {
+          return;
+        }
+        stopRequested = true;
+        recorder.stop();
+      };
+
+      const measureRms = () => {
+        analyser.getByteTimeDomainData(timeDomainData);
+
+        let sum = 0;
+        for (let i = 0; i < timeDomainData.length; i += 1) {
+          const normalized = (timeDomainData[i] - 128) / 128;
+          sum += normalized * normalized;
+        }
+
+        return Math.sqrt(sum / timeDomainData.length);
+      };
+
+      const detectionInterval = window.setInterval(() => {
+        const now = performance.now();
+        const rms = measureRms();
+        const hasVoice = rms >= silenceRmsThreshold;
+
+        if (hasVoice) {
+          if (!speechDetected) {
+            speechDetected = true;
+            speechStartedAt = now;
+          }
+          lastSpeechAt = now;
+        }
+
+        const silenceAfterSpeech =
+          speechDetected &&
+          now - speechStartedAt >= 300 &&
+          now - lastSpeechAt >= silenceDurationMs;
+
+        if (silenceAfterSpeech || now - recordingStartedAt >= maxRecordingMs) {
+          stopRecorder();
+        }
+      }, 100);
+
       const stopped = new Promise<Blob>((resolve, reject) => {
         recorder.addEventListener('stop', () => {
+          window.clearInterval(detectionInterval);
+
           if (chunks.length === 0) {
             reject(new Error('No audio captured.'));
+            return;
+          }
+
+          if (!speechDetected) {
+            reject(new Error('Speech was not detected. Please try again and speak louder.'));
             return;
           }
 
@@ -117,17 +183,18 @@ export class BariwebWidget extends LitElement {
         });
 
         recorder.addEventListener('error', () => {
+          window.clearInterval(detectionInterval);
           reject(new Error('Audio recorder failed.'));
         });
       });
 
       recorder.start();
-      await new Promise((resolve) => setTimeout(resolve, durationMs));
-      recorder.stop();
-
       const recordedBlob = await stopped;
       return await this._toWav(recordedBlob);
     } finally {
+      source.disconnect();
+      analyser.disconnect();
+      await audioContext.close();
       stream.getTracks().forEach((track) => track.stop());
     }
   }
@@ -308,7 +375,7 @@ export class BariwebWidget extends LitElement {
 
             <div class="ai-beta-actions">
               <button class="ai-beta-btn" @click=${this._handleVoiceCommand} ?disabled=${isBusy}>
-                Voice command (5s) - ${this._voiceLanguage.toUpperCase()}
+                Voice command (auto stop) - ${this._voiceLanguage.toUpperCase()}
               </button>
               <button class="ai-beta-btn" @click=${this._handleOcrByUrl} ?disabled=${isBusy}>
                 OCR by image URL

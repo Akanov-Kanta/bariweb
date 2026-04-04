@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetMyClientsData, GetMyClientsResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutResponses, MeData, MeResponses, RegisterClientData, RegisterClientErrors, RegisterClientResponses, RegisterData, RegisterErrors, RegisterResponses, VerifyTokenData, VerifyTokenResponses } from './types.gen';
+import type { GetMyClientsData, GetMyClientsResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutResponses, MeData, MeResponses, RegisterClientData, RegisterClientErrors, RegisterClientResponses, RegisterData, RegisterErrors, RegisterResponses, UpdateClientData, VerifyTokenData, VerifyTokenResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -117,6 +117,25 @@ export class Organizations {
                 }],
             url: '/clients/my',
             ...options
+        });
+    }
+    
+    /**
+     * Update Client
+     */
+    public static updateClient<ThrowOnError extends boolean = false>(options: Options<UpdateClientData, ThrowOnError>) {
+        return (options.client ?? client).patch<any, any, ThrowOnError>({
+            security: [{
+                    in: 'cookie',
+                    name: 'access_token',
+                    type: 'apiKey'
+                }],
+            url: '/clients/{client_id}',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
         });
     }
 }

@@ -9,10 +9,8 @@ import Link from "next/link";
 import LanguageSwitcher from "../ui/LanguageSwitcher";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { landingTranslations } from "@/lib/i18n/landingTranslations";
-
-function cn(...inputs: (string | undefined | null | false)[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from "@/lib/utils";
+import Logo from "../ui/Logo";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -39,14 +37,29 @@ export default function Navbar() {
     >
       {/* Logo */}
       <Link href="/" className="nav-logo">
-        <span>Access</span>
-        <span className="heading-accent">Layer</span>
+        <Logo />
       </Link>
 
       <div className="flex items-center gap-6">
         <Link href="/docs" className="nav-link">
           {t.docs}
         </Link>
+        <a 
+          href="https://a1-gitlab3.alem.ai/aidyn/arifalta" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="nav-link flex items-center gap-2"
+        >
+          GitLab
+        </a>
+        <a 
+          href="https://alem.plus" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="nav-link"
+        >
+          Витрина alem.plus
+        </a>
         <Link href="/login" className="nav-link nav-link-accent">
           Log In
         </Link>

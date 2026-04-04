@@ -1,16 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Copy, CheckCircle2 } from 'lucide-react';
+import { Organizations } from '@/lib/api/sdk.gen';
 
 export default function IntegrationPage() {
   const [copied, setCopied] = useState(false);
-  const apiKey = 'sk_live_12345abcdef'; // In reality, fetch from API
-  const integrationCode = `<script src="https://cdn.accesslayer.kz/v2.js" client_id="${apiKey}"></script>`;
+  const [clientId, setClientId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchClient = async () => {
+      try {
+        const res = await Organizations.getMyClients();
+        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+          setClientId((res.data[0] as any).public_id);
+        }
+      } catch (err) {
+        console.error('Failed to fetch client', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClient();
+  }, []);
+
+  const integrationCode = clientId 
+    ? `<script src="https://widget.bariweb.org/bariweb.js" data-client-id="${clientId}"></script>`
+    : '<!-- Register your domain in Settings to get your Client ID -->';
 
   const copyToClipboard = () => {
+    if (!clientId) return;
     navigator.clipboard.writeText(integrationCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -21,7 +43,7 @@ export default function IntegrationPage() {
       <div>
         <h2 className="text-3xl font-bold tracking-tight text-zinc-100">Integration</h2>
         <p className="text-zinc-400 mt-1">
-          Install the AccessLayer widget on your website to instantly enable AI accessibility features.
+          Install the Bariweb widget on your website to instantly enable AI accessibility features.
         </p>
       </div>
 
@@ -40,6 +62,7 @@ export default function IntegrationPage() {
                 variant="ghost" 
                 size="sm" 
                 onClick={copyToClipboard}
+                disabled={!clientId || loading}
                 className="h-8 text-zinc-400 hover:text-white"
               >
                 {copied ? (
@@ -56,9 +79,14 @@ export default function IntegrationPage() {
               </Button>
             </div>
             <pre className="overflow-x-auto p-2">
-              <code>{integrationCode}</code>
+              <code>{loading ? 'Loading...' : integrationCode}</code>
             </pre>
           </div>
+          {!clientId && !loading && (
+            <p className="mt-4 text-sm text-amber-500 font-medium">
+              ⚠️ You need to add at least one domain in Settings to generate your Client ID.
+            </p>
+          )}
         </CardContent>
       </Card>
 

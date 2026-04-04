@@ -269,3 +269,68 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--accent-lime);
 }
 
+/* --- Dashboard Visual Identity (Unified with Landing) --- */
+
+/* Sidebar Overrides */
+.dashboard-sidebar {
+  background: var(--bg-surface) !important;
+  border-right: 1px solid var(--border-main) !important;
+}
+
+/* Global Overrides for common zinc utility classes to match brand palette */
+.bg-zinc-950 { background-color: var(--bg-deep) !important; }
+.bg-zinc-900 { background-color: var(--bg-surface) !important; }
+.bg-zinc-900\/50 { background-color: rgba(10, 10, 15, 0.5) !important; }
+.border-zinc-800 { border-color: var(--border-main) !important; }
+.text-zinc-400 { color: var(--text-dim) !important; }
+.text-zinc-100 { color: var(--text-main) !important; }
+
+/* Dashboard Cards (Seamless with ScrollTour/Bento) */
+.dashboard-card {
+  @apply relative overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-900/50 p-8 transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.3)];
+}
+
+/* Navigation Overrides */
+.nav-active-item {
+  @apply bg-lime-400/10 text-lime-400;
+  background-color: rgba(200, 255, 0, 0.1) !important;
+  color: var(--accent-lime) !important;
+  box-shadow: inset 0 0 10px rgba(200, 255, 0, 0.05);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-main);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dark);
+}
+
+/* Uniform Dashboard Elements */
+input[type="text"], input[type="email"], input[type="url"], select, textarea {
+  @apply rounded-xl border border-neutral-800 bg-[#0a0a0f] px-4 py-2.5 text-sm text-white transition-all outline-none;
+  background-color: #0a0a0f !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  @apply border-lime-400/50 bg-neutral-900 ring-4 ring-lime-400/10;
+  border-color: rgba(200, 255, 0, 0.5) !important;
+}
+
+.dashboard-btn-primary {
+  @apply inline-flex items-center justify-center px-6 py-2 rounded-xl text-sm font-bold transition-all;
+  background-color: var(--accent-lime) !important;
+  color: black !important;
+}
+
+
+
+
+

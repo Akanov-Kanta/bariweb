@@ -25,7 +25,7 @@ export class BariwebWidget extends LitElement {
           aria-label="Accessibility Menu"
         >
           <div slot="header" class="header-content">
-            <h2 class="header-title">BariWeb Инклюзия</h2>
+            <h2 class="header-title">Bariweb Инклюзия</h2>
             <button 
               class="close-btn" 
               @click=${this._toggle} 
@@ -87,13 +87,13 @@ export class BariwebWidget extends LitElement {
           </bw-accordion-item>
           
           <bw-accordion-item title="О нас">
-            <p>BariWeb — лидер в области инклюзивных технологий в Казахстане.</p>
+            <p>Bariweb — лидер в области инклюзивных технологий в Казахстане.</p>
           </bw-accordion-item>
 
 
           <div slot="footer" class="footer-content">
             <div class="footer-brand">
-              ${Icons.accessibility} BariWeb
+              ${Icons.accessibility} Bariweb
             </div>
             <span>Сделано в Казахстане 🇰🇿</span>
           </div>

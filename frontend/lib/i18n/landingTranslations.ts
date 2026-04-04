@@ -17,7 +17,7 @@ export const landingTranslations: Record<string, any> = {
       problem: "Проблема: перегруженные интерфейсы.",
       problemDesc: "Избыток баннеров, плохой контраст и мелкий шрифт делают современные сайты недоступными для 15% аудитории.",
       scan: "Интеллектуальный скан DOM-дерева.",
-      scanDesc: "За доли секунды AccessLayer анализирует каждый узел страницы, выявляя и устраняя нарушения доступности.",
+      scanDesc: "За доли секунды Bariweb анализирует каждый узел страницы, выявляя и устраняя нарушения доступности.",
       voice: "Голосовой AI-Ассистент.",
       voiceDesc: "Встроенный агент понимает команды, сам находит нужные поля и заполняет формы вместо пользователя.",
       result: "Абсолютная доступность.",
@@ -54,7 +54,7 @@ export const landingTranslations: Record<string, any> = {
     integration: {
       title1: "Одна строка кода.",
       title2: "Всё остальное — магия.",
-      desc: "Вставьте тег скрипта в <head>. AccessLayer всё сделает сам: расставит ARIA-атрибуты, исправит контраст и настроит навигацию.",
+      desc: "Вставьте тег скрипта в <head>. Bariweb всё сделает сам: расставит ARIA-атрибуты, исправит контраст и настроит навигацию.",
     },
     pricing: {
       title1: "Дешевле, чем штраф.",
@@ -95,7 +95,7 @@ export const landingTranslations: Record<string, any> = {
     },
     docsPage: {
       title: "Документация по интеграции",
-      desc: "Внедрите AccessLayer в вашу инфраструктуру за 2 минуты. Здесь собраны инструкции по установке и настройке параметров виджета.",
+      desc: "Внедрите Bariweb в вашу инфраструктуру за 2 минуты. Здесь собраны инструкции по установке и настройке параметров виджета.",
       quickStart: "Примеры кода",
       html: "HTML / Vanilla JS",
       react: "React / Next.js",
@@ -103,7 +103,7 @@ export const landingTranslations: Record<string, any> = {
       sidebar: {
         category1: "Платформа",
         items1: {
-          intro: "О технологии AccessLayer",
+          intro: "О технологии Bariweb",
           architecture: "Архитектура решения",
           security: "Безопасность и GDPR"
         },
@@ -122,8 +122,8 @@ export const landingTranslations: Record<string, any> = {
       },
       content: {
         intro: {
-          title: "О технологии AccessLayer",
-          body: "AccessLayer работает как невидимый слой (overlay) поверх существующей DOM-структуры. Он перехватывает ошибки доступности и динамически внедряет инклюзивные решения."
+          title: "О технологии Bariweb",
+          body: "Bariweb работает как невидимый слой (overlay) поверх существующей DOM-структуры. Он перехватывает ошибки доступности и динамически внедряет инклюзивные решения."
         },
         architecture: {
           title: "Архитектура решения",
@@ -131,32 +131,32 @@ export const landingTranslations: Record<string, any> = {
         },
         security: {
           title: "Безопасность и GDPR",
-          body: "AccessLayer не собирает PII (персональные данные). Агент работает исключительно с разметкой. Скрипт прошел аудит безопасности SOC2 Type II."
+          body: "Bariweb не собирает PII (персональные данные). Агент работает исключительно с разметкой. Скрипт прошел аудит безопасности SOC2 Type II."
         },
         vanilla: {
           title: "Установка для HTML / Vanilla",
           body: "Для статических сайтов и CMS (WordPress, Tilda) вставьте скрипт прямо перед закрывающимся тегом </head>:",
-          code: "<!-- AccessLayer Script -->\n<script src=\"https://cdn.accesslayer.kz/v2.js\" client_id=\"YOUR_API_KEY\"></script>"
+          code: "<!-- Bariweb Script -->\n<script src=\"https://cdn.bariweb.kz/v2.js\" client_id=\"YOUR_API_KEY\"></script>"
         },
         react: {
           title: "Установка для React / Next.js",
           body: "В Next.js мы рекомендуем использовать встроенный компонент next/script со стратегией beforeInteractive.",
-          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.accesslayer.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
+          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.bariweb.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
         },
         vue: {
           title: "Установка для Vue / Nuxt",
           body: "Для Vue.js или Nuxt.js добавьте директиву в nuxt.config.ts или напрямую в index.html.",
-          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.accesslayer.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
+          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.bariweb.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
         },
         config: {
           title: "Объект конфигурации",
-          body: "Помимо data-атрибутов, вы можете передать объект window.AccessLayerConfig для глубокой настройки.",
-          code: "window.AccessLayerConfig = {\n  locale: 'ru',\n  position: 'bottom-right',\n  theme: 'dark',\n  disableVoice: false\n};"
+          body: "Помимо data-атрибутов, вы можете передать объект window.BariwebConfig для глубокой настройки.",
+          code: "window.BariwebConfig = {\n  locale: 'ru',\n  position: 'bottom-right',\n  theme: 'dark',\n  disableVoice: false\n};"
         },
         callbacks: {
           title: "Подписка на события",
           body: "Вы можете слушать события сканирования и работы AI-агента.",
-          code: "window.addEventListener('accesslayer:ready', () => {\n  console.log('Виджет инициализирован');\n});\nwindow.addEventListener('accesslayer:action', (e) => {\n  console.log('Пользователь активировал функцию', e.detail);\n});"
+          code: "window.addEventListener('bariweb:ready', () => {\n  console.log('Виджет инициализирован');\n});\nwindow.addEventListener('bariweb:action', (e) => {\n  console.log('Пользователь активировал функцию', e.detail);\n});"
         },
         css: {
           title: "Кастомизация стилей",
@@ -184,7 +184,7 @@ export const landingTranslations: Record<string, any> = {
       problem: "Мәселе: шамадан тыс жүктелген интерфейстер.",
       problemDesc: "Баннерлердің көптігі, нашар контраст және ұсақ қаріптер заманауи сайттарды аудиторияның 15%-на қолжетімсіз етеді.",
       scan: "DOM-ағашының зияткерлік сканерлеуі.",
-      scanDesc: "AccessLayer секундтың ішінде беттің әрбір түйінін талдап, қолжетімділік ережелерін бұзушылықты табады және жояды.",
+      scanDesc: "Bariweb секундтың ішінде беттің әрбір түйінін талдап, қолжетімділік ережелерін бұзушылықты табады және жояды.",
       voice: "Дауыстық AI-Ассистент.",
       voiceDesc: "Кіріктірілген агент пәрмендерді түсінеді, қажетті өрістерді өзі табады және пайдаланушының орнына формаларды толтырады.",
       result: "Толық қолжетімділік.",
@@ -221,7 +221,7 @@ export const landingTranslations: Record<string, any> = {
     integration: {
       title1: "Бір жол код.",
       title2: "Қалғаны — сиқыр.",
-      desc: "Скрипт тегін <head> ішіне қойыңыз. AccessLayer барлығын өзі жасайды: ARIA-атрибуттарын орнатады, контрастты түзетеді.",
+      desc: "Скрипт тегін <head> ішіне қойыңыз. Bariweb барлығын өзі жасайды: ARIA-атрибуттарын орнатады, контрастты түзетеді.",
     },
     pricing: {
       title1: "Айыппұлдан арзан.",
@@ -262,7 +262,7 @@ export const landingTranslations: Record<string, any> = {
     },
     docsPage: {
       title: "Интеграциялық құжаттама",
-      desc: "AccessLayer жүйесін 2 минут ішінде орнатыңыз. Бұл жерде виджетті орнату және баптау нұсқаулары жинақталған.",
+      desc: "Bariweb жүйесін 2 минут ішінде орнатыңыз. Бұл жерде виджетті орнату және баптау нұсқаулары жинақталған.",
       quickStart: "Код мысалдары",
       html: "HTML / Vanilla JS",
       react: "React / Next.js",
@@ -270,7 +270,7 @@ export const landingTranslations: Record<string, any> = {
       sidebar: {
         category1: "Платформа",
         items1: {
-          intro: "AccessLayer технологиясы туралы",
+          intro: "Bariweb технологиясы туралы",
           architecture: "Шешім архитектурасы",
           security: "Қауіпсіздік және GDPR"
         },
@@ -289,8 +289,8 @@ export const landingTranslations: Record<string, any> = {
       },
       content: {
         intro: {
-          title: "AccessLayer технологиясы туралы",
-          body: "AccessLayer бар DOM-құрылымның үстінен көрінбейтін қабат (overlay) ретінде жұмыс істейді. Ол қолжетімділік қателерін ұстап, инклюзивті шешімдерді динамикалық түрде енгізеді."
+          title: "Bariweb технологиясы туралы",
+          body: "Bariweb бар DOM-құрылымның үстінен көрінбейтін қабат (overlay) ретінде жұмыс істейді. Ол қолжетімділік қателерін ұстап, инклюзивті шешімдерді динамикалық түрде енгізеді."
         },
         architecture: {
           title: "Шешім архитектурасы",
@@ -298,32 +298,32 @@ export const landingTranslations: Record<string, any> = {
         },
         security: {
           title: "Қауіпсіздік және GDPR",
-          body: "AccessLayer PII жинамайды. Агент тек белгілеумен ғана жұмыс істейді. Скрипт SOC2 Type II қауіпсіздік аудитінен сәтті өтті."
+          body: "Bariweb PII жинамайды. Агент тек белгілеумен ғана жұмыс істейді. Скрипт SOC2 Type II қауіпсіздік аудитінен сәтті өтті."
         },
         vanilla: {
           title: "HTML / Vanilla үшін орнату",
           body: "Статикалық сайттар мен CMS (WordPress, Tilda) үшін скриптті </head> жабылатын тегінің алдына енгізіңіз:",
-          code: "<!-- AccessLayer Script -->\n<script src=\"https://cdn.accesslayer.kz/v2.js\" client_id=\"Сіздің_КІЛТІҢІЗ\"></script>"
+          code: "<!-- Bariweb Script -->\n<script src=\"https://cdn.bariweb.kz/v2.js\" client_id=\"Сіздің_КІЛТІҢІЗ\"></script>"
         },
         react: {
           title: "React / Next.js үшін орнату",
           body: "Next.js-те beforeInteractive стратегиясы бар кірістірілген next/script компонентін пайдалануды ұсынамыз.",
-          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.accesslayer.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
+          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.bariweb.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
         },
         vue: {
           title: "Vue / Nuxt үшін орнату",
           body: "Vue.js немесе Nuxt.js үшін nuxt.config.ts файлында немесе тікелей index.html ішіне қосыңыз.",
-          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.accesslayer.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
+          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.bariweb.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
         },
         config: {
           title: "Конфигурация объектісі",
-          body: "Data-атрибуттарынан бөлек, терең баптау үшін window.AccessLayerConfig объектісін бере аласыз.",
-          code: "window.AccessLayerConfig = {\n  locale: 'kz',\n  position: 'bottom-right',\n  theme: 'dark',\n  disableVoice: false\n};"
+          body: "Data-атрибуттарынан бөлек, терең баптау үшін window.BariwebConfig объектісін бере аласыз.",
+          code: "window.BariwebConfig = {\n  locale: 'kz',\n  position: 'bottom-right',\n  theme: 'dark',\n  disableVoice: false\n};"
         },
         callbacks: {
           title: "Оқиғаларға жазылу",
           body: "Сканерлеу және AI-агенттің жұмыс оқиғаларын тыңдай аласыз.",
-          code: "window.addEventListener('accesslayer:ready', () => {\n  console.log('Виджет іске қосылды');\n});\nwindow.addEventListener('accesslayer:action', (e) => {\n  console.log('Пайдаланушы функцияны іске қосты', e.detail);\n});"
+          code: "window.addEventListener('bariweb:ready', () => {\n  console.log('Виджет іске қосылды');\n});\nwindow.addEventListener('bariweb:action', (e) => {\n  console.log('Пайдаланушы функцияны іске қосты', e.detail);\n});"
         },
         css: {
           title: "Стильдерді өзгерту",
@@ -351,7 +351,7 @@ export const landingTranslations: Record<string, any> = {
       problem: "Problem: Overloaded interfaces.",
       problemDesc: "An excess of banners, poor contrast, and tiny fonts make modern websites inaccessible to 15% of your audience.",
       scan: "Intelligent DOM Tree Scanning.",
-      scanDesc: "In milliseconds, AccessLayer analyzes every node on the page, identifying and fixing accessibility violations.",
+      scanDesc: "In milliseconds, Bariweb analyzes every node on the page, identifying and fixing accessibility violations.",
       voice: "Voice AI Assistant.",
       voiceDesc: "The built-in agent understands commands, automatically locates target fields, and fills forms on behalf of the user.",
       result: "Absolute Accessibility.",
@@ -388,7 +388,7 @@ export const landingTranslations: Record<string, any> = {
     integration: {
       title1: "One line of code.",
       title2: "Everything else is strictly magic.",
-      desc: "Paste the script tag into your <head>. AccessLayer handles the rest: configuring ARIA attributes, fixing color ratios, and ensuring keyboard traps are cleared.",
+      desc: "Paste the script tag into your <head>. Bariweb handles the rest: configuring ARIA attributes, fixing color ratios, and ensuring keyboard traps are cleared.",
     },
     pricing: {
       title1: "Cheaper than the fine.",
@@ -429,7 +429,7 @@ export const landingTranslations: Record<string, any> = {
     },
     docsPage: {
       title: "Integration Documentation",
-      desc: "Deploy AccessLayer onto your infrastructure in 2 minutes flat. Explore installation guides and advanced configuration parameters.",
+      desc: "Deploy Bariweb onto your infrastructure in 2 minutes flat. Explore installation guides and advanced configuration parameters.",
       quickStart: "Code Examples",
       html: "HTML / Vanilla JS",
       react: "React / Next.js",
@@ -437,7 +437,7 @@ export const landingTranslations: Record<string, any> = {
       sidebar: {
         category1: "Platform",
         items1: {
-          intro: "About AccessLayer Tech",
+          intro: "About Bariweb Tech",
           architecture: "Solution Architecture",
           security: "Security & GDPR"
         },
@@ -456,8 +456,8 @@ export const landingTranslations: Record<string, any> = {
       },
       content: {
         intro: {
-          title: "About AccessLayer Tech",
-          body: "AccessLayer operates as a fully invisible accessibility overlay acting entirely on the DOM. It intercepts semantic errors and dynamically injects solutions."
+          title: "About Bariweb Tech",
+          body: "Bariweb operates as a fully invisible accessibility overlay acting entirely on the DOM. It intercepts semantic errors and dynamically injects solutions."
         },
         architecture: {
           title: "Solution Architecture",
@@ -465,32 +465,32 @@ export const landingTranslations: Record<string, any> = {
         },
         security: {
           title: "Security & GDPR",
-          body: "AccessLayer explicitly forbids collecting PII (Personally Identifiable Information). Web agents only interface with public markup. Certified SOC2 Type II compliant."
+          body: "Bariweb explicitly forbids collecting PII (Personally Identifiable Information). Web agents only interface with public markup. Certified SOC2 Type II compliant."
         },
         vanilla: {
           title: "HTML / Vanilla Setup",
           body: "For static websites and CMS platforms (WordPress, Shopify), insert the script immediately preceding your closing </head> tag:",
-          code: "<!-- AccessLayer Script -->\n<script src=\"https://cdn.accesslayer.kz/v2.js\" client_id=\"YOUR_API_KEY\"></script>"
+          code: "<!-- Bariweb Script -->\n<script src=\"https://cdn.bariweb.kz/v2.js\" client_id=\"YOUR_API_KEY\"></script>"
         },
         react: {
           title: "React / Next.js Setup",
           body: "For Next.js implementations, utilize the native next/script component specifying a beforeInteractive loading strategy.",
-          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.accesslayer.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
+          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.bariweb.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
         },
         vue: {
           title: "Vue / Nuxt Setup",
           body: "In Vue / Nuxt architectures, simply configure the directive dynamically inside nuxt.config.ts or globally in your index.html definition.",
-          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.accesslayer.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
+          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.bariweb.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
         },
         config: {
           title: "Configuration Object",
-          body: "Beyond default data-attributes, you can instantiate the global window.AccessLayerConfig to dictate localized and advanced widget behaviors.",
-          code: "window.AccessLayerConfig = {\n  locale: 'en',\n  position: 'bottom-right',\n  theme: 'dark',\n  disableVoice: false\n};"
+          body: "Beyond default data-attributes, you can instantiate the global window.BariwebConfig to dictate localized and advanced widget behaviors.",
+          code: "window.BariwebConfig = {\n  locale: 'en',\n  position: 'bottom-right',\n  theme: 'dark',\n  disableVoice: false\n};"
         },
         callbacks: {
           title: "Event Subscription",
           body: "Bind specific listeners to intercept crucial scanning events and AI-agent actions.",
-          code: "window.addEventListener('accesslayer:ready', () => {\n  console.log('Widget successfully booted');\n});\nwindow.addEventListener('accesslayer:action', (e) => {\n  console.log('User triggered assistive feature:', e.detail);\n});"
+          code: "window.addEventListener('bariweb:ready', () => {\n  console.log('Widget successfully booted');\n});\nwindow.addEventListener('bariweb:action', (e) => {\n  console.log('User triggered assistive feature:', e.detail);\n});"
         },
         css: {
           title: "Custom CSS Overrides",

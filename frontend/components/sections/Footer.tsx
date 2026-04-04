@@ -2,6 +2,7 @@
 
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { landingTranslations } from "@/lib/i18n/landingTranslations";
+import Logo from "../ui/Logo";
 
 export default function Footer() {
   const { lang } = useLanguage();
@@ -14,14 +15,13 @@ export default function Footer() {
         {/* Brand */}
         <div className="col-span-2 lg:col-span-2">
           <div className="nav-logo mb-4">
-            <span>Access</span>
-            <span className="heading-accent">Layer</span>
+            <Logo />
           </div>
           <p className="mb-6 max-w-xs text-sm text-neutral-400">
             {t.desc}
           </p>
           <div className="text-xs opacity-50 font-mono">
-            © 2026 AccessLayer. Made in Kazakhstan.
+            © 2026 Bariweb. Made in Kazakhstan.
           </div>
         </div>
 
@@ -29,6 +29,8 @@ export default function Footer() {
         <div>
           <h4 className="mb-4 text-white font-medium">{t.product}</h4>
           <ul className="space-y-2 text-sm">
+            <li><a href="https://a1-gitlab3.alem.ai/aidyn/arifalta" target="_blank" rel="noopener noreferrer" className="nav-link nav-link-accent">GitLab</a></li>
+            <li><a href="https://alem.plus" target="_blank" rel="noopener noreferrer" className="nav-link nav-link-accent">Витрина alem.plus</a></li>
             <li><a href="#" className="nav-link nav-link-accent">Фичи</a></li>
             <li><a href="#" className="nav-link nav-link-accent">Интеграция</a></li>
             <li><a href="#" className="nav-link nav-link-accent">Цены</a></li>

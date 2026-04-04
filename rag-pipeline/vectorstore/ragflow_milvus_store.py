@@ -41,8 +41,8 @@ class RagflowMilvusStore(VectorStoreBase):
             self._ensure_dataset()
 
     def _ensure_dataset(self):
-        """Ensure a RAGFlow dataset exists for ArifAlta DOM Elements."""
-        dataset_name = "ArifAlta DOM Elements"
+        """Ensure a RAGFlow dataset exists for Bariweb DOM Elements."""
+        dataset_name = "Bariweb DOM Elements"
         try:
             datasets = self.ragflow_client.get_datasets()
             for ds in datasets:

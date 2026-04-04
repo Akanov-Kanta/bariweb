@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from pydantic import BaseModel
+from typing import Optional
+import uuid
 
 from app.features.organizations.models import Client
 from app.features.auth.schemas import User
@@ -42,3 +44,29 @@ def get_my_clients(
     stmt = select(Client).where(Client.owner_id == current_user.id)
     clients = db.exec(stmt).all()
     return clients
+
+class ClientUpdate(BaseModel):
+    name: Optional[str] = None
+    domains: Optional[str] = None
+
+@org_router.patch("/{client_id}")
+def update_client(
+    client_id: uuid.UUID,
+    client_in: ClientUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    stmt = select(Client).where(Client.id == client_id, Client.owner_id == current_user.id)
+    client = db.exec(stmt).first()
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    if client_in.name is not None:
+        client.name = client_in.name
+    if client_in.domains is not None:
+        client.allowed_domains = client_in.domains
+    
+    db.add(client)
+    db.commit()
+    db.refresh(client)
+    return client

@@ -107,7 +107,7 @@ MILVUS_PORT = os.environ.get("MILVUS_PORT", "")
 MILVUS_USER = os.environ.get("MILVUS_USER", "")
 MILVUS_PASSWORD = os.environ.get("MILVUS_PASSWORD", "")
 MILVUS_DB = os.environ.get("MILVUS_DB", "default")
-MILVUS_COLLECTION = os.environ.get("MILVUS_COLLECTION", "arifalta_dom_elements")
+MILVUS_COLLECTION = os.environ.get("MILVUS_COLLECTION", "bariweb_dom_elements")
 
 # RAGFlow Settings
 RAGFLOW_API_URL = os.environ.get("RAGFLOW_API_URL", "https://a1-ragflow1.alem.ai/api/v1")

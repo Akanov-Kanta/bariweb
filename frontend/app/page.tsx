@@ -7,6 +7,10 @@ import IntegrationSection from "@/components/sections/IntegrationSection";
 import PricingSection from "@/components/sections/PricingSection";
 import Footer from "@/components/sections/Footer";
 
+import TechStackSection from "@/components/sections/TechStackSection";
+import AIPipelineSection from "@/components/sections/AIPipelineSection";
+import AuditSection from "@/components/sections/AuditSection";
+
 export default function Home() {
   return (
     <main className="relative min-h-screen bg-[#080808] text-white">
@@ -14,10 +18,13 @@ export default function Home() {
       
       <Navbar />
       <HeroSection />
+      <TechStackSection />
       <ScrollTourSection />
+      <AIPipelineSection />
       <BentoFeaturesSection />
       <IntegrationSection />
       <PricingSection />
+      <AuditSection />
       <Footer />
     </main>
   );

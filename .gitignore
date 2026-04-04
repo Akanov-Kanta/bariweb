@@ -10,3 +10,8 @@ node_modules/
 # Secrets
 .env
 .env.*
+
+.venv/
+venv/
+__pycache__/
+*.pyc

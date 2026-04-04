@@ -63,6 +63,22 @@ class IndexResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Crawling
+# ---------------------------------------------------------------------------
+
+class CrawlRequest(BaseModel):
+    """Request body for POST /crawl."""
+    url: str = Field(description="URL to start crawling from")
+    max_pages: Optional[int] = Field(default=None, description="Max pages to crawl")
+    max_depth: Optional[int] = Field(default=None, description="Max crawl depth")
+
+class CrawlResponse(BaseModel):
+    """Response from POST /crawl."""
+    status: str
+    message: str
+
+
+# ---------------------------------------------------------------------------
 # Search
 # ---------------------------------------------------------------------------
 

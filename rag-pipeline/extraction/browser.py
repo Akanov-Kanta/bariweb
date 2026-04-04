@@ -43,14 +43,28 @@ async def open_page(url: str) -> Page:
     )
 
     # Create a new browser context (isolated cookies/storage)
-    context = await browser.new_context()
+    context = await browser.new_context(
+        user_agent=config.BROWSER_USER_AGENT
+    )
 
     page = await context.new_page()
 
     try:
-        # Navigate and wait until no network requests for 500ms
-        await page.goto(url, wait_until="networkidle",
-                        timeout=config.PAGE_LOAD_TIMEOUT_MS)
+        # Use configurable wait strategy (default: domcontentloaded)
+        try:
+            await page.goto(url, wait_until=config.BROWSER_WAIT_STRATEGY,
+                            timeout=config.PAGE_LOAD_TIMEOUT_MS)
+        except Exception as e:
+            # Check for Playwright-specific TimeoutError
+            if "Timeout" in str(e):
+                import logging
+                logging.getLogger(__name__).warning(f"Timeout loading {url}, attempting partial extraction...")
+            else:
+                raise e
+        
+        # Give JS/React a moment to render (default: 2000ms)
+        import asyncio
+        await asyncio.sleep(config.BROWSER_SETTLE_MS / 1000.0)
 
         yield page
 
@@ -58,4 +72,5 @@ async def open_page(url: str) -> Page:
         # Always clean up, even if extraction fails
         await context.close()
         await browser.close()
+        # The 'playwright' variable here is the object from async_playwright().start()
         await playwright.stop()

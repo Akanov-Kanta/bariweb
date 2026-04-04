@@ -43,8 +43,9 @@ export const cardStyles = css`
   }
 
   .body-slot {
-    display: block;
-    padding: var(--bw-card-padding);
+    display: flex;
+    flex-direction: column;
+    padding: var(--bw-body-padding, var(--bw-card-padding));
     flex: 1;
     overflow-y: auto;
     min-height: 0;

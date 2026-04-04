@@ -67,6 +67,10 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    # Protect API with Token Auth mapping to Main Backend
+    from api.middleware import AuthMiddleware
+    app.add_middleware(AuthMiddleware)
+
     # Initialize the service.
     # auto_load_index=True means it will try to load the latest
     # index from disk at startup so the API is immediately searchable.

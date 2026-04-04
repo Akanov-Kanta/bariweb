@@ -184,3 +184,41 @@ async def _get_context_text(handle: ElementHandle) -> str:
         return context
     except Exception:
         return ""
+
+
+async def extract_page_links(page: Page, base_url: str) -> List[str]:
+    """
+    Collect all <a href> values from the page and resolve them
+    to absolute URLs.
+
+    Used by the crawler to discover links on each page.
+    Returns a deduplicated list of absolute URLs.
+    """
+    from urllib.parse import urljoin
+
+    raw_hrefs = await page.evaluate("""() => {
+        const anchors = document.querySelectorAll('a[href]');
+        return Array.from(anchors).map(a => a.getAttribute('href'));
+    }""")
+
+    seen = set()
+    absolute_urls = []
+
+    for href in raw_hrefs:
+        if not href or not href.strip():
+            continue
+
+        href = href.strip()
+
+        # Skip non-navigable hrefs
+        if href.startswith(("#", "javascript:", "mailto:", "tel:", "data:")):
+            continue
+
+        # Resolve relative URLs
+        absolute = urljoin(base_url, href)
+
+        if absolute not in seen:
+            seen.add(absolute)
+            absolute_urls.append(absolute)
+
+    return absolute_urls

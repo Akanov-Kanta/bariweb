@@ -4,11 +4,74 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>widget-sdk</title>
+    <title>BariWeb - Accessibility SDK Demo</title>
     <link rel="stylesheet" href="./src/index.css" />
     <script type="module" src="/src/index.ts"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 4rem;
+        background: #f8fafc;
+        color: #0f172a;
+        line-height: 1.5;
+        transition: all 0.3s ease;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      h1 { font-size: 3rem; margin-bottom: 2rem; letter-spacing: -0.05em; font-weight: 800; }
+      p { font-size: 1.125rem; margin-bottom: 1.5rem; opacity: 0.8; }
+      a { color: #2563eb; }
+      .test-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; margin: 3rem 0; }
+      .box { padding: 2rem; background: white; border-radius: 12px; border: 1px solid #e2e8f0; }
+      bw-widget { position: fixed; bottom: 2rem; left: 2rem; z-index: 100; }
+
+      /* Host Styles to be controlled by A11y Controller */
+      bw-widget {
+        --bw-primary-color: #3b82f6;
+      }
+    </style>
   </head>
   <body>
-    <bw-widget></bw-widget>
+    <div class="container">
+      <h1>BariWeb Инклюзия</h1>
+      <p>Этот демонстрационный сайт предназначен для тестирования всех функций BariWeb Widget SDK. Используйте панель управления слева (синяя кнопка), чтобы адаптировать страницу под свои нужды.</p>
+      
+      <div class="test-grid">
+        <div class="box">
+          <h3>Тестирование Чтения</h3>
+          <p>Попробуйте включить <a href="#">Дислексический шрифт</a> или изменить <a href="#">Межстрочные интервалы</a>. Текст должен стать более разреженным и читаемым.</p>
+        </div>
+        <div class="box">
+          <h3>Тестирование Зрения</h3>
+          <p>Включите <strong>ЧБ Режим</strong> или режим <strong>Высокой Контрастности</strong>. Обратите внимание, что цвета изменятся только для виджета, если не прокинуть переменные на родителя.</p>
+        </div>
+      </div>
+
+      <h2>Секция для тестирования кнопок</h2>
+      <div class="test-grid">
+        <div class="box">
+          <button @click=${() => alert('Click!')}>Стандартная кнопка</button>
+          <button style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px;">Зеленая кнопка</button>
+        </div>
+        <div class="box">
+          <a href="#" role="button" style="display: inline-block; padding: 10px 20px; border: 1px solid #ccc; border-radius: 6px; text-decoration: none; color: inherit;">Ссылка как кнопка</a>
+        </div>
+      </div>
+
+      <h2>Фокус и Чтение</h2>
+      <p>Используйте клавишу <strong>Tab</strong> для перемещения фокуса. Если функция 'Read Focus' включена, вы увидите мощную обводку.</p>
+      
+      <h3>Заголовок H3</h3>
+      <h4>Заголовок H4</h4>
+      
+      <ul>
+        <li><a href="https://ari.alta.kz">Посетите наш основной сайт</a></li>
+        <li><a href="https://ari.alta.kz/docs">Документация для разработчиков</a></li>
+      </ul>
+    </div>
+    
+    <bw-widget client-id="arif-alta"></bw-widget>
   </body>
 </html>

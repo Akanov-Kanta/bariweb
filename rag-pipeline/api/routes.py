@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 
 from api.schemas import (
     ElementResponse,
@@ -24,6 +24,8 @@ from api.schemas import (
     MatchResult,
     SearchRequest,
     SearchResponse,
+    CrawlRequest,
+    CrawlResponse,
 )
 from api.service import RetrievalService
 
@@ -103,51 +105,39 @@ async def index_records(request: IndexRequest):
 
 
 # ---------------------------------------------------------------------------
-# POST /search
+# POST /crawl
 # ---------------------------------------------------------------------------
 
 @router.post(
-    "/search",
-    response_model=SearchResponse,
-    summary="Semantic search",
-    description=(
-        "Accepts a natural-language query and returns the top-matching "
-        "interactive DOM elements with similarity scores."
-    ),
+    "/crawl",
+    response_model=CrawlResponse,
+    summary="Trigger the background crawler",
+    description="Starts crawling the specified URL in the background. After crawling, the elements are indexed.",
 )
-async def search(request: SearchRequest):
-    service = _get_service()
+async def crawl(request: CrawlRequest, background_tasks: BackgroundTasks):
+    from main import run_crawl_pipeline
 
-    logger.info(
-        "Search request: query=%r, top_k=%d, min_score=%s, "
-        "action_type=%s, page_url=%s, tag=%s",
-        request.query,
-        request.top_k,
-        request.min_score,
-        request.action_type,
-        request.page_url,
-        request.tag,
-    )
+    async def _run_crawl():
+        try:
+            logger.info("Starting background crawl for %s", request.url)
+            await run_crawl_pipeline(
+                url=request.url,
+                max_pages=request.max_pages,
+                max_depth=request.max_depth
+            )
+            logger.info("Completed background crawl for %s", request.url)
+            
+            # Autotrigger index right away
+            service = _get_service()
+            service.index_files(clear_existing=False)
+        except Exception as e:
+            logger.error("Error in background crawl for %s: %s", request.url, e)
 
-    result = service.search(
-        query=request.query,
-        top_k=request.top_k,
-        min_score=request.min_score,
-        action_type=request.action_type,
-        page_url=request.page_url,
-        tag=request.tag,
-    )
+    background_tasks.add_task(_run_crawl)
+    return CrawlResponse(status="accepted", message="Crawl started in the background")
 
-    # Convert match dicts to MatchResult models.
-    matches = [MatchResult(**m) for m in result["matches"]]
 
-    return SearchResponse(
-        query=result["query"],
-        top_k=result["top_k"],
-        total_matches=result["total_matches"],
-        search_time_ms=result["search_time_ms"],
-        matches=matches,
-    )
+
 
 
 # ---------------------------------------------------------------------------

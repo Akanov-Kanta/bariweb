@@ -8,9 +8,11 @@ from app.core.milvus import milvus_manager
 from app.core.langfuse import langfuse_manager
 from app.features.auth.router import auth_router
 from app.features.organizations.router import org_router
+from app.features.widget.router import chat_router
 
 from app.features.auth.schemas import User
 from app.features.organizations.models import Client
+from app.core.middleware.dynamic_cors import DynamicCORSMiddleware
 
 def custom_generate_unique_id(route: APIRoute):
     return f"{route.name}"
@@ -27,11 +29,11 @@ def on_startup():
         init_db(session)
     
     milvus_manager.initialize()
-    
     langfuse_manager.initialize()
 
+
 app.add_middleware(
-    CORSMiddleware,
+    DynamicCORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
@@ -40,3 +42,4 @@ app.add_middleware(
 
 app.include_router(auth_router, prefix="/auth")
 app.include_router(org_router, prefix="/clients")
+app.include_router(chat_router, prefix="")

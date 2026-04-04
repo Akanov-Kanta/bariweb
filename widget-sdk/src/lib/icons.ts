@@ -15,7 +15,11 @@ import {
   Brain, 
   Info,
   CircleCheckBig,
-  ChevronDown
+  ChevronDown,
+  Sun,
+  Moon,
+  Droplet,
+  RefreshCw
 } from 'lucide-static';
 
 const createIcon = (svgString: string) => html`${unsafeHTML(svgString)}`;
@@ -35,5 +39,9 @@ export const Icons = {
   cognitive: createIcon(Brain),
   info: createIcon(Info),
   check: createIcon(CircleCheckBig),
-  chevronDown: createIcon(ChevronDown)
+  chevronDown: createIcon(ChevronDown),
+  sun: createIcon(Sun),
+  moon: createIcon(Moon),
+  droplet: createIcon(Droplet),
+  refresh: createIcon(RefreshCw)
 };

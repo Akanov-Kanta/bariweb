@@ -5,6 +5,62 @@ export type ClientOptions = {
 };
 
 /**
+ * AdminKeyDisplay
+ */
+export type AdminKeyDisplay = {
+    /**
+     * Plain Key
+     */
+    plain_key: string;
+    /**
+     * Message
+     */
+    message?: string;
+};
+
+/**
+ * AdminKeyLoginRequest
+ */
+export type AdminKeyLoginRequest = {
+    /**
+     * Client Public Id
+     */
+    client_public_id: string;
+    /**
+     * Admin Key
+     */
+    admin_key: string;
+};
+
+/**
+ * AdminKeyStatus
+ */
+export type AdminKeyStatus = {
+    /**
+     * Has Key
+     */
+    has_key: boolean;
+};
+
+/**
+ * AutoSaveRequest
+ */
+export type AutoSaveRequest = {
+    /**
+     * Fingerprint
+     */
+    fingerprint: string;
+    /**
+     * Tokens
+     */
+    tokens: Array<string>;
+    /**
+     * Page Url
+     */
+    page_url?: string | null;
+};
+
+/**
  * ChatMessage
  */
 export type ChatMessage = {
@@ -29,7 +85,7 @@ export type ChatRequest = {
     /**
      * History
      */
-    history?: Array<ChatMessage>;
+    history?: Array<ChatMessage> | null;
     /**
      * Page Text
      */
@@ -37,11 +93,19 @@ export type ChatRequest = {
     /**
      * Elements
      */
-    elements?: Array<InteractiveElement>;
+    elements?: string;
     /**
      * Page Url
      */
     page_url?: string | null;
+    /**
+     * Screen Label
+     */
+    screen_label?: string | null;
+    /**
+     * Screen Fingerprint
+     */
+    screen_fingerprint?: string | null;
 };
 
 /**
@@ -89,6 +153,10 @@ export type Client = {
      */
     is_active?: boolean;
     /**
+     * Admin Key Hash
+     */
+    admin_key_hash?: string | null;
+    /**
      * Created At
      */
     created_at?: string;
@@ -123,6 +191,20 @@ export type ClientUpdate = {
 };
 
 /**
+ * ConfirmRequest
+ */
+export type ConfirmRequest = {
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Description
+     */
+    description?: string | null;
+};
+
+/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -133,17 +215,63 @@ export type HttpValidationError = {
 };
 
 /**
- * InteractiveElement
+ * MatchScreenRequest
  */
-export type InteractiveElement = {
+export type MatchScreenRequest = {
     /**
-     * Id
+     * Fingerprint
      */
-    id: string;
+    fingerprint: string;
+};
+
+/**
+ * MatchScreenResponse
+ */
+export type MatchScreenResponse = {
+    /**
+     * Matched
+     */
+    matched: boolean;
+    /**
+     * Label
+     */
+    label?: string | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+};
+
+/**
+ * SaveScreenRequest
+ */
+export type SaveScreenRequest = {
+    /**
+     * Fingerprint
+     */
+    fingerprint: string;
     /**
      * Label
      */
     label: string;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Page Url
+     */
+    page_url?: string | null;
+};
+
+/**
+ * SuggestNameRequest
+ */
+export type SuggestNameRequest = {
+    /**
+     * Tokens
+     */
+    tokens: Array<string>;
 };
 
 /**
@@ -243,6 +371,29 @@ export type LoginResponses = {
     200: unknown;
 };
 
+export type WidgetLoginData = {
+    body: AdminKeyLoginRequest;
+    path?: never;
+    query?: never;
+    url: '/auth/login/widget';
+};
+
+export type WidgetLoginErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type WidgetLoginError = WidgetLoginErrors[keyof WidgetLoginErrors];
+
+export type WidgetLoginResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
 export type MeData = {
     body?: never;
     path?: never;
@@ -313,6 +464,22 @@ export type VerifyTokenResponses = {
 };
 
 export type VerifyTokenResponse = VerifyTokenResponses[keyof VerifyTokenResponses];
+
+export type GetStatusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/status';
+};
+
+export type GetStatusResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserRead;
+};
+
+export type GetStatusResponse = GetStatusResponses[keyof GetStatusResponses];
 
 export type RegisterClientData = {
     body: ClientRegisterRequest;
@@ -411,6 +578,66 @@ export type UpdateClientResponses = {
     200: unknown;
 };
 
+export type GenerateAdminKeyData = {
+    body?: never;
+    path: {
+        /**
+         * Client Id
+         */
+        client_id: string;
+    };
+    query?: never;
+    url: '/clients/{client_id}/keys';
+};
+
+export type GenerateAdminKeyErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GenerateAdminKeyError = GenerateAdminKeyErrors[keyof GenerateAdminKeyErrors];
+
+export type GenerateAdminKeyResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminKeyDisplay;
+};
+
+export type GenerateAdminKeyResponse = GenerateAdminKeyResponses[keyof GenerateAdminKeyResponses];
+
+export type GetAdminKeyStatusData = {
+    body?: never;
+    path: {
+        /**
+         * Client Id
+         */
+        client_id: string;
+    };
+    query?: never;
+    url: '/clients/{client_id}/keys/status';
+};
+
+export type GetAdminKeyStatusErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetAdminKeyStatusError = GetAdminKeyStatusErrors[keyof GetAdminKeyStatusErrors];
+
+export type GetAdminKeyStatusResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminKeyStatus;
+};
+
+export type GetAdminKeyStatusResponse = GetAdminKeyStatusResponses[keyof GetAdminKeyStatusResponses];
+
 export type ChatData = {
     body: ChatRequest;
     path?: never;
@@ -435,3 +662,130 @@ export type ChatResponses = {
 };
 
 export type ChatResponse2 = ChatResponses[keyof ChatResponses];
+
+export type MatchScreenData = {
+    body: MatchScreenRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/training/match-screen';
+};
+
+export type MatchScreenErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type MatchScreenError = MatchScreenErrors[keyof MatchScreenErrors];
+
+export type MatchScreenResponses = {
+    /**
+     * Successful Response
+     */
+    200: MatchScreenResponse;
+};
+
+export type MatchScreenResponse2 = MatchScreenResponses[keyof MatchScreenResponses];
+
+export type SaveScreenContextData = {
+    body: SaveScreenRequest;
+    path?: never;
+    query?: {
+        /**
+         * Client Id
+         */
+        client_id?: string;
+    };
+    url: '/v1/training/save-screen-context';
+};
+
+export type SaveScreenContextErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SaveScreenContextError = SaveScreenContextErrors[keyof SaveScreenContextErrors];
+
+export type SaveScreenContextResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type AutoSaveData = {
+    body: AutoSaveRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/training/auto-save';
+};
+
+export type AutoSaveErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AutoSaveError = AutoSaveErrors[keyof AutoSaveErrors];
+
+export type AutoSaveResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type SuggestNameData = {
+    body: SuggestNameRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/training/suggest-name';
+};
+
+export type SuggestNameErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SuggestNameError = SuggestNameErrors[keyof SuggestNameErrors];
+
+export type SuggestNameResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type ConfirmScreenData = {
+    body: ConfirmRequest;
+    path: {
+        /**
+         * Screen Id
+         */
+        screen_id: string;
+    };
+    query?: never;
+    url: '/v1/training/confirm/{screen_id}';
+};
+
+export type ConfirmScreenErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ConfirmScreenError = ConfirmScreenErrors[keyof ConfirmScreenErrors];
+
+export type ConfirmScreenResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};

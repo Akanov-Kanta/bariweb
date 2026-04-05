@@ -19,4 +19,5 @@ class Client(SQLModel, table=True):
     allowed_domains: str
     owner_id: uuid.UUID = Field(foreign_key="users.id", index=True)
     is_active: bool = Field(default=True)
+    admin_key_hash: Optional[str] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.utcnow)

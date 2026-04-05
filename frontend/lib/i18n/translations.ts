@@ -1,6 +1,6 @@
 export type Lang = "ru" | "kz" | "en";
 
-export const translations = {
+export const translations: Record<Lang, any> = {
   ru: {
     nav: {
       problem: "Проблема",
@@ -143,6 +143,7 @@ export const translations = {
       th2: "Традиционный Редизайн",
       th3: "Игнорирование (Штраф)",
       thFull: "AccessLayer",
+      recommended: "Рекомендуемый",
       rows: [
         { name: "Сроки внедрения", r1: "3-6 месяцев", r2: "-", r3: "10 минут" },
         { name: "Затраты на разработку", r1: "От 2 000 000 ₸", r2: "-", r3: "0 ₸" },
@@ -164,6 +165,10 @@ export const translations = {
           desc: "Для небольших статических сайтов и лендингов",
           features: ["До 10 000 просмотров/мес", "Базовый виджет доступности", "1 домен", "Email-поддержка", "Соответствие WCAG 2.1 A"]
         },
+        lite: {
+          desc: "Для растущих сайтов и блогов",
+          features: ["До 50 000 просмотров/мес", "Голосовой помощник", "1 домен", "Чат-поддержка", "Соответствие WCAG 2.1 A+"]
+        },
         business: {
           desc: "Для корпоративных порталов и интернет-магазинов",
           features: ["До 100 000 просмотров/мес", "Продвинутый ИИ-виджет (AA)", "До 3 доменов", "Приоритетная поддержка", "Автоматические отчеты"]
@@ -178,16 +183,18 @@ export const translations = {
       label: "Калькулятор Штрафов",
       title: "Сколько стоит ",
       titleGlitch: "НЕ",
-      title2: " внедрить AccessLayer?",
+      titleAfter: " внедрить AccessLayer?",
       desc: "Оцените реальную стоимость игнорирования Цифрового кодекса РК.",
       sizes: ["Микробизнес", "Малый и средний бизнес", "Крупный бизнес", "Квазигоссектор / Госсектор"],
       companySize: "Размер компании",
-      traffic: "Посещаемость сайта / мес",
-      riskCost: "Риск штрафа",
+      monthlyTraffic: "Посещаемость сайта / мес",
+      fineRisk: "Риск штрафа",
       redesignCost: "Стоимость редизайна",
       alCost: "AccessLayer / год",
-      savings: "Ваша чистая экономия:",
-      btn: "Защитить компанию за"
+      netSavings: "Ваша чистая экономия:",
+      protectBtn: "Защитить компанию за",
+      year: "год",
+      month: "мес"
     },
     faq: {
       title: "Частые ",
@@ -206,6 +213,95 @@ export const translations = {
       btn: "Запустить скан",
       terms1: "Нажимая кнопку, вы соглашаетесь с",
       terms2: "политикой конфиденциальности"
+    },
+    dashboard: {
+      sidebar: {
+        overview: "Обзор",
+        integration: "Интеграция",
+        reports: "Отчеты",
+        billing: "Оплата",
+        settings: "Настройки",
+        signout: "Выйти",
+        loggingOut: "Выход...",
+        clientName: "Клиент SaaS",
+        planType: "Тариф Pro"
+      },
+      overview: {
+        title: "Обзор",
+        welcome: "С возвращением",
+        subtitle: "Вот что происходит с вашим виджетом сегодня.",
+        activeIntegrations: "Активные интеграции",
+        domainsWhitelisted: "Доменов в белом списке",
+        realtime: "В реальном времени",
+        sessionsUsed: "Использовано сессий",
+        monthlyUsage: "Месячное использование",
+        newAccount: "Новый аккаунт",
+        accessibilityScore: "Оценка доступности",
+        requiresScan: "Нужен скан",
+        pending: "В ожидании",
+        avgLoadImpact: "Влияние на загрузку",
+        optimal: "Оптимально",
+        verified: "Проверено",
+        usageActivity: "Активность использования (30 дней)",
+        noActivity: "Нет данных об активности. Установите виджет, чтобы увидеть аналитику."
+      },
+      integration: {
+        title: "Интеграция",
+        subtitle: "Установите виджет Bariweb на свой сайт, чтобы мгновенно включить функции доступности ИИ.",
+        step1Title: "1. Добавьте в свой HTML",
+        step1Desc: "Скопируйте тег скрипта ниже и вставьте его непосредственно перед закрывающим тегом </body> каждой страницы.",
+        htmlLabel: "HTML",
+        copyCode: "Копировать код",
+        copied: "Скопировано!",
+        loading: "Загрузка...",
+        noDomainWarning: "⚠️ Вам нужно добавить хотя бы один домен в Настройках, чтобы сгенерировать Client ID.",
+        step2Title: "2. Белый список доменов",
+        step2Desc: "По соображениям безопасности виджет будет загружаться только на доменах, внесенных в белый список.",
+        settingsHint: "Перейдите в настройки для управления разрешенными доменами. Виджет будет полностью невидим на неавторизованных доменах.",
+        goToSettings: "Перейти в настройки домена"
+      },
+      reports: {
+        title: "Отчеты о соответствии",
+        subtitle: "Просмотр и загрузка отчетов об аудите доступности для ваших доменов.",
+        historyTitle: "История аудита WCAG 2.1",
+        historyDesc: "Отчеты генерируются автоматически после сбора достаточного количества данных.",
+        scanning: "СКАНИРОВАНИЕ БАЗЫ ДАННЫХ...",
+        noSites: "Нет интегрированных сайтов",
+        noSitesDesc: "Вам необходимо интегрировать Bariweb хотя бы на одном домене, чтобы начать генерировать отчеты.",
+        startIntegration: "Начать интеграцию",
+        generating: "Генерация первого отчета",
+        generatingDesc: "Сбор данных продолжается. Наши ИИ-агенты сканируют ваши сайты на соответствие WCAG 2.1 / Section 508.",
+        pdfReport: "PDF Отчет",
+        jsonExport: "JSON Экспорт",
+        secureAuditLog: "КАНАЛ ЛОГА БЕЗОПАСНОГО АУДИТА #0712 - ВНЕШНИХ УТЕЧЕК НЕ ОБНАРУЖЕНО"
+      },
+      settings: {
+        title: "Настройки",
+        subtitle: "Управление настройками аккаунта и конфигурацией безопасности.",
+        clientIdTitle: "Ваш Client ID",
+        clientIdDesc: "Это ваш уникальный идентификатор для виджета Bariweb. Храните его в безопасности.",
+        whitelistedDomains: "Разрешенные домены",
+        domainsDesc: "Виджет Bariweb будет загружаться ТОЛЬКО на доменах из списка ниже. Загрузка на других доменах будет заблокирована.",
+        addNewDomain: "Добавить новый домен",
+        domainPlaceholder: "например, example.com",
+        addButton: "Добавить",
+        noDomains: "Домены еще не добавлены. Виджет нигде не будет загружаться.",
+        removeDomain: "Удалить",
+        apiConfig: "Конфигурация API",
+        apiDesc: "Ваши активные строки подключения для кастомной серверной интеграции.",
+        enterpriseOnly: "Расширенные настройки API доступны только на тарифе Enterprise.",
+        loading: "Загрузка настроек...",
+        errorDomain: "Домен обязателен",
+        errorUrl: "Должен быть валидный URL или имя хоста",
+        securityTitle: "Безопасность и API",
+        securityDesc: "Управление ключами администратора для доступа к режиму обучения виджета.",
+        generateKey: "Сгенерировать ключ доступа",
+        rotateKey: "Обновить ключ",
+        keyWarning: "Скопируйте этот ключ сейчас. В целях безопасности он больше не будет показан.",
+        copyKey: "Копировать ключ",
+        keyActive: "Ключ активен",
+        keyNotSet: "Ключ не установлен"
+      }
     }
   },
   kz: {
@@ -271,7 +367,7 @@ export const translations = {
         "STEP_1 · ARIA-навигация қосылды",
         "STEP_2 · контраст бейімделді",
         "STEP_3 · көрнекі шу жойылды",
-        "STEP_4 · CTA оңтайландырылды",
+        "STEP_4 · оңтайландырылды",
         "STEP_5 · COMPLIANCE ЖЕТТІ ✓",
       ],
       mockup: {
@@ -335,7 +431,7 @@ export const translations = {
         { val: "+45с", label: "Сайттағы орташа уақыт" }
       ],
       personas: [
-        { name: "Нашар көретіндер", status: "Глаукома, +4.5D", quote: "Авто-дыбыстаудың арқасында немерелерімнің көмегінсіз салықтарды өзім төлей аламын.", tag: "Экран дикторы" },
+        { name: "Нашар көретіндер", status: "Глаукома, +4.5D", quote: "Авто-дыбыстаудың арқасында немерелерімнің көмегінсіз салықтарды өзи төлей аламын.", tag: "Экран дикторы" },
         { name: "Моторика бұзылулары", status: "Қол треморы", quote: "Үлкен шегіністер мен пернетақта арқылы басқару мені кездейсоқ басулардан құтқарады.", tag: "Ақылды фокус" },
         { name: "Когнитивтік ерекшеліктер", status: "СДВГ, Дислексия", quote: "Жыпылықтайтын жарнаманы жасыру маған несие шарттарын оқуға зейін қоюға мүмкіндік береді.", tag: "Фокустау режимі" }
       ]
@@ -350,6 +446,7 @@ export const translations = {
       th2: "Дәстүрлі Редизайн",
       th3: "Елемеу (Айыппұл)",
       thFull: "AccessLayer",
+      recommended: "Ұсынылатын",
       rows: [
         { name: "Енгізу мерзімі", r1: "3-6 ай", r2: "-", r3: "10 минут" },
         { name: "Әзірлеу шығындары", r1: "2 000 000 ₸ бастап", r2: "-", r3: "0 ₸" },
@@ -371,6 +468,10 @@ export const translations = {
           desc: "Шағын статикалық сайттар мен лендингтер үшін",
           features: ["Айына 10 000 қаралымға дейін", "Қолжетімділіктің базалық виджеті", "1 домен", "Email-қолдау", "WCAG 2.1 A сәйкестік"]
         },
+        lite: {
+          desc: "Өсіп келе жатқан сайттар мен блогтар үшін",
+          features: ["Айына 50 000 қаралымға дейін", "Дауыстық көмекші", "1 домен", "Чат-қолдау", "WCAG 2.1 A+ сәйкестік"]
+        },
         business: {
           desc: "Корпоративтік порталдар мен интернет-дүкендер үшін",
           features: ["Айына 100 000 қаралымға дейін", "Кеңейтілген ЖИ-виджеті (AA)", "3 доменге дейін", "Басымдықпен қолдау", "Автоматты есептер"]
@@ -385,23 +486,25 @@ export const translations = {
       label: "Айыппұлдар калькуляторы",
       title: "AccessLayer-ді орнатпау ",
       titleGlitch: "ҚАНША",
-      title2: " тұрады?",
+      titleAfter: " тұрады?",
       desc: "ҚР Цифрлық кодексін елемеудің нақты құнын бағалаңыз.",
       sizes: ["Микробизнес", "Шағын және орта бизнес", "Ірі бизнес", "Квазимемлекеттік сектор / Мемсектор"],
       companySize: "Компания көлемі",
-      traffic: "Сайтқа кірушілер / айына",
-      riskCost: "Айыппұл тәуекелі",
+      monthlyTraffic: "Сайтқа кірушілер / айына",
+      fineRisk: "Айыппұл тәуекелі",
       redesignCost: "Редизайн құны",
       alCost: "AccessLayer / жылына",
-      savings: "Сіздің таза үнемдеуіңіз:",
-      btn: "Компанияны қорғау"
+      netSavings: "Сіздің таза үнемдеуіңіз:",
+      protectBtn: "Компанияны қорғау",
+      year: "жылы",
+      month: "ай"
     },
     faq: {
       title: "Жиі қойылатын ",
       titleHighlight: "сұрақтар",
       items: [
         { q: "Менің сайтымның кодын қайта жазу қажет пе?", a: "Жоқ. AccessLayer сіздің бар сайтыңыздың үстінен жұмыс істейді. Ол DOM ағашын талдайды және қажетті ARIA атрибуттарын қосады, фокус пен стильдерді (мысалы, контраст) лезде түзетеді." },
-        { q: "Виджет сайттың жүктелу жылдамдығына әсер ете ме?", a: "Скрипт CDN арқылы асинхронды түрде жүктеледі және салмағы 20КБ-тан аз. Ол негізгі рендеринг ағынын блоктамайды және парақ толық жүктелгеннен кейін ғана жұмыс істей бастайды." },
+        { q: "Виджет сайттың жүктелу жылдамдығына әсер ете ме?", a: "Скрипт CDN арқылы асинхронды түрде жүктеледі және салмағы 20КБ-тан аз. Ол негізгі рендериринг ағынын блоктамайды және парақ толық жүктелгеннен кейін ғана жұмыс істей бастайды." },
         { q: "AccessLayer айыппұлдардан қалай құтылуға көмектеседі?", a: "Виджет бірден WCAG 2.1 AA талаптарын енгізеді, бұл ҚР Цифрлық кодексіне сәйкес инклюзивтілік бойынша техникалық міндеттемелерді жабады." },
         { q: "Виджет дизайнын өзгертуге бола ма?", a: "Иә, Business және Enterprise тарифтерінде виджеттің түстерін, белгішелерін және орналасуын жеке кабинетте брендіңізге сәйкестендіруге болады." }
       ]
@@ -413,6 +516,95 @@ export const translations = {
       btn: "Сканды бастау",
       terms1: "Түймені басу арқылы сіз келісесіз",
       terms2: "құпиялылық саясатымен"
+    },
+    dashboard: {
+      sidebar: {
+        overview: "Шолу",
+        integration: "Интеграция",
+        reports: "Есептер",
+        billing: "Төлем",
+        settings: "Баптаулар",
+        signout: "Шығу",
+        loggingOut: "Шығу...",
+        clientName: "SaaS Клиенті",
+        planType: "Pro Тарифі"
+      },
+      overview: {
+        title: "Шолу",
+        welcome: "Қош келдіңіз",
+        subtitle: "Бүгін сіздің виджетіңізбен не болып жатқанын қараңыз.",
+        activeIntegrations: "Белсенді интеграциялар",
+        domainsWhitelisted: "Ақ тізімдегі домендер",
+        realtime: "Нақты уақытта",
+        sessionsUsed: "Пайдаланылған сессиялар",
+        monthlyUsage: "Айлық пайдалану",
+        newAccount: "Жаңа аккаунт",
+        accessibilityScore: "Қолжетімділік бағасы",
+        requiresScan: "Скан қажет",
+        pending: "Күтуде",
+        avgLoadImpact: "Жүктеуге әсері",
+        optimal: "Оңтайлы",
+        verified: "Тексерілді",
+        usageActivity: "Пайдалану белсенділігі (30 күн)",
+        noActivity: "Белсенділік деректері әлі жоқ. Аналитиканы көру үшін виджетті орнатыңыз."
+      },
+      integration: {
+        title: "Интеграция",
+        subtitle: "ЖИ қолжетімділік функцияларын лезде қосу үшін сайтыңызға Bariweb виджетін орнатыңыз.",
+        step1Title: "1. HTML-ге қосыңыз",
+        step1Desc: "Төмендегі скрипт тегін көшіріп, оны әр беттің </body> жабылатын тегінің алдына қойыңыз.",
+        htmlLabel: "HTML",
+        copyCode: "Кодты көшіру",
+        copied: "Көшірілді!",
+        loading: "Жүктелуде...",
+        noDomainWarning: "⚠️ Client ID жасау үшін Баптаулар бөлімінде кем дегенде бір домен қосу керек.",
+        step2Title: "2. Домендерді ақ тізімге қосу",
+        step2Desc: "Қауіпсіздік мақсатында виджет тек ақ тізімге енгізілген домендерде ғана жүктеледі.",
+        settingsHint: "Рұқсат етілген домендерді басқару үшін баптауларға өтіңіз. Виджет рұқсат етілмеген домендерде мүлдем көрінбейді.",
+        goToSettings: "Домен баптауларына өту"
+      },
+      reports: {
+        title: "Сәйкестік есептері",
+        subtitle: "Домендеріңіз үшін қолжетімділік аудиті есептерін көру және жүктеу.",
+        historyTitle: "WCAG 2.1 аудитінің тарихы",
+        historyDesc: "Есептер жеткілікті деректер жиналғаннан кейін автоматты түрде жасалады.",
+        scanning: "ДЕРЕКТЕР БАЗАСЫН СКАНЕРЛЕУ...",
+        noSites: "Интеграцияланған сайттар жоқ",
+        noSitesDesc: "Есептерді жасауды бастау үшін кем дегенде бір доменде Bariweb-ті интеграциялау қажет.",
+        startIntegration: "Интеграцияны бастау",
+        generating: "Бірінші есепті жасау",
+        generatingDesc: "Деректерді жинау жалғасуда. Біздің ЖИ-агенттер сайттарыңызды WCAG 2.1 / Section 508 сәйкестігіне тексеруде.",
+        pdfReport: "PDF Есеп",
+        jsonExport: "JSON Экспорт",
+        secureAuditLog: "ҚАУІПСІЗ АУДИТ ЛОГЫНЫҢ КАНАЛЫ #0712 - СЫРТҚЫ ЖЫЛЫСТАУЛАР ТАБЫЛМАДЫ"
+      },
+      settings: {
+        title: "Баптаулар",
+        subtitle: "Аккаунт баптауларын және қауіпсіздік конфигурациясын басқару.",
+        clientIdTitle: "Сіздің Client ID",
+        clientIdDesc: "Бұл Bariweb виджеті үшін сіздің бірегей идентификаторыңыз. Оны қауіпсіз сақтаңыз.",
+        whitelistedDomains: "Рұқсат етілген домендер",
+        domainsDesc: "Bariweb виджеті ТЕК төмендегі тізімдегі домендерде жүктеледі. Басқа домендерде жүктеу бұғатталады.",
+        addNewDomain: "Жаңа домен қосу",
+        domainPlaceholder: "мысалы, example.com",
+        addButton: "Қосу",
+        noDomains: "Домендер әлі қосылмаған. Виджет еш жерде жүктелмейді.",
+        removeDomain: "Өшіру",
+        apiConfig: "API конфигурациясы",
+        apiDesc: "Арнайы серверлік интеграция үшін белсенді қосылым жолдары.",
+        enterpriseOnly: "Кеңейтілген API баптаулары тек Enterprise тарифінде қолжетімді.",
+        loading: "Баптаулар жүктелуде...",
+        errorDomain: "Домен қажет",
+        errorUrl: "Жарамды URL немесе хост атауы болуы керек",
+        securityTitle: "Қауіпсіздік және API",
+        securityDesc: "Виджеттің оқыту режиміне кіру үшін әкімші кілттерін басқару.",
+        generateKey: "Кіру кілтін жасау",
+        rotateKey: "Кілтті жаңарту",
+        keyWarning: "Бұл кілтті қазір көшіріп алыңыз. Қауіпсіздік мақсатында ол қайта көрсетілмейді.",
+        copyKey: "Кілтті көшіру",
+        keyActive: "Кілт белсенді",
+        keyNotSet: "Кілт орнатылмаған"
+      }
     }
   },
   en: {
@@ -557,6 +749,7 @@ export const translations = {
       th2: "Traditional Redesign",
       th3: "Ignorance (Fine)",
       thFull: "AccessLayer",
+      recommended: "Recommended",
       rows: [
         { name: "Time to implement", r1: "3-6 months", r2: "-", r3: "10 minutes" },
         { name: "Development costs", r1: "From 2,000,000 ₸", r2: "-", r3: "0 ₸" },
@@ -578,6 +771,10 @@ export const translations = {
           desc: "For small static websites and landing pages",
           features: ["Up to 10,000 pageviews/mo", "Basic accessibility widget", "1 domain", "Email support", "WCAG 2.1 A compliance"]
         },
+        lite: {
+          desc: "For growing sites and blogs",
+          features: ["Up to 50,000 pageviews/mo", "Voice assistant", "1 domain", "Chat support", "WCAG 2.1 A+ compliance"]
+        },
         business: {
           desc: "For corporate portals and e-commerce",
           features: ["Up to 100,000 pageviews/mo", "Advanced AI widget (AA)", "Up to 3 domains", "Priority support", "Automated reports"]
@@ -592,16 +789,18 @@ export const translations = {
       label: "Penalty Calculator",
       title: "How much does it cost ",
       titleGlitch: "NOT",
-      title2: " to use AccessLayer?",
+      titleAfter: " to use AccessLayer?",
       desc: "Estimate the real cost of ignoring the Digital Code of Kazakhstan.",
       sizes: ["Microbusiness", "SMB / Small & Medium Business", "Enterprise", "Government / Quasi-Gov"],
       companySize: "Company Size",
-      traffic: "Website traffic / month",
-      riskCost: "Penalty Risk",
+      monthlyTraffic: "Website traffic / month",
+      fineRisk: "Penalty Risk",
       redesignCost: "Redesign Cost",
       alCost: "AccessLayer / year",
-      savings: "Your Net Savings:",
-      btn: "Protect Company for"
+      netSavings: "Your Net Savings:",
+      protectBtn: "Protect Company for",
+      year: "year",
+      month: "mo"
     },
     faq: {
       title: "Frequently Asked ",
@@ -620,6 +819,87 @@ export const translations = {
       btn: "Run Scan",
       terms1: "By clicking this button you agree to the",
       terms2: "privacy policy"
+    },
+    dashboard: {
+      sidebar: {
+        overview: "Overview",
+        integration: "Integration",
+        reports: "Reports",
+        billing: "Billing",
+        settings: "Settings",
+        signout: "Sign out",
+        loggingOut: "Logging out...",
+        clientName: "SaaS Client",
+        planType: "Pro Plan"
+      },
+      overview: {
+        title: "Overview",
+        welcome: "Welcome back",
+        subtitle: "Here's what's happening with your widget today.",
+        activeIntegrations: "Active Integrations",
+        domainsWhitelisted: "Domains whitelisted",
+        realtime: "Real-time",
+        sessionsUsed: "Sessions Used",
+        monthlyUsage: "Monthly usage",
+        newAccount: "New account",
+        accessibilityScore: "Accessibility Score",
+        requiresScan: "Requires scan",
+        pending: "Pending",
+        avgLoadImpact: "Avg. Load Impact",
+        optimal: "Optimal",
+        verified: "Verified",
+        usageActivity: "Usage Activity (Last 30 Days)",
+        noActivity: "No activity data available yet. Install the widget to see analytics."
+      },
+      integration: {
+        title: "Integration",
+        subtitle: "Install the Bariweb widget on your website to instantly enable AI accessibility features.",
+        step1Title: "1. Add to your HTML",
+        step1Desc: "Copy the script tag below and paste it just before the closing </body> tag of every page.",
+        htmlLabel: "HTML",
+        copyCode: "Copy Code",
+        copied: "Copied!",
+        loading: "Loading...",
+        noDomainWarning: "⚠️ You need to add at least one domain in Settings to generate your Client ID.",
+        step2Title: "2. Whitelist your domains",
+        step2Desc: "For security reasons, the widget will only load on domains that have been whitelisted in your account.",
+        settingsHint: "Head over to your settings to manage allowed domains. The widget will be completely invisible on any unauthorized domains.",
+        goToSettings: "Go to Domain Settings"
+      },
+      reports: {
+        title: "Compliance Reports",
+        subtitle: "View and download accessibility audit reports for your domains.",
+        historyTitle: "WCAG 2.1 Audit History",
+        historyDesc: "Reports are automatically generated once we collect enough interaction data.",
+        scanning: "SCANNING DATABASE...",
+        noSites: "No Sites Integrated",
+        noSitesDesc: "You need to integrate Bariweb on at least one domain to start generating compliance reports.",
+        startIntegration: "Start Integration",
+        generating: "Generating First Report",
+        generatingDesc: "Data collection is in progress. Our AI agents are currently auditing your sites for WCAG 2.1 / Section 508 compliance.",
+        pdfReport: "PDF Report",
+        jsonExport: "JSON Export",
+        secureAuditLog: "SECURE AUDIT LOG CHANNEL #0712 - NO EXTERNAL LEAKS DETECTED"
+      },
+      settings: {
+        title: "Settings",
+        subtitle: "Manage your account preferences and security configuration.",
+        clientIdTitle: "Your Client ID",
+        clientIdDesc: "This is your unique identifier for the Bariweb widget. Keep it safe.",
+        whitelistedDomains: "Whitelisted Domains",
+        domainsDesc: "The Bariweb widget will ONLY load on domains listed below. Attempts to load on other domains will be blocked.",
+        addNewDomain: "Add New Domain",
+        domainPlaceholder: "e.g. example.com",
+        addButton: "Add",
+        noDomains: "No domains whitelisted yet. The widget will not load anywhere.",
+        removeDomain: "Remove",
+        apiConfig: "API Configuration",
+        apiDesc: "Your active connection strings for custom server-to-server integration.",
+        enterpriseOnly: "Advanced API settings are restricted to the Enterprise plan.",
+        loading: "Loading settings...",
+        errorDomain: "Domain is required",
+        errorUrl: "Must be a valid URL or hostname"
+      }
     }
   }
 };

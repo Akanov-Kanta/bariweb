@@ -44,7 +44,16 @@ export const accordionStyles = css`
   .icon-wrapper {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
     transition: transform 0.3s ease;
+    color: var(--bw-accordion-fg);
+  }
+
+  .icon-wrapper svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    flex-shrink: 0;
   }
 
   .trigger[aria-expanded="true"] .icon-wrapper {

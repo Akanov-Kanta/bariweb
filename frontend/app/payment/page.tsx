@@ -14,11 +14,12 @@ export default function PaymentPage() {
   const { lang } = useLanguage();
   const t = landingTranslations[lang].paymentPage;
 
-  const [selectedPlan, setSelectedPlan] = useState<"starter" | "business" | "enterprise">("business");
+  const [selectedPlan, setSelectedPlan] = useState<"lite" | "starter" | "business" | "enterprise">("business");
   const [isAnnual, setIsAnnual] = useState(true);
   const [status, setStatus] = useState<"idle" | "processing" | "success">("idle");
 
   const plans = {
+    lite: { name: "Lite", price: 99 },
     starter: { name: "Starter", price: 299 },
     business: { name: "Business", price: 1200 },
     enterprise: { name: "Enterprise", price: 3500 }
@@ -42,11 +43,11 @@ export default function PaymentPage() {
       <Navbar />
 
       {/* Abstract Background Effect */}
-      <div className="absolute left-1/2 top-1/2 -z-10 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 opacity-20">
+      <div className="absolute left-1/2 top-1/2 -z-10 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 opacity-10">
         <motion.div
           animate={{
-            scale: [1, 1.1, 1],
-            rotate: [0, 45, 0],
+            scale: [1, 1.05, 1],
+            rotate: [0, 20, 0],
             borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "70% 30% 30% 70% / 70% 70% 30% 30%", "30% 70% 70% 30% / 30% 30% 70% 70%"],
           }}
           transition={{
@@ -54,7 +55,7 @@ export default function PaymentPage() {
             repeat: Infinity,
             ease: "linear",
           }}
-          className="h-full w-full bg-gradient-to-br from-lime-400 to-[#003311] blur-[120px]"
+          className="h-full w-full bg-gradient-to-br from-lime-400 to-[#003311] blur-[80px]"
         />
       </div>
 
@@ -75,8 +76,8 @@ export default function PaymentPage() {
             </p>
 
             {/* Plan Cards - Horizontal Selector */}
-            <div className="mb-12 grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {(["starter", "business", "enterprise"] as const).map((plan) => (
+            <div className="mb-12 grid grid-cols-1 gap-4 sm:grid-cols-4">
+              {(["lite", "starter", "business", "enterprise"] as const).map((plan) => (
                 <button
                   key={plan}
                   onClick={() => setSelectedPlan(plan)}
@@ -90,7 +91,7 @@ export default function PaymentPage() {
                     {plan}
                   </span>
                   <span className="text-xl font-bold text-white transition-colors">
-                    \${plans[plan].price}
+                    ${plans[plan].price}
                   </span>
                   {selectedPlan === plan && (
                     <motion.div
@@ -180,7 +181,7 @@ export default function PaymentPage() {
                     <div className="mb-8 flex items-center justify-between border-b border-neutral-800/50 pb-8">
                        <div className="flex flex-col">
                          <span className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-500">{t.billingInfo}</span>
-                         <span className="text-xl font-bold">Total: \${currentPrice.toLocaleString()}</span>
+                         <span className="text-xl font-bold">Total: ${currentPrice.toLocaleString()}</span>
                        </div>
                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-neutral-900 border border-neutral-800">
                          <CreditCard className="h-6 w-6 text-neutral-400" />

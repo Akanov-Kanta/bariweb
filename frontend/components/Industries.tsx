@@ -10,7 +10,7 @@ export function Industries() {
   const c = t.industries.cards;
   const icons = [Building2, ShoppingCart, Landmark, GraduationCap, ShieldCheck, Wifi];
   
-  const industries = c.map((card, i) => ({
+  const industries = c.map((card: any, i: number) => ({
     name: card.name,
     desc: card.desc,
     icon: icons[i]
@@ -54,7 +54,7 @@ export function Industries() {
           viewport={{ once: true, margin: "-100px" }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {industries.map((ind, idx) => (
+          {industries.map((ind: any, idx: number) => (
             <motion.div 
               key={idx}
               variants={itemVariants}

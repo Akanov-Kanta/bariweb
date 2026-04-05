@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ChatData, ChatErrors, ChatResponses, DeleteClientData, DeleteClientErrors, DeleteClientResponses, GetMyClientsData, GetMyClientsResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutResponses, MeData, MeResponses, RegisterClientData, RegisterClientErrors, RegisterClientResponses, RegisterData, RegisterErrors, RegisterResponses, UpdateClientData, UpdateClientErrors, UpdateClientResponses, VerifyTokenData, VerifyTokenResponses } from './types.gen';
+import type { AutoSaveData, AutoSaveErrors, AutoSaveResponses, ChatData, ChatErrors, ChatResponses, ConfirmScreenData, ConfirmScreenErrors, ConfirmScreenResponses, DeleteClientData, DeleteClientErrors, DeleteClientResponses, GenerateAdminKeyData, GenerateAdminKeyErrors, GenerateAdminKeyResponses, GetAdminKeyStatusData, GetAdminKeyStatusErrors, GetAdminKeyStatusResponses, GetMyClientsData, GetMyClientsResponses, GetStatusData, GetStatusResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutResponses, MatchScreenData, MatchScreenErrors, MatchScreenResponses, MeData, MeResponses, RegisterClientData, RegisterClientErrors, RegisterClientResponses, RegisterData, RegisterErrors, RegisterResponses, SaveScreenContextData, SaveScreenContextErrors, SaveScreenContextResponses, SuggestNameData, SuggestNameErrors, SuggestNameResponses, UpdateClientData, UpdateClientErrors, UpdateClientResponses, VerifyTokenData, VerifyTokenResponses, WidgetLoginData, WidgetLoginErrors, WidgetLoginResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -25,6 +25,23 @@ export class Auth {
     public static login<ThrowOnError extends boolean = false>(options: Options<LoginData, ThrowOnError>) {
         return (options.client ?? client).post<LoginResponses, LoginErrors, ThrowOnError>({
             url: '/auth/login',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
+     * Widget Login
+     *
+     * Login for the Bariweb Widget using an Admin Key.
+     * Verifies the key against the organizations admin_key_hash.
+     */
+    public static widgetLogin<ThrowOnError extends boolean = false>(options: Options<WidgetLoginData, ThrowOnError>) {
+        return (options.client ?? client).post<WidgetLoginResponses, WidgetLoginErrors, ThrowOnError>({
+            url: '/auth/login/widget',
             ...options,
             headers: {
                 'Content-Type': 'application/json',
@@ -80,6 +97,23 @@ export class Auth {
                     type: 'apiKey'
                 }],
             url: '/auth/verify',
+            ...options
+        });
+    }
+    
+    /**
+     * Get Status
+     *
+     * Keep /status for compatibility with SDK calls if needed
+     */
+    public static getStatus<ThrowOnError extends boolean = false>(options?: Options<GetStatusData, ThrowOnError>) {
+        return (options?.client ?? client).get<GetStatusResponses, unknown, ThrowOnError>({
+            security: [{
+                    in: 'cookie',
+                    name: 'access_token',
+                    type: 'apiKey'
+                }],
+            url: '/auth/status',
             ...options
         });
     }
@@ -153,6 +187,36 @@ export class Organizations {
             }
         });
     }
+    
+    /**
+     * Generate Admin Key
+     */
+    public static generateAdminKey<ThrowOnError extends boolean = false>(options: Options<GenerateAdminKeyData, ThrowOnError>) {
+        return (options.client ?? client).post<GenerateAdminKeyResponses, GenerateAdminKeyErrors, ThrowOnError>({
+            security: [{
+                    in: 'cookie',
+                    name: 'access_token',
+                    type: 'apiKey'
+                }],
+            url: '/clients/{client_id}/keys',
+            ...options
+        });
+    }
+    
+    /**
+     * Get Admin Key Status
+     */
+    public static getAdminKeyStatus<ThrowOnError extends boolean = false>(options: Options<GetAdminKeyStatusData, ThrowOnError>) {
+        return (options.client ?? client).get<GetAdminKeyStatusResponses, GetAdminKeyStatusErrors, ThrowOnError>({
+            security: [{
+                    in: 'cookie',
+                    name: 'access_token',
+                    type: 'apiKey'
+                }],
+            url: '/clients/{client_id}/keys/status',
+            ...options
+        });
+    }
 }
 
 export class Chat {
@@ -165,6 +229,86 @@ export class Chat {
     public static chat<ThrowOnError extends boolean = false>(options: Options<ChatData, ThrowOnError>) {
         return (options.client ?? client).post<ChatResponses, ChatErrors, ThrowOnError>({
             url: '/v1/chat',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+}
+
+export class Training {
+    /**
+     * Match Screen
+     *
+     * Called by the SDK Admin UI to check if a screen is already trained.
+     */
+    public static matchScreen<ThrowOnError extends boolean = false>(options: Options<MatchScreenData, ThrowOnError>) {
+        return (options.client ?? client).get<MatchScreenResponses, MatchScreenErrors, ThrowOnError>({ url: '/v1/training/match-screen', ...options });
+    }
+    
+    /**
+     * Save Screen Context
+     *
+     * Protected Admin endpoint: Saves/Updates a screen annotation.
+     * Note: Admin must provide/resolve the client_id they are training for.
+     */
+    public static saveScreenContext<ThrowOnError extends boolean = false>(options: Options<SaveScreenContextData, ThrowOnError>) {
+        return (options.client ?? client).post<SaveScreenContextResponses, SaveScreenContextErrors, ThrowOnError>({
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/v1/training/save-screen-context',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
+     * Auto Save
+     *
+     * Experimental: Auto-saves a draft fingerprint while admin navigates.
+     */
+    public static autoSave<ThrowOnError extends boolean = false>(options: Options<AutoSaveData, ThrowOnError>) {
+        return (options.client ?? client).post<AutoSaveResponses, AutoSaveErrors, ThrowOnError>({
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/v1/training/auto-save',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
+     * Suggest Name
+     *
+     * Uses LLM to suggest a screen name based on button tokens.
+     */
+    public static suggestName<ThrowOnError extends boolean = false>(options: Options<SuggestNameData, ThrowOnError>) {
+        return (options.client ?? client).post<SuggestNameResponses, SuggestNameErrors, ThrowOnError>({
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/v1/training/suggest-name',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
+     * Confirm Screen
+     *
+     * Moderation: Confirms a draft and updates its label/description.
+     */
+    public static confirmScreen<ThrowOnError extends boolean = false>(options: Options<ConfirmScreenData, ThrowOnError>) {
+        return (options.client ?? client).patch<ConfirmScreenResponses, ConfirmScreenErrors, ThrowOnError>({
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/v1/training/confirm/{screen_id}',
             ...options,
             headers: {
                 'Content-Type': 'application/json',

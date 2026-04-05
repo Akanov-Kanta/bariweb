@@ -22,7 +22,7 @@ export function Problem() {
     "md:col-span-1 md:row-span-1 bg-zinc-950 border-zinc-800"
   ];
 
-  const bentoItems = t.problem.cards.map((card, i) => ({
+  const bentoItems = t.problem.cards.map((card: any, i: number) => ({
     title: card.title,
     description: card.desc,
     icon: icons[i],
@@ -61,7 +61,7 @@ export function Problem() {
             }
           }}
         >
-          {bentoItems.map((item, i) => (
+          {bentoItems.map((item: any, i: number) => (
             <motion.div
               key={i}
               variants={{

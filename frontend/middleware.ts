@@ -20,13 +20,21 @@ export async function middleware(request: NextRequest) {
     
     try {
       // Must pass cookie manually in headers for Server-Side API calls
-      const { error } = await Auth.verifyToken({
+      const response = await Auth.verifyToken({
         headers: { Cookie: `access_token=${accessToken}` }
       });
-      if (error) throw new Error('Invalid token');
+      
+      // If backend returns 401/403 or explicit error, clear cookie and login
+      if (response.error) {
+        const nextResponse = NextResponse.redirect(new URL('/login', request.url));
+        nextResponse.cookies.delete('access_token');
+        return nextResponse;
+      }
+      
       return NextResponse.next();
     } catch (e) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      // Network error or breakdown, fallback safely
+      return NextResponse.next();
     }
   }
 

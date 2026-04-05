@@ -78,7 +78,7 @@ export default function BentoFeaturesSection() {
                   initial={{ x: 0, y: 0 }}
                 >
                   <MousePointer2 className="h-8 w-8 fill-black text-white" />
-                  <div className="mt-2 rounded bg-neutral-800 px-2 py-1 text-[10px] text-white font-mono">Agent Active</div>
+                  <div className="mt-2 rounded bg-neutral-800 px-2 py-1 text-[10px] text-white font-mono">{t.agentActive}</div>
                 </motion.div>
               </div>
             </div>

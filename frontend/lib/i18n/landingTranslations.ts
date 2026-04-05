@@ -5,6 +5,9 @@ export const landingTranslations: Record<string, any> = {
       embed: "Встроить скрипт",
       docs: "Документация",
       payment: "Тарифы",
+      gitLab: "GitLab",
+      vitrine: "Витрина alem.plus",
+      login: "Войти"
     },
     hero: {
       title: "Сделайте ваш сайт инклюзивным за 1 день. Избежите штрафов.",
@@ -12,6 +15,42 @@ export const landingTranslations: Record<string, any> = {
       timeLeft: "Осталось:",
       days: "дней",
       hours: "часов",
+    },
+    techstack: {
+      label: "Архитектура построена на инфраструктуре ",
+      items: [
+        "KazLLM (обработка языка)",
+        "RAGFlow (анализ DOM)",
+        "Speech-to-text Kazakh (голосовой ввод)",
+        "Milvus (векторная БД)",
+      ]
+    },
+    aipipeline: {
+      title: "Как мыслит ",
+      titleHighlight: "ИИ-агент",
+      desc: "Под капотом Bariweb работает сложная сеть AI-агентов, обеспечивающая бесшовную доступность.",
+      steps: [
+        {
+          title: "Голос пользователя",
+          subtitle: "Speech-to-text",
+          desc: "Распознавание казахской и русской речи в реальном времени.",
+        },
+        {
+          title: "Анализ намерения",
+          subtitle: "KazLLM / Qwen",
+          desc: "Определение цели пользователя и планирование действий.",
+        },
+        {
+          title: "Поиск элементов",
+          subtitle: "RAGFlow + Milvus",
+          desc: "Мгновенная навигация по структуре сайта через векторный поиск.",
+        },
+        {
+          title: "Автономное действие",
+          subtitle: "Web Component UI",
+          desc: "Выполнение задачи: от заполнения форм до оформления заказов.",
+        },
+      ]
     },
     scroll: {
       problem: "Проблема: перегруженные интерфейсы.",
@@ -50,6 +89,7 @@ export const landingTranslations: Record<string, any> = {
       codeDesc: "Юридическая защита от штрафов до 500 МРП. Стопроцентное соответствие закону с 2026 года.",
       perfTitle: "Незаметен для сервера",
       perfDesc: "Асинхронный скрипт кэшируется в CDN и не влияет на метрики Web Core Vitals.",
+      agentActive: "Агент активен"
     },
     integration: {
       title1: "Одна строка кода.",
@@ -65,10 +105,22 @@ export const landingTranslations: Record<string, any> = {
       calcPenalty: "Риск штрафа (МРП-эквивалент):",
       calcSavings: "Чистая экономия с нами:",
       starter: "Выбрать Starter",
+      lite: "Выбрать Lite",
       business: "Выбрать Business",
       enterprise: "Запросить Enterprise",
       hit: "ПОПУЛЯРНЫЙ",
       mo: "/мес",
+      starterFeatures: ["До 10,000 визитов", "Базовое сканирование", "Отчеты об ошибках"],
+      liteFeatures: ["До 50,000 визитов", "Голосовой помощник", "Базовая поддержка"],
+      businessFeatures: ["До 500,000 визитов", "Голосовой автопилот", "SLA & Поддержка 24/7", "Сертификат compliance"],
+      enterpriseFeatures: ["Анлим визиты", "On-premise релиз", "Кастомный ИИ-помощник"]
+    },
+    audit: {
+      title: "Проверьте свой сайт на ",
+      titleHighlight: "уязвимости",
+      desc: "Введите адрес вашего сайта, и наш ИИ проведет мгновенный аудит на соответствие Цифровому кодексу РК.",
+      placeholder: "https://vash-site.kz",
+      button: "Запустить скан"
     },
     paymentPage: {
       title: "Оформление подписки",
@@ -92,6 +144,19 @@ export const landingTranslations: Record<string, any> = {
       product: "Платформа",
       docs: "Для разработчиков",
       company: "О компании",
+      gitLab: "GitLab",
+      vitrine: "Витрина alem.plus",
+      features: "Фичи",
+      integration: "Интеграция",
+      pricing: "Цены",
+      changelog: "Changelog",
+      apiDocs: "API Docs",
+      wcagGuide: "WCAG 2.1 Guide",
+      calcPenalty: "Калькулятор штрафов",
+      about: "О нас",
+      blog: "Блог",
+      contacts: "Контакты",
+      copyright: "© 2026 Bariweb. Сделано в Казахстане."
     },
     docsPage: {
       title: "Документация по интеграции",
@@ -172,6 +237,9 @@ export const landingTranslations: Record<string, any> = {
       embed: "Скриптті орнату",
       docs: "Құжаттама",
       payment: "Тарифтер",
+      gitLab: "GitLab",
+      vitrine: "alem.plus витринасы",
+      login: "Кіру"
     },
     hero: {
       title: "Сайтыңызды 1 күнде инклюзивті етіңіз. Айыппұлдардан сақтаныңыз.",
@@ -179,6 +247,42 @@ export const landingTranslations: Record<string, any> = {
       timeLeft: "Қалды:",
       days: "күн",
       hours: "сағат",
+    },
+    techstack: {
+      label: "Архитектура alem.plus инфрақұрылымында ",
+      items: [
+        "KazLLM (тілді өңдеу)",
+        "RAGFlow (DOM талдау)",
+        "Speech-to-text Kazakh (дауыстық енгізу)",
+        "Milvus (векторлық БД)",
+      ]
+    },
+    aipipeline: {
+      title: "ЖИ-агент қалай ",
+      titleHighlight: "ойлайды",
+      desc: "Bariweb астында үздіксіз қолжетімділікті қамтануыз ететін AI агенттерінің күрделі желісі жұмыс істейді.",
+      steps: [
+        {
+          title: "Пайдаланушы дауысы",
+          subtitle: "Speech-to-text",
+          desc: "Қазақ және орыс тілдерін нақты уақытта тану.",
+        },
+        {
+          title: "Ниетті талдау",
+          subtitle: "KazLLM / Qwen",
+          desc: "Пайдаланушы мақсатын анықтау және әрекеттерді жоспарлау.",
+        },
+        {
+          title: "Элементтерді іздеу",
+          subtitle: "RAGFlow + Milvus",
+          desc: "Векторлық іздеу арқылы сайт құрылымы бойынша жылдам навигация.",
+        },
+        {
+          title: "Автономды әрекет",
+          subtitle: "Web Component UI",
+          desc: "Тапсырманы орындау: формаларды толтырудан бастап тапсырысты рәсімдеуге дейін.",
+        },
+      ]
     },
     scroll: {
       problem: "Мәселе: шамадан тыс жүктелген интерфейстер.",
@@ -217,6 +321,7 @@ export const landingTranslations: Record<string, any> = {
       codeDesc: "500 АЕК-ке дейінгі айыппұлдардан заңды түрде қорғау. 2026 жылдан бастап заңға 100% сәйкестік.",
       perfTitle: "Серверге әсер етпейді",
       perfDesc: "Асинхронды скрипт CDN кэшінде сақталады және Web Core Vitals көрсеткіштеріне әсер етпейді.",
+      agentActive: "Агент белсенді"
     },
     integration: {
       title1: "Бір жол код.",
@@ -232,10 +337,22 @@ export const landingTranslations: Record<string, any> = {
       calcPenalty: "Айыппұл қаупі (АЕК):",
       calcSavings: "Бізбен бірге таза үнемдеу:",
       starter: "Starter таңдау",
+      lite: "Lite таңдау",
       business: "Business таңдау",
       enterprise: "Enterprise сұрау",
       hit: "КӨП ТАҢДАЛАТЫН",
       mo: "/ай",
+      starterFeatures: ["10,000 қаралымға дейін", "Базалық сканерлеу", "Қателер туралы есептер"],
+      liteFeatures: ["50,000 қаралымға дейін", "Дауыстық көмекші", "Базалық қолдау"],
+      businessFeatures: ["500,000 қаралымға дейін", "Дауыстық автопилот", "SLA және 24/7 қолдау", "Compliance сертификаты"],
+      enterpriseFeatures: ["Шексіз қаралым", "On-premise нұсқасы", "Жеке ЖИ-көмекші"]
+    },
+    audit: {
+      title: "Сайтыңызды осалдыққа ",
+      titleHighlight: "тексеріңіз",
+      desc: "Сайтыңыздың мекенжайын енгізіңіз, біздің ЖИ оның ҚР Цифрлық кодексіне сәйкестігін лезде аудитін өткізеді.",
+      placeholder: "https://vash-site.kz",
+      button: "Сканды бастау"
     },
     paymentPage: {
       title: "Жазылымды рәсімдеу",
@@ -259,6 +376,19 @@ export const landingTranslations: Record<string, any> = {
       product: "Платформа",
       docs: "Әзірлеушілерге",
       company: "Компания туралы",
+      gitLab: "GitLab",
+      vitrine: "alem.plus витринасы",
+      features: "Фичалар",
+      integration: "Интеграция",
+      pricing: "Бағалар",
+      changelog: "Changelog",
+      apiDocs: "API Docs",
+      wcagGuide: "WCAG 2.1 Guide",
+      calcPenalty: "Айыппұл калькуляторы",
+      about: "Біз туралы",
+      blog: "Блог",
+      contacts: "Контактілер",
+      copyright: "© 2026 Bariweb. Қазақстанда жасалған."
     },
     docsPage: {
       title: "Интеграциялық құжаттама",
@@ -339,6 +469,9 @@ export const landingTranslations: Record<string, any> = {
       embed: "Embed Script",
       docs: "Documentation",
       payment: "Pricing",
+      gitLab: "GitLab",
+      vitrine: "Vitrine alem.plus",
+      login: "Log In"
     },
     hero: {
       title: "Make your site inclusive in 1 day. Avoid heavy fines.",
@@ -346,6 +479,42 @@ export const landingTranslations: Record<string, any> = {
       timeLeft: "Time remaining:",
       days: "days",
       hours: "hours",
+    },
+    techstack: {
+      label: "Architecture built on alem.plus infrastructure ",
+      items: [
+        "KazLLM (language processing)",
+        "RAGFlow (DOM analysis)",
+        "Speech-to-text Kazakh (voice input)",
+        "Milvus (vector DB)",
+      ]
+    },
+    aipipeline: {
+      title: "How the ",
+      titleHighlight: "AI agent",
+      desc: "Under the hood, Bariweb processes a complex network of AI agents ensuring seamless accessibility.",
+      steps: [
+        {
+          title: "User Voice",
+          subtitle: "Speech-to-text",
+          desc: "Real-time recognition of Kazakh and Russian speech.",
+        },
+        {
+          title: "Intent Analysis",
+          subtitle: "KazLLM / Qwen",
+          desc: "Determining user goals and planning actions.",
+        },
+        {
+          title: "Element Search",
+          subtitle: "RAGFlow + Milvus",
+          desc: "Instant navigation through the site structure via vector search.",
+        },
+        {
+          title: "Autonomous Action",
+          subtitle: "Web Component UI",
+          desc: "Task execution: from filling forms to processing orders.",
+        },
+      ]
     },
     scroll: {
       problem: "Problem: Overloaded interfaces.",
@@ -384,6 +553,7 @@ export const landingTranslations: Record<string, any> = {
       codeDesc: "Legal shielding from fines up to 500 MCI. 100% guaranteed compliance with upcoming 2026 regulations.",
       perfTitle: "Invisible to servers",
       perfDesc: "The asynchronous script is securely cached in CDN edge nodes and leaves Web Core Vitals completely unharmed.",
+      agentActive: "Agent Active"
     },
     integration: {
       title1: "One line of code.",
@@ -399,10 +569,22 @@ export const landingTranslations: Record<string, any> = {
       calcPenalty: "Risk of penalty (MCI equiv):",
       calcSavings: "Net savings with us:",
       starter: "Select Starter",
+      lite: "Select Lite",
       business: "Select Business",
       enterprise: "Request Enterprise",
       hit: "MOST POPULAR",
       mo: "/mo",
+      starterFeatures: ["Up to 10,000 pageviews/mo", "Basic accessibility widget", "Error reports"],
+      liteFeatures: ["Up to 50,000 pageviews/mo", "Voice assistant", "Basic support"],
+      businessFeatures: ["Up to 500,000 pageviews/mo", "Voice autopilot", "SLA & 24/7 support", "Compliance certificate"],
+      enterpriseFeatures: ["Unlimited traffic", "On-premise option", "Custom AI assistant"]
+    },
+    audit: {
+      title: "Check your site for ",
+      titleHighlight: "vulnerabilities",
+      desc: "Enter your website address, and our AI will conduct an instant compliance audit against the Digital Code.",
+      placeholder: "https://your-site.com",
+      button: "Run Scan"
     },
     paymentPage: {
       title: "Subscription Checkout",
@@ -426,6 +608,19 @@ export const landingTranslations: Record<string, any> = {
       product: "Platform",
       docs: "Developers",
       company: "Company",
+      gitLab: "GitLab",
+      vitrine: "Vitrine alem.plus",
+      features: "Features",
+      integration: "Integration",
+      pricing: "Pricing",
+      changelog: "Changelog",
+      apiDocs: "API Docs",
+      wcagGuide: "WCAG 2.1 Guide",
+      calcPenalty: "Penalty Calculator",
+      about: "About Us",
+      blog: "Blog",
+      contacts: "Contacts",
+      copyright: "© 2026 Bariweb. Made in Kazakhstan."
     },
     docsPage: {
       title: "Integration Documentation",

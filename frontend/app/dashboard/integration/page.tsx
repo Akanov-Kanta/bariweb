@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Copy, CheckCircle2 } from 'lucide-react';
 import { Organizations } from '@/lib/api/sdk.gen';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { translations } from '@/lib/i18n/translations';
 
 interface ClientData {
   id: string;
@@ -18,6 +20,8 @@ export default function IntegrationPage() {
   const [clients, setClients] = useState<ClientData[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { lang } = useLanguage();
+  const t = translations[lang].dashboard.integration;
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -39,7 +43,7 @@ export default function IntegrationPage() {
 
   const integrationCode = selectedClientId 
     ? `<script src="https://widget.bariweb.org/bariweb.js" data-client-id="${selectedClientId}"></script>`
-    : '<!-- Register your domain in Settings to get your Client ID -->';
+    : t.noDomainWarning;
 
   const copyToClipboard = () => {
     if (!selectedClientId) return;
@@ -49,30 +53,30 @@ export default function IntegrationPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-8 max-w-5xl">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-zinc-100">Integration</h2>
-        <p className="text-zinc-400 mt-1">
-          Install the Bariweb widget on your website to instantly enable AI accessibility features.
+        <h2 className="text-4xl font-bold tracking-tight text-white mb-2">{t.title}</h2>
+        <p className="text-zinc-400 text-lg">
+          {t.subtitle}
         </p>
       </div>
 
-      <Card>
+      <Card className="dashboard-card">
         <CardHeader>
-          <CardTitle>1. Add to your HTML</CardTitle>
-          <CardDescription>
-            Select your registered domain to get the correct integration code. Each domain has its own unique Client ID.
+          <CardTitle className="text-xl font-bold text-white">{t.step1Title}</CardTitle>
+          <CardDescription className="text-zinc-400">
+            {t.step1Desc}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {clients.length > 0 && (
-            <div className="mb-4">
-              <label htmlFor="domain-select" className="block text-sm font-medium text-zinc-300 mb-2">
-                Select Domain
+            <div className="mb-6">
+              <label htmlFor="domain-select" className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2 ml-1">
+                {t.selectDomain}
               </label>
               <select
                 id="domain-select"
-                className="w-full max-w-sm rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full max-w-sm rounded-xl border border-[#1f1f23] bg-black/60 px-4 py-3 text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-lime-400 transition-all cursor-pointer"
                 value={selectedClientId || ''}
                 onChange={(e) => setSelectedClientId(e.target.value)}
               >
@@ -83,51 +87,59 @@ export default function IntegrationPage() {
             </div>
           )}
 
-          <div className="relative rounded-lg bg-zinc-950 border border-zinc-800 p-4 font-mono text-sm text-zinc-300">
-            <div className="flex justify-between items-center mb-2 pb-2 border-b border-zinc-800/50">
-              <span className="text-zinc-500 text-xs">HTML</span>
+          <div className="relative rounded-2xl bg-black/60 border border-[#1f1f23] p-6 font-mono text-sm text-zinc-300 shadow-inner">
+            <div className="flex justify-between items-center mb-4 pb-4 border-b border-[#1f1f23]">
+              <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">{t.htmlLabel}</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={copyToClipboard}
                 disabled={!selectedClientId || loading}
-                className="h-8 text-zinc-400 hover:text-white"
+                className="h-9 px-4 text-zinc-400 hover:text-lime-400 hover:bg-lime-400/10 rounded-lg transition-all"
               >
                 {copied ? (
                   <>
-                    <CheckCircle2 className="mr-2 h-4 w-4 text-green-500" />
-                    Copied!
+                    <CheckCircle2 className="mr-2 h-4 w-4 text-lime-400" />
+                    <span className="text-lime-400 font-bold">{t.copied}</span>
                   </>
                 ) : (
                   <>
                     <Copy className="mr-2 h-4 w-4" />
-                    Copy Code
+                    {t.copyCode}
                   </>
                 )}
               </Button>
             </div>
-            <pre className="overflow-x-auto p-2 text-zinc-300">
-              <code>{loading ? 'Loading...' : integrationCode}</code>
+            <pre className="overflow-x-auto p-2 scrollbar-thin">
+              <code className={selectedClientId ? "text-lime-400/90" : "text-zinc-600 italic"}>
+                {loading ? t.loading : integrationCode}
+              </code>
             </pre>
           </div>
           {!selectedClientId && !loading && (
-            <p className="mt-4 text-sm text-amber-500 font-medium">
-              ⚠️ You need to add at least one domain in Settings to generate your integration code.
-            </p>
+            <div className="mt-6 flex items-center gap-3 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl">
+              <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+              <p className="text-sm text-amber-500/90 font-medium">
+                {t.noDomainWarning}
+              </p>
+            </div>
           )}
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="dashboard-card">
         <CardHeader>
-          <CardTitle>2. Manage your domains</CardTitle>
-          <CardDescription>
-            You can register additional domains in the settings panel. Each new domain will receive its own individual tracking ID.
+          <CardTitle className="text-xl font-bold text-white">{t.step2Title}</CardTitle>
+          <CardDescription className="text-zinc-400">
+            {t.step2Desc}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button variant="outline" asChild>
-            <a href="/dashboard/settings">Go to Domain Settings</a>
+          <p className="text-sm text-zinc-400 mb-6 leading-relaxed">
+            {t.settingsHint}
+          </p>
+          <Button className="dashboard-btn-primary" asChild>
+            <a href="/dashboard/settings">{t.goToSettings}</a>
           </Button>
         </CardContent>
       </Card>

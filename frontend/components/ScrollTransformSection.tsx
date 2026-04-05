@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
 import { AlertCircle, Phone, User, CheckCircle2, Mic } from 'lucide-react'
-import { BariWebWidgetUI } from './BariWebWidgetUI'
+import { BariwebWidgetUI } from './BariWebWidgetUI'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 // Global stages definition for scroll tracking
@@ -24,7 +24,7 @@ export function ScrollTransformSection() {
   const [stage, setStage] = useState(shouldReduceMotion ? 5 : 0)
 
   // Hydrate stage labels from i18n
-  const stagesWithLabels = STAGES.map((s, i) => ({
+  const stagesWithLabels = STAGES.map((s: any, i: number) => ({
     ...s,
     label: t.scrollTransform.stages[i]
   }));
@@ -344,7 +344,7 @@ function BrowserMockup({ stage, progress }: { stage: number, progress: number })
               className="absolute top-4 right-4 z-40 origin-top-right drop-shadow-2xl"
             >
               <div className="scale-75 md:scale-90 lg:scale-100 origin-top-right">
-                <BariWebWidgetUI onClose={() => {}} forceMode="hidden-close" />
+                <BariwebWidgetUI onClose={() => {}} forceMode="hidden-close" />
               </div>
             </motion.div>
           )}

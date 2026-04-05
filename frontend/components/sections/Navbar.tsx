@@ -53,7 +53,7 @@ export default function Navbar() {
           GitLab
         </a>
         <a 
-          href="https://alem.plus" 
+          href="https://plus.alem.ai" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="nav-link"

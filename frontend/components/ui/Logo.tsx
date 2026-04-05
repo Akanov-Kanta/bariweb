@@ -9,6 +9,7 @@ export default function Logo({ className, iconOnly = false }: { className?: stri
           src="/logo-infinite.png" 
           alt="Bariweb Logo" 
           fill
+          sizes="(max-width: 768px) 40px, 40px"
           className="object-contain"
           priority
         />

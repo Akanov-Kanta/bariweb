@@ -11,7 +11,11 @@ export interface ChatMessage {
 export interface InteractiveElement {
     id: string;
     label: string;
-    tag?: string;
+    tag: string;
+    type?: string;       // input type (text, email, password, submit, button, etc.)
+    placeholder?: string;
+    name?: string;
+    value?: string;      // current value of input/textarea
 }
 
 export interface ChatAction {
@@ -30,12 +34,51 @@ const API_URL = (typeof import.meta !== 'undefined' && (import.meta as any).env?
 
 const MAX_AGENT_STEPS = 5;
 
+// ─── Critical action detection ──────────────────────────────────────────────
+// If a button's label or attributes match these patterns, we pause and ask user.
+
+const CRITICAL_PATTERNS = [
+    /(submit|отправить|оплатить|сгенерировать|сохранить|перевести|подтвердит|купить|удалить|delete|pay|purchase|buy|send|transfer|confirm|place.?order|checkout|remove|drop|unsubscribe|sign.?out|выйти|уволить)/i,
+];
+
+function isCriticalAction(action: ChatAction): boolean {
+    if (action.type !== 'click_element' || !action.element_id) return false;
+    const el = document.getElementById(action.element_id);
+    if (!el) return false;
+
+    // 1. Is it a form submit button? (This catches most 'save' / 'send' actions)
+    const isSubmitBtn = el.getAttribute('type') === 'submit' || 
+        (el.tagName.toLowerCase() === 'button' && el.closest('form') !== null && el.getAttribute('type') !== 'button');
+    if (isSubmitBtn) return true;
+
+    // 2. Does it use critical wording?
+    const checkStr = [
+        el.textContent?.trim() || '',
+        el.getAttribute('aria-label') || '',
+        el.getAttribute('title') || '',
+        el.getAttribute('name') || '',
+        el.getAttribute('value') || '',
+    ].join(' ');
+
+    return CRITICAL_PATTERNS.some(p => p.test(checkStr));
+}
+
+
 export class ChatController implements ReactiveController {
     host: ReactiveControllerHost;
 
     messages: ChatMessage[] = [];
     isLoading = false;
     error: string | null = null;
+
+    // ─── Confirmation flow ──────────────────────────────────────────
+    /** When non-null, the agent is paused waiting for user confirmation */
+    pendingConfirmation: {
+        text: string;               // What the AI wants to do
+        action: ChatAction;         // The action to execute
+        currentQuery: string;       // Loop context
+        step: number;               // Current step
+    } | null = null;
 
     constructor(host: ReactiveControllerHost) {
         (this.host = host).addController(this);
@@ -56,11 +99,13 @@ export class ChatController implements ReactiveController {
             }
             
             const autoResume = sessionStorage.getItem('bw-auto-resume');
-            if (autoResume === 'true') {
+            if (autoResume === 'true' || autoResume === 'verify-only') {
                 sessionStorage.removeItem('bw-auto-resume');
-                // After a full page navigation, auto-continue the agent task
+                const resumeMsg = autoResume === 'verify-only'
+                    ? 'Страница загрузилась после отправки формы. Проверь новый DOM: если авторизация прошла успешно (нет формы входа, есть контент приложения) — сообщи об успехе. НЕ нажимай ничего снова.'
+                    : 'Страница загрузилась. Продолжай выполнение задачи с учетом нового контекста и DOM.';
                 setTimeout(() => {
-                    this._agentStep("Страница загрузилась. Продолжай выполнение задачи с учетом нового контекста и DOM.");
+                    this._agentStep(resumeMsg);
                 }, 1000);
             }
         } catch (e) {
@@ -77,10 +122,8 @@ export class ChatController implements ReactiveController {
     }
 
     /**
-     * Gather page context: page text + interactive elements with IDs.
-    /**
      * Gather page context for the AI agent.
-     * Elements are returned in a compressed [tag:id:text] string to save tokens.
+     * Format: [tag|type|id|name|placeholder|value|label]
      */
     gatherContext(): { page_text: string; elements: string; page_url: string } {
         const page_url = window.location.href;
@@ -92,24 +135,28 @@ export class ChatController implements ReactiveController {
         const elements: InteractiveElement[] = rawElements
             .map((el) => {
                 const htmlEl = el as HTMLElement;
+                const tagName = htmlEl.tagName.toLowerCase();
+                const isFormField = tagName === 'input' || tagName === 'textarea' || tagName === 'select';
 
-                // --- STABLE ID GENERATION ---
-                // Use explicit ID first, then generate a stable hash from element properties
-                // so that DOM re-renders don't break previously assigned IDs.
+                const inputType = htmlEl.getAttribute('type')
+                    || (tagName === 'input' ? 'text' : (tagName === 'button' ? 'button' : tagName));
+                const name = htmlEl.getAttribute('name') || '';
+                const placeholder = htmlEl.getAttribute('placeholder') || '';
+                const currentValue = isFormField
+                    ? ((htmlEl as HTMLInputElement).value || '').slice(0, 80)
+                    : '';
+
                 let id = htmlEl.id && !htmlEl.getAttribute('data-bw-auto')
                     ? htmlEl.id
                     : htmlEl.getAttribute('data-id') || htmlEl.getAttribute('data-testid') || '';
 
                 if (!id) {
-                    // Build a stable fingerprint: tag + class + href/text snippet + parent info
-                    const tag = htmlEl.tagName.toLowerCase();
                     const cls = (htmlEl.className || '').toString().replace(/\s+/g, '-').slice(0, 40);
                     const href = (htmlEl as HTMLAnchorElement).href || '';
                     const textSnip = (htmlEl.textContent || '').trim().slice(0, 30);
                     const parentTag = htmlEl.parentElement?.tagName?.toLowerCase() || 'root';
-                    const raw = `${tag}|${cls}|${href}|${textSnip}|${parentTag}`;
+                    const raw = `${tagName}|${inputType}|${name}|${placeholder}|${cls}|${href}|${textSnip}|${parentTag}`;
 
-                    // Simple djb2 hash → short hex string
                     let h = 5381;
                     for (let i = 0; i < raw.length; i++) {
                         h = ((h << 5) + h) ^ raw.charCodeAt(i);
@@ -119,46 +166,55 @@ export class ChatController implements ReactiveController {
                     htmlEl.setAttribute('data-bw-auto', 'true');
                 }
 
-                let label =
-                    htmlEl.getAttribute('aria-label') ||
-                    htmlEl.textContent?.trim().slice(0, 100) ||
-                    htmlEl.getAttribute('title') ||
-                    htmlEl.getAttribute('placeholder') ||
-                    '';
-
-                // Add input name/type to label if it's a form element
-                if (htmlEl.tagName.toLowerCase() === 'input' || htmlEl.tagName.toLowerCase() === 'textarea') {
-                    const name = htmlEl.getAttribute('name') || htmlEl.getAttribute('type') || '';
-                    if (!label && name) {
-                        label = `[Поле ввода: ${name}]`;
+                let label = htmlEl.getAttribute('aria-label') || '';
+                if (!label && id) {
+                    const associated = document.querySelector(`label[for="${id}"]`);
+                    if (associated) label = associated.textContent?.trim() || '';
+                }
+                if (!label) {
+                    let p = htmlEl.parentElement;
+                    while (p && p.tagName.toLowerCase() !== 'form' && p.tagName.toLowerCase() !== 'body') {
+                        if (p.tagName.toLowerCase() === 'label') {
+                            label = (p.textContent || '').replace(htmlEl.textContent || '', '').trim();
+                            break;
+                        }
+                        p = p.parentElement;
                     }
                 }
-
-                // Handle icon-only buttons (e.g. Lucide SVGs)
-                if (!label) {
+                if (!label) label = (htmlEl.textContent || '').trim().slice(0, 80);
+                if (!label) label = htmlEl.getAttribute('title') || '';
+                if (!label && placeholder) label = placeholder;
+                if (!label && tagName === 'button') {
                     const svg = htmlEl.querySelector('svg');
                     if (svg && typeof svg.className?.baseVal === 'string') {
                         const match = svg.className.baseVal.match(/lucide-([a-z0-9\-]+)/);
-                        label = match ? `[Иконка: ${match[1]}]` : '[Иконка]';
-                    } else if (htmlEl.tagName.toLowerCase() === 'button') {
-                        label = `[Кнопка] class="${(htmlEl.className || '').toString().slice(0, 30)}"`;
-                    } else if (htmlEl.parentElement && htmlEl.parentElement.textContent) {
-                        // Fallback to parent text if any
-                        const parentText = htmlEl.parentElement.textContent.replace(/\s+/g, ' ').trim().slice(0, 40);
-                        if (parentText) label = `[Рядом с текстом: ${parentText}]`;
+                        label = match ? `[icon:${match[1]}]` : '[icon]';
+                    } else {
+                        label = `[btn:${(htmlEl.className || '').toString().slice(0, 30)}]`;
                     }
                 }
 
-                const tag = htmlEl.tagName.toLowerCase();
-                return { id, label: label.trim(), tag };
+                return {
+                    id,
+                    label: label.trim(),
+                    tag: tagName,
+                    type: inputType,
+                    name,
+                    placeholder,
+                    value: currentValue,
+                } as InteractiveElement;
             })
-            .filter((el) => el.label.length > 0)
+            .filter((el) => el.label.length > 0 || (el.placeholder ?? '').length > 0 || (el.name ?? '').length > 0)
             .slice(0, 100);
 
-        // --- COMPRESSION ---
-        // Convert to [tag:id:label] string
         const compressedElements = elements
-            .map(el => `[${el.tag}:${el.id}:${el.label}]`)
+            .map(el => {
+                const parts = [
+                    el.tag, el.type || '', el.id, el.name || '',
+                    el.placeholder || '', el.value || '', el.label,
+                ];
+                return '[' + parts.join('|') + ']';
+            })
             .join('');
 
         return { page_text, elements: compressedElements, page_url };
@@ -166,7 +222,6 @@ export class ChatController implements ReactiveController {
 
     /**
      * Execute a server-returned action on the DOM.
-     * Returns: { result: string, causesNavigation: boolean }
      */
     executeAction(action: ChatAction): { result: string; causesNavigation: boolean } {
         if (action.type === 'click_element' && action.element_id) {
@@ -174,18 +229,25 @@ export class ChatController implements ReactiveController {
             if (el) {
                 if (el.tagName.toLowerCase() === 'a' && (el as HTMLAnchorElement).href) {
                     const href = (el as HTMLAnchorElement).href;
-                    // Check if it's a same-origin link (SPA) or external
                     const isSameOrigin = new URL(href, window.location.origin).origin === window.location.origin;
                     if (isSameOrigin) {
                         sessionStorage.setItem('bw-auto-resume', 'true');
                     }
-                    // Use click() instead of location.href to let React Router intercept
                     el.click();
                     return { result: `✅ Нажал на "${el.textContent?.trim() || action.element_id}"`, causesNavigation: true };
-                } else {
-                    el.click();
-                    return { result: `✅ Нажал на "${el.textContent?.trim() || action.element_id}"`, causesNavigation: false };
                 }
+
+                const isSubmit = el.getAttribute('type') === 'submit'
+                    || (el.tagName.toLowerCase() === 'button' && el.closest('form') !== null && el.getAttribute('type') !== 'button');
+
+                if (isSubmit) {
+                    sessionStorage.setItem('bw-auto-resume', 'verify-only');
+                    el.click();
+                    return { result: `✅ Нажал на "${el.textContent?.trim() || action.element_id}"`, causesNavigation: true };
+                }
+
+                el.click();
+                return { result: `✅ Нажал на "${el.textContent?.trim() || action.element_id}"`, causesNavigation: false };
             }
             return { result: `⚠️ Элемент "${action.element_id}" не найден.`, causesNavigation: false };
         }
@@ -199,7 +261,6 @@ export class ChatController implements ReactiveController {
         if (action.type === 'input_text' && action.element_id && action.value !== undefined) {
             const el = document.getElementById(action.element_id) as HTMLInputElement | HTMLTextAreaElement;
             if (el) {
-                // Must simulate React/SPA typing events (value setter + dispatch Event)
                 const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
                 const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value')?.set;
                 
@@ -237,7 +298,6 @@ export class ChatController implements ReactiveController {
             || (window as any).__BARIWEB_CLIENT_ID__ 
             || '';
 
-        // 1. Try to match fingerprint to an admin-trained label
         let screen_label = null;
         try {
             const matchResp = await fetch(`${API_URL}/v1/training/match-screen`, {
@@ -256,7 +316,6 @@ export class ChatController implements ReactiveController {
             console.warn('Failed to match screen fingerprint', e);
         }
 
-        // 2. Call the main chat API with the label context
         const resp = await fetch(`${API_URL}/v1/chat`, {
             method: 'POST',
             headers: {
@@ -274,47 +333,60 @@ export class ChatController implements ReactiveController {
             }),
         });
 
-
         if (!resp.ok) {
             throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
         }
 
-        return await resp.json() as ChatResponse;
+        const data = await resp.json() as ChatResponse;
+
+        // Safety net: if backend somehow returned raw JSON in the text field, extract it
+        if (data.text && data.text.trimStart().startsWith('{')) {
+            try {
+                const inner = JSON.parse(data.text);
+                if (inner.text) {
+                    data.text = inner.text;
+                    if (inner.action && !data.action) data.action = inner.action;
+                }
+            } catch {
+                // Not valid JSON — show as-is (partial text is acceptable)
+                data.text = data.text.replace(/^\{"text"\s*:\s*"/, '').replace(/",?\s*"action".*$/, '');
+            }
+        }
+
+        return data;
     }
 
     /**
-     * Returns a compressed history to send to the LLM:
-     * - First user message (original intent)
-     * - Last 2 assistant+user exchanges (recent context)
-     * This prevents token bloat during multi-step agent tasks.
+     * MINIMAL history sent to LLM:
+     *  - The LAST user message (original task intent)
+     *  - Last 2 assistant messages (action results only)
+     *
+     * We deliberately DROP early context. The LLM already gets the
+     * current DOM, elements, and page_url as context — that's the
+     * ground truth. Old history just confuses it.
      */
     private _compressedHistory(): Array<{ role: string; text: string }> {
         const all = this.messages.map(m => ({ role: m.role, text: m.text }));
-        if (all.length <= 2) return all;
+        if (all.length <= 3) return all;
 
-        // Always include first user message (original goal)
-        const first = all[0];
-        // Get the last 4 messages (2 exchanges) — exclude the very last one since
-        // it's the current user message that's already being sent as `query`.
-        const recent = all.slice(-4, -1);
-
-        // Deduplicate in case first is already in recent
-        const seen = new Set<string>();
-        const result: Array<{ role: string; text: string }> = [];
-        for (const msg of [first, ...recent]) {
-            const key = `${msg.role}|${msg.text.slice(0, 50)}`;
-            if (!seen.has(key)) {
-                seen.add(key);
-                result.push(msg);
-            }
+        // Find the last user message (that's the current task)
+        let lastUserIdx = -1;
+        for (let i = all.length - 1; i >= 0; i--) {
+            if (all[i].role === 'user') { lastUserIdx = i; break; }
         }
-        return result;
+        if (lastUserIdx === -1) return all.slice(-3);
+
+        const lastUser = all[lastUserIdx];
+        // Get last 2 assistant messages AFTER the last user message
+        const afterUser = all.slice(lastUserIdx + 1).filter(m => m.role === 'assistant');
+        const recentAssistant = afterUser.slice(-2);
+
+        return [lastUser, ...recentAssistant];
     }
 
 
     /**
-     * The main agentic loop. Sends a query, executes actions, and loops
-     * if the LLM returns "continue" (up to MAX_AGENT_STEPS).
+     * Main agentic loop with CONFIRMATION for critical actions.
      */
     private async _agentLoop(initialQuery: string, addUserMessage: boolean): Promise<void> {
         if (this.isLoading) return;
@@ -338,17 +410,35 @@ export class ChatController implements ReactiveController {
                 let displayText = data.text;
 
                 if (data.action) {
+                    // ─── CRITICAL ACTION GATE ─────────────────────────────
+                    // Before submit/pay/delete: STOP and ask user for confirmation.
+                    if (isCriticalAction(data.action)) {
+                        const el = document.getElementById(data.action.element_id || '');
+                        const btnLabel = el?.textContent?.trim() || data.action.element_id || 'кнопку';
+
+                        this.pendingConfirmation = {
+                            text: `${data.text}\n\n⚠️ Нажать «${btnLabel}»?`,
+                            action: data.action,
+                            currentQuery,
+                            step: steps,
+                        };
+                        this.messages = [
+                            ...this.messages,
+                            { role: 'assistant', text: `${data.text}\n\n🛑 **Подтвердите действие:** нажать «${btnLabel}»?`, timestamp: Date.now() },
+                        ];
+                        this._saveMessages();
+                        this.isLoading = false;
+                        this.host.requestUpdate();
+                        return; // Pause loop — user must call confirmAction() or cancelAction()
+                    }
+
                     const oldDomText = this.gatherContext().page_text;
                     const { result, causesNavigation } = this.executeAction(data.action);
 
                     if (data.action.type === 'continue') {
-                        // LLM wants to re-read DOM after an in-page state change.
-                        // Add a thinking message, wait for DOM to settle, then loop.
                         this.messages = [...this.messages, { role: 'assistant', text: '🔄 Анализирую...', timestamp: Date.now() }];
                         this._saveMessages();
                         this.host.requestUpdate();
-
-                        // Wait for SPA DOM to settle (React re-render)
                         await this._waitForDom(800);
                         currentQuery = "Страница обновилась. Продолжай задачу, прочитай DOM.";
                         continue;
@@ -357,49 +447,49 @@ export class ChatController implements ReactiveController {
                     displayText = `${data.text}\n${result}`;
 
                     if (causesNavigation) {
-                        // Full page reload will happen → auto-resume handles continuation
                         this.messages = [...this.messages, { role: 'assistant', text: displayText, timestamp: Date.now() }];
                         this._saveMessages();
                         this.host.requestUpdate();
-
-                        // For SPA (React Router), the page won't fully reload.
-                        // Wait a bit and check if URL changed without a reload.
                         await this._waitForDom(1500);
                         
-                        // Check if we're still here (SPA navigation, no full reload)
                         const resumeFlag = sessionStorage.getItem('bw-auto-resume');
-                        if (resumeFlag === 'true') {
-                            // Still on the same page instance — SPA routing happened
+                        if (resumeFlag === 'true' || resumeFlag === 'verify-only') {
                             sessionStorage.removeItem('bw-auto-resume');
-                            currentQuery = "Страница загрузилась (SPA навигация). Продолжай задачу, прочитай новый DOM.";
+                            currentQuery = resumeFlag === 'verify-only'
+                                ? 'Страница загрузилась после отправки формы (SPA навигация). Проверь новый DOM: если задача выполнена — сообщи об успехе. НЕ нажимай ничего снова.'
+                                : 'Страница загрузилась (SPA навигация). Продолжай задачу, прочитай новый DOM.';
                             continue;
                         }
-                        
-                        // If we got here, the page is about to fully reload.
-                        // auto-resume flag is already set; the new page load handles it.
                         break;
                     }
 
-                    // In-page click that's not a navigation and LLM didn't ask for "continue"
-                    // Wait briefly for DOM to update, then loop once more to let LLM see result
                     this.messages = [...this.messages, { role: 'assistant', text: displayText, timestamp: Date.now() }];
                     this._saveMessages();
                     this.host.requestUpdate();
 
-                    // Give more time for input_text (React controlled inputs debounce)
-                    const waitMs = data.action.type === 'input_text' ? 1200 : 800;
-                    await this._waitForDom(waitMs);
-                    const newDomText = this.gatherContext().page_text;
-                    
-                    if (oldDomText === newDomText && (data.action.type === 'click_element' || data.action.type === 'input_text')) {
-                        currentQuery = '⚠️ Действие выполнено, но экран НЕ ИЗМЕНИЛСЯ визуально. Возможно: (1) кнопка не сработала, (2) есть ошибка валидации, (3) ты не на правильной странице. Перечитай DOM, проверь ошибки или переходи на вкладку Карта для подачи жалобы.';
+                    if (data.action.type === 'input_text' && data.action.element_id) {
+                        await this._waitForDom(800);
+                        const filledEl = document.getElementById(data.action.element_id) as HTMLInputElement | null;
+                        const actualValue = filledEl?.value ?? '';
+
+                        if (actualValue.length > 0) {
+                            currentQuery = `✅ Поле заполнено. Переходи к СЛЕДУЮЩЕМУ незаполненному полю или нажми кнопку отправки. НЕ повторяй ввод.`;
+                        } else {
+                            currentQuery = `⚠️ Поле не получило значение. Попробуй ввести снова в id="${data.action.element_id}".`;
+                        }
                     } else {
-                        currentQuery = 'Действие выполнено, экран ИЗМЕНИЛСЯ. Прочти новый DOM: если видишь успешное подтверждение задачи — сообщи об успехе. Иначе продолжай следующий шаг.';
+                        await this._waitForDom(800);
+                        const newDomText = this.gatherContext().page_text;
+                        if (oldDomText === newDomText) {
+                            currentQuery = '⚠️ Страница не изменилась. Возможно кнопка не сработала. Проверь DOM.';
+                        } else {
+                            currentQuery = 'Действие выполнено. Если задача готова — сообщи. Иначе продолжай.';
+                        }
                     }
                     continue;
                 }
 
-                // No action — this is the final answer
+                // No action — final answer
                 this.messages = [...this.messages, { role: 'assistant', text: displayText, timestamp: Date.now() }];
                 this._saveMessages();
                 break;
@@ -417,9 +507,49 @@ export class ChatController implements ReactiveController {
         }
     }
 
-    /**
-     * Wait for the DOM to settle after a click / SPA navigation.
-     */
+    // ─── Confirmation public API ──────────────────────────────────────
+
+    /** User confirmed the critical action → execute it and resume the loop */
+    async confirmAction(): Promise<void> {
+        if (!this.pendingConfirmation) return;
+        const { action } = this.pendingConfirmation;
+        this.pendingConfirmation = null;
+
+        this.messages = [...this.messages, { role: 'user', text: '✅ Подтверждаю', timestamp: Date.now() }];
+        this._saveMessages();
+        this.host.requestUpdate();
+
+        // Execute the action
+        const { result, causesNavigation } = this.executeAction(action);
+        this.messages = [...this.messages, { role: 'assistant', text: result, timestamp: Date.now() }];
+        this._saveMessages();
+        this.host.requestUpdate();
+
+        if (causesNavigation) {
+            // Navigation will happen, auto-resume will handle continuation
+            return;
+        }
+
+        // If it didn't cause navigation, let the agent check the result
+        await this._waitForDom(1200);
+        await this._agentStep('Действие подтверждено и выполнено. Проверь результат в DOM.');
+    }
+
+    /** User cancelled the critical action → inform the agent */
+    cancelAction(): void {
+        if (!this.pendingConfirmation) return;
+        this.pendingConfirmation = null;
+
+        this.messages = [
+            ...this.messages,
+            { role: 'user', text: '❌ Отмена', timestamp: Date.now() },
+            { role: 'assistant', text: '🚫 Действие отменено. Чем ещё могу помочь?', timestamp: Date.now() },
+        ];
+        this._saveMessages();
+        this.host.requestUpdate();
+    }
+
+
     private _waitForDom(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -430,16 +560,12 @@ export class ChatController implements ReactiveController {
     async sendMessage(query: string): Promise<void> {
         if (!query.trim() || this.isLoading) return;
         await this._agentLoop(query, true);
-        // Scroll to bottom after the loop ends
         (this.host as any).updateComplete?.then(() => {
             const messagesEl = (this.host as any).renderRoot?.querySelector('.chat-messages');
             if (messagesEl) messagesEl.scrollTop = messagesEl.scrollHeight;
         });
     }
 
-    /**
-     * Internal: resume agent from a system trigger (e.g. after page load).
-     */
     private async _agentStep(sysMsg: string): Promise<void> {
         await this._agentLoop(sysMsg, false);
         (this.host as any).updateComplete?.then(() => {
@@ -451,6 +577,7 @@ export class ChatController implements ReactiveController {
     clearMessages() {
         this.messages = [];
         this.error = null;
+        this.pendingConfirmation = null;
         this._saveMessages();
         this.host.requestUpdate();
     }

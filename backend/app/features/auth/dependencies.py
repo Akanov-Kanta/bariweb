@@ -105,6 +105,7 @@ security_scheme = HTTPBearer()
 def get_current_admin(token: Annotated[HTTPAuthorizationCredentials, Depends(security_scheme)]) -> dict:
     """
     Dependency to validate the Admin JWT token from the Authorization header.
+    Used by the widget admin flow.
     """
     payload = decode_access_token(token.credentials)
     if not payload or payload.get("role") != "admin":
@@ -114,3 +115,42 @@ def get_current_admin(token: Annotated[HTTPAuthorizationCredentials, Depends(sec
             headers={"WWW-Authenticate": "Bearer"},
         )
     return payload
+
+
+def get_current_user_as_admin(
+    token: TokenDep,
+    db: Session = Depends(get_db),
+) -> dict:
+    """
+    Dashboard dependency: authenticates via cookie session (same as get_current_user),
+    then resolves the user's primary client and returns an admin-like payload.
+    This lets dashboard pages call training endpoints without a separate widget token.
+    """
+    from jose import jwt as jose_jwt
+    from jose.exceptions import JWTError
+    try:
+        payload = jose_jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+        )
+        user_id_str = payload.get("sub")
+        if not user_id_str:
+            raise HTTPException(status_code=403, detail="Invalid session token")
+        user_id = uuid.UUID(user_id_str)
+    except (JWTError, ValueError):
+        raise HTTPException(status_code=403, detail="Invalid session token")
+
+    # Get user's primary client
+    client = db.exec(
+        select(Client).where(Client.owner_id == user_id)
+    ).first()
+
+    if not client:
+        raise HTTPException(status_code=404, detail="No client found for this account")
+
+    return {
+        "sub": str(user_id),
+        "role": "admin",
+        "client_id": client.public_id,
+    }

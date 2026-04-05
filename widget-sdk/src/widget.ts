@@ -44,7 +44,9 @@ export class BariwebWidget extends LitElement {
     if (!token) return;
 
     try {
-      const resp = await fetch('http://localhost:8000/auth/status', {
+      // Verify the token is still valid against the widget auth endpoint
+      const resp = await fetch('http://localhost:8000/auth/login/widget/verify', {
+        method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (resp.ok) {
@@ -54,7 +56,18 @@ export class BariwebWidget extends LitElement {
         localStorage.removeItem('bw_admin_token');
       }
     } catch (e) {
-      console.error('Auth sync failed', e);
+      // If network fails, check token expiry locally (JWT decode without verify)
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.exp && payload.exp * 1000 > Date.now() && payload.role === 'admin') {
+          this._isAdmin = true;
+          this._loadAdminUI();
+        } else {
+          localStorage.removeItem('bw_admin_token');
+        }
+      } catch {
+        localStorage.removeItem('bw_admin_token');
+      }
     }
   }
 
@@ -71,11 +84,19 @@ export class BariwebWidget extends LitElement {
 
   private async _handleAdminLogin() {
     this._authError = '';
+    if (!this.clientId) {
+      this._authError = 'Client ID not configured';
+      return;
+    }
     try {
-      const resp = await fetch('http://localhost:8000/auth/login', {
+      // Use the dedicated widget admin login endpoint
+      const resp = await fetch('http://localhost:8000/auth/login/widget', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: this._adminPassword })
+        body: JSON.stringify({
+          client_public_id: this.clientId,
+          admin_key: this._adminPassword,
+        })
       });
 
       if (resp.ok) {
@@ -84,11 +105,22 @@ export class BariwebWidget extends LitElement {
         this._isAdmin = true;
         this._loadAdminUI();
       } else {
-        this._authError = 'Invalid password';
+        const err = await resp.json().catch(() => ({}));
+        this._authError = err.detail || 'Invalid admin key';
       }
     } catch (e) {
       this._authError = 'Connection failed';
     }
+  }
+
+  private _handleAdminLogout() {
+    localStorage.removeItem('bw_admin_token');
+    this._isAdmin = false;
+    this._adminPassword = '';
+    bariwebWatcher.isAutoDiscoveryEnabled = false;
+    // Remove the floating admin panel if present
+    const panel = document.querySelector('#bw-admin-wrapper');
+    if (panel) panel.remove();
   }
 
   connectedCallback() {
@@ -167,6 +199,7 @@ export class BariwebWidget extends LitElement {
   private _renderChatTab() {
     const messages = this._chat.messages;
     const isLoading = this._chat.isLoading;
+    const pending = this._chat.pendingConfirmation;
 
     const sendIcon = html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
     const chatIcon = html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
@@ -197,26 +230,41 @@ export class BariwebWidget extends LitElement {
           ` : ''}
         `}
       </div>
-      <div class="chat-input-bar">
-        <input
-          class="chat-input"
-          type="text"
-          placeholder="Напишите сообщение..."
-          .value=${this._inputValue}
-          @input=${this._handleInput}
-          @keydown=${this._handleKeydown}
-          ?disabled=${isLoading}
-          aria-label="Chat input"
-        />
-        <button
-          class="chat-send-btn"
-          @click=${this._handleSend}
-          ?disabled=${isLoading || !this._inputValue.trim()}
-          aria-label="Send message"
-        >
-          ${sendIcon}
-        </button>
-      </div>
+
+      ${pending ? html`
+        <!-- Confirmation buttons — replaces input bar while awaiting user decision -->
+        <div style="display: flex; gap: 8px; padding: 10px 14px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <button
+            @click=${() => this._chat.confirmAction()}
+            style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid rgba(74, 222, 128, 0.3); background: rgba(74, 222, 128, 0.1); color: #4ade80; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.15s;"
+          >✅ Подтвердить</button>
+          <button
+            @click=${() => this._chat.cancelAction()}
+            style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1); color: #ef4444; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.15s;"
+          >❌ Отмена</button>
+        </div>
+      ` : html`
+        <div class="chat-input-bar">
+          <input
+            class="chat-input"
+            type="text"
+            placeholder="Напишите сообщение..."
+            .value=${this._inputValue}
+            @input=${this._handleInput}
+            @keydown=${this._handleKeydown}
+            ?disabled=${isLoading}
+            aria-label="Chat input"
+          />
+          <button
+            class="chat-send-btn"
+            @click=${this._handleSend}
+            ?disabled=${isLoading || !this._inputValue.trim()}
+            aria-label="Send message"
+          >
+            ${sendIcon}
+          </button>
+        </div>
+      `}
     `;
   }
 
@@ -332,24 +380,38 @@ export class BariwebWidget extends LitElement {
         <bw-accordion-item title="Admin Access">
           <div style="padding: 10px 0;">
             ${this._isAdmin ? html`
-              <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 8px; padding: 12px; text-align: center;">
-                <p style="margin: 0 0 10px; color: #4ade80; font-size: 12px; font-weight: 600;">✅ Admin Mode Active</p>
-                <div style="font-size: 10px; color: #94a3b8; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                  <span style="width: 8px; height: 8px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80;"></span>
-                  Auto-discovery recording...
+              <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 10px; padding: 14px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                  <span style="width: 10px; height: 10px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 10px #4ade80; animation: bw-dot-pulse 2s infinite;"></span>
+                  <span style="color: #4ade80; font-size: 12px; font-weight: 700;">Discovery Mode Active</span>
                 </div>
+                ${this._currentScreenLabel ? html`
+                  <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 6px; padding: 8px 10px; margin-bottom: 10px;">
+                    <div style="font-size: 10px; color: #10b981; font-weight: 600; margin-bottom: 2px;">✅ Текущий экран</div>
+                    <div style="font-size: 13px; color: #e2e8f0; font-weight: 700;">${this._currentScreenLabel}</div>
+                  </div>
+                ` : ''}
+                <p style="margin: 0 0 12px; font-size: 11px; color: #64748b; line-height: 1.4;">
+                  🤖 Ходите по сайту — система автоматически записывает экраны. Управляйте ими в дашборде.
+                </p>
+                <button
+                  style="width: 100%; background: #1e293b; color: #94a3b8; border: 1px solid #334155; border-radius: 8px; padding: 8px; font-size: 12px; cursor: pointer;"
+                  @click=${this._handleAdminLogout}
+                >
+                  Выйти из Admin Mode
+                </button>
               </div>
             ` : html`
-              <p style="margin: 0 0 12px; font-size: 12px; color: #94a3b8; line-height: 1.4;">Enter admin password to enable training tools and screen identification.</p>
-              <input 
-                type="password" 
-                placeholder="Admin Password" 
+              <p style="margin: 0 0 12px; font-size: 12px; color: #94a3b8; line-height: 1.4;">Введите admin-ключ для включения автоматического обучения экранов.</p>
+              <input
+                type="password"
+                placeholder="Admin Key"
                 style="width: 100%; box-sizing: border-box; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; color: white; margin-bottom: 12px; outline: none;"
                 .value=${this._adminPassword}
                 @input=${(e: any) => this._adminPassword = e.target.value}
               />
               ${this._authError ? html`<p style="color: #f87171; font-size: 11px; margin-bottom: 10px; text-align: center;">${this._authError}</p>` : ''}
-              <button 
+              <button
                 style="width: 100%; background: #7c3aed; color: white; border: none; border-radius: 8px; padding: 10px; font-size: 13px; font-weight: 600; cursor: pointer;"
                 @click=${this._handleAdminLogin}
               >

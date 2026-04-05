@@ -5,11 +5,14 @@ from typing import Optional
 import httpx
 import logging
 import uuid
+import secrets
 
 from app.features.organizations.models import Client
 from app.features.auth.schemas import User
 from app.features.auth.dependencies import get_current_user, get_db
+from app.features.organizations.schemas import AdminKeyDisplay, AdminKeyStatus
 from app.core.config import settings
+from app.core.security import get_password_hash
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +56,12 @@ async def register_client(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    # Check for domain uniqueness
+    stmt = select(Client).where(Client.allowed_domains == client_in.domains)
+    existing = db.exec(stmt).first()
+    if existing:
+        raise HTTPException(status_code=400, detail=f"Domain {client_in.domains} is already registered")
+
     new_client = Client(
         name=client_in.name,
         allowed_domains=client_in.domains,
@@ -121,3 +130,38 @@ def delete_client(
     db.delete(client)
     db.commit()
     return {"status": "deleted"}
+
+@org_router.post("/{client_id}/keys", response_model=AdminKeyDisplay)
+def generate_admin_key(
+    client_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    stmt = select(Client).where(Client.id == client_id, Client.owner_id == current_user.id)
+    client = db.exec(stmt).first()
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    # Generate secure 32-char key
+    plain_key = secrets.token_urlsafe(32)
+    # Hash and save
+    client.admin_key_hash = get_password_hash(plain_key)
+    
+    db.add(client)
+    db.commit()
+    db.refresh(client)
+    
+    return AdminKeyDisplay(plain_key=plain_key)
+
+@org_router.get("/{client_id}/keys/status", response_model=AdminKeyStatus)
+def get_admin_key_status(
+    client_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    stmt = select(Client).where(Client.id == client_id, Client.owner_id == current_user.id)
+    client = db.exec(stmt).first()
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+        
+    return AdminKeyStatus(has_key=bool(client.admin_key_hash))

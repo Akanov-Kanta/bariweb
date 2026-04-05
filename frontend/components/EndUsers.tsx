@@ -19,7 +19,7 @@ export function EndUsers() {
     { color: "bg-green-600", tagColor: "bg-green-500/20 text-green-400 border-green-500/30" }
   ];
 
-  const personas = t.endUsers.personas.map((p, i) => ({
+  const personas = t.endUsers.personas.map((p: any, i: number) => ({
     ...p,
     icon: icons[i],
     ...colors[i]
@@ -40,7 +40,7 @@ export function EndUsers() {
 
         {/* TOP METRICS */}
         <div className="flex flex-col md:flex-row justify-between items-center bg-white/5 border border-white/10 rounded-2xl p-8 mb-16 divide-y md:divide-y-0 md:divide-x divide-white/10 max-w-5xl mx-auto">
-          {t.endUsers.metrics.map((m, i) => (
+          {t.endUsers.metrics.map((m: any, i: number) => (
             <div key={i} className="flex-1 text-center py-6 md:py-0 px-4">
               <div className="text-5xl md:text-6xl font-light text-white mb-2 tracking-tight">{m.val}</div>
               <div className="text-sm text-zinc-400">{m.label}</div>
@@ -56,7 +56,7 @@ export function EndUsers() {
           viewport={{ once: true, margin: "-50px" }}
           variants={{ visible: { transition: { staggerChildren: 0.1 } }, hidden: {} }}
         >
-          {personas.map((p, idx) => (
+          {personas.map((p: any, idx: number) => (
             <motion.div
               key={idx}
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}

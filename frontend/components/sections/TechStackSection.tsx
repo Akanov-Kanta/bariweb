@@ -1,24 +1,22 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { landingTranslations } from "@/lib/i18n/landingTranslations";
 
 export default function TechStackSection() {
-  const items = [
-    "KazLLM (обработка языка)",
-    "RAGFlow (анализ DOM)",
-    "Speech-to-text Kazakh (голосовой ввод)",
-    "Milvus (векторная БД)",
-  ];
+  const { lang } = useLanguage();
+  const t = landingTranslations[lang].techstack;
 
   return (
     <div className="w-full border-y border-neutral-900 bg-[#080808] py-8 overflow-hidden">
       <div className="mx-auto max-w-7xl px-6 text-center">
         <div className="mb-4 text-[10px] font-bold uppercase tracking-[0.3em] text-neutral-500 opacity-60">
-          Архитектура построена на инфраструктуре <span className="text-white">alem.plus</span>
+          {t.label}<span className="text-white">alem.plus</span>
         </div>
         
         <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 md:gap-x-12">
-          {items.map((item, index) => (
+          {t.items.map((item: string, index: number) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 10 }}

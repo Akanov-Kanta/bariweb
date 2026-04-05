@@ -49,7 +49,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-1 bg-zinc-900/80 border border-zinc-800 rounded-full p-1 mr-2 backdrop-blur-sm">
-            {(["ru", "kz", "en"] as Lang[]).map((l) => (
+            {(["ru", "kz", "en"] as Lang[]).map((l: Lang) => (
               <button
                 key={l}
                 onClick={() => setLang(l)}

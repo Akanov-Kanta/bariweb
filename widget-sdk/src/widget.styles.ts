@@ -2,35 +2,24 @@ import { css } from 'lit';
 
 export const widgetStyles = css`
   :host {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 2147483647;
-    pointer-events: none; /* Let clicks pass through empty areas */
+    display: block;
+    pointer-events: none;
+    user-select: none;
     
-    /* Base Accessibility Variables */
-    --bw-grayscale: 0%;
-    --bw-saturation: 1;
-    --bw-font-scale: 1;
-    --bw-line-height: normal;
-    --bw-letter-spacing: normal;
-    --bw-word-spacing: normal;
+    /* Убиваем тени на корню через переменные */
+    --bw-shadow: none !important;
+    --bw-shadow-lg: none !important;
+    --bw-card-shadow: none !important;
 
-    /* Theme Variables */
     --bw-primary: var(--bw-primary-color, #18181b);
     --bw-primary-fg: var(--bw-primary-fg-color, #ffffff);
     --bw-bg: var(--bw-bg-color, #ffffff);
     --bw-fg: var(--bw-fg-color, #09090b);
     --bw-border: var(--bw-border-color, #e4e4e7);
     --bw-radius: var(--bw-radius-size, 1rem);
-    --bw-shadow: var(--bw-shadow-lg, 0 -10px 40px rgba(0, 0, 0, 0.12));
     --bw-bg-hover: #f4f4f5;
     
     font-family: system-ui, -apple-system, sans-serif;
-    font-size: calc(16px * var(--bw-font-scale));
-    filter: grayscale(var(--bw-grayscale)) saturate(var(--bw-saturation));
   }
 
   /* --- Accessibility Themes & Toggles --- */
@@ -104,54 +93,58 @@ export const widgetStyles = css`
     left: 2rem;
     width: var(--bw-trigger-size, 64px);
     height: var(--bw-trigger-size, 64px);
-    --bw-button-icon-size: calc(var(--bw-trigger-size, 64px) * 0.5); /* Adaptive icon size */
     pointer-events: auto;
-    margin: 0;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    /* Убираем тень, если она была у кнопки */
+    box-shadow: none !important; 
   }
 
   /* The sliding sidebar panel */
   bw-card {
-    --bw-radius: 0; /* Flat edges for full height sidebar */
-    --bw-bg: var(--bw-bg);
-    --bw-fg: var(--bw-fg);
-    --bw-border: var(--bw-border);
-    --bw-shadow: var(--bw-shadow);
-    --bw-body-padding: 0; /* Chat panel manages its own padding */
+    all: initial;
+    display: flex;
+    flex-direction: column;
+    
+    /* ГАРАНТИРОВАННОЕ ОТСУТСТВИЕ ТЕНИ */
+    box-shadow: none !important;
+    --bw-card-shadow: none !important;
+    --bw-shadow: none !important;
     
     position: fixed;
     top: 0;
     left: 0;
-    width: 400px;
-    max-width: 85vw; /* Respect small screens */
+    min-width: 420px;
+    width: 35vw; 
+    max-width: 95vw; 
     height: 100vh;
-    margin: 0;
-    border-top: none;
-    border-bottom: none;
-    border-left: none; /* Attached to left edge */
-    border-right: 1px solid var(--bw-border);
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease, visibility 0.4s, box-shadow 0.3s;
-    display: flex;
-    flex-direction: column;
-    pointer-events: auto;
-    z-index: 2147483647; /* Maximum safe z-index to overlay everything */
+    background: var(--bw-bg);
+    color: var(--bw-fg);
+    border: none;
+    overflow-y: auto; /* Scroll if font is too large */
+    
+    /* АНИМАЦИЯ: убираем display: none, используем visibility */
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+    will-change: transform, opacity;
+    z-index: 2147483647;
+  }
+
+  bw-card * {
+    box-sizing: border-box;
   }
 
   /* Slide from the left edge */
   .panel-hidden {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-100%);
-    pointer-events: none;
-    box-shadow: none;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translate3d(-100%, 0, 0) !important;
+    box-shadow: none !important;
   }
 
-  .panel-visible {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0);
-    pointer-events: auto;
-    box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+  .panel-visible ~ .trigger {
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* Hide the trigger button gently when panel is open */
@@ -236,7 +229,7 @@ export const widgetStyles = css`
   /* Grid */
   .grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 10px;
     margin-top: 1rem;
   }
@@ -244,7 +237,7 @@ export const widgetStyles = css`
   /* Grid 3-column for Color Tiles */
   .grid-3 {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
     gap: 8px;
     margin-top: 1rem;
   }

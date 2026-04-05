@@ -8,7 +8,7 @@ export const cardStyles = css`
     --bw-card-fg: var(--bw-fg, #09090b);
     --bw-card-radius: var(--bw-radius, 1rem);
     --bw-card-border: var(--bw-border, #e4e4e7);
-    --bw-card-shadow: var(--bw-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
+    --bw-card-shadow: var(--bw-shadow, none);
     --bw-card-padding: var(--bw-padding, 1.5rem);
   }
 

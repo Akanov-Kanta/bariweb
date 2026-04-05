@@ -11,6 +11,7 @@ import { bariwebWatcher } from './lib/Watcher.js';
 
 
 type Tab = 'a11y' | 'chat';
+const STT_LANG_STORAGE_KEY = 'bw-stt-language-mode-v1';
 
 const STT_SILENCE_CHECK_MS = 200;
 const STT_SILENCE_THRESHOLD = 0.015;
@@ -56,7 +57,28 @@ export class BariwebWidget extends LitElement {
   constructor() {
     super();
     // No more public initAdminMode() - we only load it via dynamic import after auth
+    this._loadSttLanguageMode();
     this._checkAuthStatus();
+  }
+
+  private _loadSttLanguageMode() {
+    try {
+      const raw = localStorage.getItem(STT_LANG_STORAGE_KEY);
+      if (raw === 'auto' || raw === 'kz' || raw === 'ru' || raw === 'en') {
+        this._sttLanguageMode = raw;
+      }
+    } catch {
+      // Ignore localStorage access issues and keep default.
+    }
+  }
+
+  private _setSttLanguageMode(mode: SttLanguageMode) {
+    this._sttLanguageMode = mode;
+    try {
+      localStorage.setItem(STT_LANG_STORAGE_KEY, mode);
+    } catch {
+      // Ignore localStorage access issues.
+    }
   }
 
   private async _checkAuthStatus() {
@@ -492,7 +514,7 @@ export class BariwebWidget extends LitElement {
             class="chat-lang-select"
             .value=${this._sttLanguageMode}
             ?disabled=${isLoading || this._sttState === 'recording' || this._sttState === 'processing'}
-            @change=${(e: Event) => { this._sttLanguageMode = (e.target as HTMLSelectElement).value as SttLanguageMode; }}
+            @change=${(e: Event) => { this._setSttLanguageMode((e.target as HTMLSelectElement).value as SttLanguageMode); }}
             aria-label="STT language mode"
           >
             <option value="auto">Auto</option>

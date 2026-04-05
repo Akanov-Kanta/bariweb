@@ -164,6 +164,7 @@ export const widgetStyles = css`
     color: white;
     box-shadow: 0 2px 8px rgba(109, 40, 217, 0.3);
   }
+  .bw-tab svg { width: 14px; height: 14px; flex-shrink: 0; }
 
   /* ─── Content area ─── */
   .bw-content {
@@ -600,6 +601,51 @@ export const widgetStyles = css`
     gap: 8px;
   }
 
+  .lang-row-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .lang-row-icon svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+
+  .settings-actions {
+    margin: 0 14px 14px;
+  }
+
+  .reset-settings-btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    border-radius: var(--bw-radius-sm);
+    border: 1.5px solid var(--bw-border);
+    background: var(--bw-bg);
+    color: var(--bw-fg);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.18s;
+  }
+  .reset-settings-btn:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: #fef2f2;
+  }
+  .reset-settings-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .trigger svg {
     width: 28px;
     height: 28px;
@@ -647,7 +693,8 @@ export const widgetStyles = css`
   }
   @keyframes adminFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-  .admin-overlay .admin-icon { font-size: 32px; margin-bottom: 12px; }
+  .admin-overlay .admin-icon { margin-bottom: 12px; color: var(--bw-primary); }
+  .admin-overlay .admin-icon svg { width: 32px; height: 32px; }
   .admin-overlay h4 { font-size: 17px; font-weight: 700; margin: 0 0 6px; color: var(--bw-fg); }
   .admin-overlay p { font-size: 13px; color: var(--bw-fg-muted); margin: 0 0 20px; }
   .admin-overlay input {

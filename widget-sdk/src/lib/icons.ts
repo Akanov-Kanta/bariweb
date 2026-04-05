@@ -22,15 +22,20 @@ const createIcon = (svgPath: string) => html`${unsafeHTML(`
 `)}`;
 
 export const Icons = {
-  accessibility: createIcon('<circle cx="12" cy="12" r="10" stroke-width="1.5" stroke-dasharray="3 3" stroke-linecap="butt"/><circle cx="12" cy="5" r="1.5"/><path d="M12 7v5"/><path d="M6 8h12"/><path d="M12 12l-3 5"/><path d="M12 12l3 5"/>'),
+  accessibility: createIcon('<circle cx="12" cy="4.5" r="2"/><path d="M4 9.5h16"/><path d="M12 6.5v6"/><path d="M9.5 20.5 12 12.5l2.5 8"/>'),
+  chat: createIcon('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'),
+  settings: createIcon('<path d="M10.325 4.317a1.724 1.724 0 0 1 3.35 0 1.724 1.724 0 0 0 2.573 1.066 1.724 1.724 0 0 1 2.305 2.305 1.724 1.724 0 0 0 1.066 2.573 1.724 1.724 0 0 1 0 3.35 1.724 1.724 0 0 0-1.066 2.573 1.724 1.724 0 0 1-2.305 2.305 1.724 1.724 0 0 0-2.573 1.066 1.724 1.724 0 0 1-3.35 0 1.724 1.724 0 0 0-2.573-1.066 1.724 1.724 0 0 1-2.305-2.305 1.724 1.724 0 0 0-1.066-2.573 1.724 1.724 0 0 1 0-3.35 1.724 1.724 0 0 0 1.066-2.573 1.724 1.724 0 0 1 2.305-2.305 1.724 1.724 0 0 0 2.573-1.066z"/><circle cx="12" cy="12" r="3"/>'),
   mic: createIcon('<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>'),
+  volumeOn: createIcon('<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>'),
+  volumeOff: createIcon('<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>'),
+  shield: createIcon('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'),
   close: createIcon('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'),
   languages: createIcon('<path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/>'),
   profiles: createIcon('<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'),
   textSize: createIcon('<polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/>'),
   contrast: createIcon('<circle cx="12" cy="12" r="10"/><path d="M12 18a6 6 0 0 0 0-12v12z"/>'),
   grayscale: createIcon('<circle cx="12" cy="12" r="10"/><path d="M12 2v20"/><path d="M12 18a6 6 0 0 0 0-12"/><path d="M12 14a2 2 0 0 0 0-4"/>'),
-  cursor: createIcon('<path d="M4 4l11.73 4.58a0.5 0 0 1 0 0.94l-4.47 1.35 1.35 4.47a0.5 0 0 1-0.94 0L6.7 9.61 4 4z"/>'),
+  cursor: createIcon('<path d="M4 3l7 17 2.2-6.2L20 11 4 3z"/>'),
   screenReader: createIcon('<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>'),
   visualImpair: createIcon('<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/>'),
   seizureSafe: createIcon('<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>'),

@@ -1,10 +1,17 @@
-const TTS_STORAGE_KEY = 'bw-tts-enabled-v1';
+﻿const TTS_STORAGE_KEY = 'bw-tts-enabled-v1';
 
 export class TtsController {
   private enabled = true;
 
   constructor() {
     this.enabled = this.loadEnabled();
+    if ('speechSynthesis' in window) {
+      // Warm up voice list in browsers that load voices lazily.
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
   }
 
   isEnabled(): boolean {
@@ -36,6 +43,7 @@ export class TtsController {
     if (!cleanText) return;
 
     try {
+      window.speechSynthesis.resume();
       window.speechSynthesis.cancel();
 
       const utterance = new SpeechSynthesisUtterance(cleanText);
@@ -49,9 +57,9 @@ export class TtsController {
 
       utterance.rate = 1;
       utterance.pitch = 1;
+      utterance.volume = 1;
       window.speechSynthesis.speak(utterance);
     } catch (e) {
-      // TTS should never break chat flow.
       console.warn('TTS speak failed', e);
     }
   }
@@ -67,14 +75,13 @@ export class TtsController {
   }
 
   private detectLanguage(text: string): 'kk-KZ' | 'ru-RU' | 'en-US' {
-    const lowered = text.toLowerCase();
-    const kazakhChars = /[әіңғүұқөһ]/i;
-    const cyrillicChars = /[а-яё]/i;
+    const kazakhChars = /[\u04D8\u04D9\u0492\u0493\u04AE\u04AF\u049A\u049B\u04E8\u04E9\u04BA\u04BB\u0406\u0456\u04A2\u04A3]/u;
+    const cyrillicChars = /[\u0400-\u04FF]/u;
     const latinChars = /[a-z]/i;
 
-    if (kazakhChars.test(lowered)) return 'kk-KZ';
-    if (cyrillicChars.test(lowered)) return 'ru-RU';
-    if (latinChars.test(lowered)) return 'en-US';
+    if (kazakhChars.test(text)) return 'kk-KZ';
+    if (cyrillicChars.test(text)) return 'ru-RU';
+    if (latinChars.test(text)) return 'en-US';
 
     return 'ru-RU';
   }

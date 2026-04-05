@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { landingTranslations } from "@/lib/i18n/landingTranslations";
@@ -15,6 +15,18 @@ export default function PaymentPage() {
   const { lang } = useLanguage();
   const router = useRouter();
   const t = landingTranslations[lang].paymentPage;
+
+  useEffect(() => {
+    const status = localStorage.getItem("subscription_status");
+    const isDev = process.env.NODE_ENV === 'development';
+    if (status === "active" || isDev) {
+      if (isDev && !status) {
+        localStorage.setItem("subscription_status", "active");
+        localStorage.setItem("subscription_plan", "pro");
+      }
+      setTimeout(() => router.push("/dashboard"), 100);
+    }
+  }, [router]);
 
   type PlanType = "freemium" | "lite" | "starter" | "business" | "enterprise" | "enterprisePremium";
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("business");

@@ -45,9 +45,10 @@ export default function RootLayout({
           </svg>
           
           {/* Global Scanlines & Noise Overlay */}
-          <div className="fixed inset-0 pointer-events-none z-[100] mix-blend-overlay opacity-30">
+          <div className="fixed inset-0 pointer-events-none z-[40] mix-blend-overlay opacity-30">
             <div className="scanlines absolute inset-0" />
           </div>
+
 
           <CustomCursor />
           {children}

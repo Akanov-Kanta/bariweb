@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { translations, Lang } from "./translations";
+import { client } from "@/lib/api/client.gen";
 
 interface LanguageContextType {
   lang: Lang;
@@ -19,6 +20,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>("ru");
 
   useEffect(() => {
+    // Configure API client once on hydration
+    client.setConfig({
+      baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+      credentials: 'include'
+    });
+
     const saved = localStorage.getItem("bariweb_lang") as Lang;
     if (saved && ["ru", "kz", "en"].includes(saved)) {
       setTimeout(() => setLangState(saved), 0);

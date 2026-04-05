@@ -5,8 +5,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Auth } from '@/lib/api/sdk.gen';
 import { client } from '@/lib/api/client.gen';
 
-client.setConfig({ credentials: 'include' });
-
 import {
   SquaresFour,
   Code,
@@ -43,18 +41,25 @@ export default function DashboardLayout({
   useEffect(() => {
     const status = localStorage.getItem('subscription_status');
     const plan = localStorage.getItem('subscription_plan');
-    if (status !== 'active') {
+    
+    // In development, we skip the payment redirect to allow quick testing
+    const isDev = process.env.NODE_ENV === 'development';
+    
+    if (status !== 'active' && !isDev) {
+      setActivePlan('Locked');
       router.push('/payment');
     } else {
       // capitalize plan string
-      setActivePlan(plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : "Unknown Plan");
+      setActivePlan(plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : "Pro");
+      // For dev UX, if status isn't set, let's treat it as active
+      if (!status && isDev) {
+        localStorage.setItem('subscription_status', 'active');
+        localStorage.setItem('subscription_plan', 'pro');
+      }
     }
   }, [router]);
 
-  // Gate access until plan is read
-  if (activePlan === null) {
-    return <div className="h-screen w-screen bg-[#05050a] flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-lime-400 border-t-transparent animate-spin"/></div>;
-  }
+
 
   const navigation = [
     { name: t.overview, href: '/dashboard', icon: SquaresFour },

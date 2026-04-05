@@ -31,12 +31,14 @@ export default function DashboardOverview() {
   
   useEffect(() => {
     const fetchData = async () => {
+      console.log('Dashboard: fetching data...');
       try {
         const [userRes, clientsRes, metricsRes] = await Promise.all([
-          Auth.me(),
-          Organizations.getMyClients(),
-          Organizations.getMyMetrics()
+          Auth.me().then(res => { console.log('Auth.me done'); return res; }),
+          Organizations.getMyClients().then(res => { console.log('Organizations.getMyClients done'); return res; }),
+          Organizations.getMyMetrics().then(res => { console.log('Organizations.getMyMetrics done'); return res; })
         ]);
+        console.log('Dashboard: all data fetched');
 
         if (!userRes.error) {
           setUserData(userRes.data);
@@ -89,13 +91,7 @@ export default function DashboardOverview() {
     { id: 2, title: t.stepInstallScript, desc: t.stepInstallScriptDesc, completed: false, href: '/dashboard/integration' },
   ];
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <Pulse className="w-8 h-8 text-lime-400 animate-pulse" weight="thin" />
-      </div>
-    );
-  }
+
 
   return (
     <div className="space-y-10 pb-12">

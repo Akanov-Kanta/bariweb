@@ -153,11 +153,7 @@ export default function SettingsPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-[50vh]">
-       <CircleNotch className="w-8 h-8 text-lime-400 animate-spin" weight="thin" />
-    </div>
-  );
+
 
   return (
     <div className="space-y-10 max-w-6xl pb-24">

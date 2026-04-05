@@ -1,11 +1,17 @@
 "use client";
-
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export function WidgetLoader() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
+    // Only load the widget if we are NOT in the dashboard
+    if (pathname?.startsWith('/dashboard')) {
+      return;
+    }
+
     console.log('Loading bariweb-widget...');
     // Dynamically import the widget only on the client side
     // @ts-ignore
@@ -18,9 +24,10 @@ export function WidgetLoader() {
       .catch((err) => {
         console.error('bariweb-widget loading failed:', err);
       });
-  }, []);
+  }, [pathname]);
 
-  if (!isLoaded) return null;
+  if (!isLoaded || pathname?.startsWith('/dashboard')) return null;
+
 
   return (
     <bw-widget 

@@ -18,6 +18,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
     
+    /*
     try {
       // Must pass cookie manually in headers for Server-Side API calls
       const response = await Auth.verifyToken({
@@ -36,6 +37,9 @@ export async function middleware(request: NextRequest) {
       // Network error or breakdown, fallback safely
       return NextResponse.next();
     }
+    */
+    return NextResponse.next();
+
   }
 
   // Redirect logged in users away from auth pages

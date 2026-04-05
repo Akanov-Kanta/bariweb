@@ -27,8 +27,10 @@ export default function IntegrationPage() {
 
   useEffect(() => {
     const fetchClients = async () => {
+      console.log('IntegrationPage: mounting and fetching clients...');
       try {
         const res = await Organizations.getMyClients();
+        console.log('IntegrationPage: clients res', res);
         if (res.data && Array.isArray(res.data) && res.data.length > 0) {
           const fetchedClients = res.data as ClientData[];
           setClients(fetchedClients);

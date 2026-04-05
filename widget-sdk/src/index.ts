@@ -27,7 +27,7 @@ const initialClientId = getClientId();
 
 // Configure the global API client
 client.setConfig({
-    baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+    baseUrl: import.meta.env.VITE_API_URL || 'https://aidyn-backend.gitlabapp.alem.ai',
 });
 
 // Intercept requests to inject the X-Client-ID header on SDK calls

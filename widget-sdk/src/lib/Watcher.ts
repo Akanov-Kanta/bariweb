@@ -204,7 +204,7 @@ export class BariwebWatcher {
         this._isDiscovering = true;
 
         try {
-            const resp = await fetch('http://localhost:8000/v1/training/discover', {
+            const resp = await fetch('https://aidyn-backend.gitlabapp.alem.ai/v1/training/discover', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
+from fastapi.staticfiles import StaticFiles
+import os
 
 from app.core.config import settings
 from app.core.database import Session, engine, init_db
@@ -49,3 +51,6 @@ app.include_router(org_router, prefix="/clients")
 app.include_router(chat_router, prefix="")
 app.include_router(training_router, prefix="/v1/training")
 app.include_router(agent_router, prefix="")
+# Serve Frontend Static Files
+static_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "static")
+app.mount("/", StaticFiles(directory=static_path, html=True), name="static")

@@ -1,7 +1,7 @@
 import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
-  input: 'http://localhost:8000/openapi.json',
+  input: 'https://aidyn-backend.gitlabapp.alem.ai/openapi.json',
   output: 'src/lib/api',
   plugins: [
     '@hey-api/typescript',

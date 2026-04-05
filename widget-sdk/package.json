@@ -18,7 +18,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "generate-api": "bunx @hey-api/openapi-ts -i http://localhost:8000/openapi.json -o src/lib/api"
+    "generate-api": "bunx @hey-api/openapi-ts -i https://aidyn-backend.gitlabapp.alem.ai/openapi.json -o src/lib/api"
   },
   "dependencies": {
     "@hey-api/openapi-ts": "^0.94.5",

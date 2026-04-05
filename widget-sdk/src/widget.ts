@@ -304,7 +304,7 @@ export class BariwebWidget extends LitElement {
     const token = localStorage.getItem('bw_admin_token');
     if (!token) return;
     try {
-      const resp = await fetch('http://localhost:8000/auth/login/widget/verify', {
+      const resp = await fetch('https://aidyn-backend.gitlabapp.alem.ai/auth/login/widget/verify', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (resp.ok) { this._isAdmin = true; this._loadAdminUI(); }
@@ -331,7 +331,7 @@ export class BariwebWidget extends LitElement {
     const cid = this.clientId || (window as any).BariwebConfig?.clientId || '';
     if (!cid) { this._authError = 'Client ID not configured'; return; }
     try {
-      const resp = await fetch('http://localhost:8000/auth/login/widget', {
+      const resp = await fetch('https://aidyn-backend.gitlabapp.alem.ai/auth/login/widget', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ client_public_id: cid, admin_key: this._adminPassword })
@@ -374,7 +374,7 @@ export class BariwebWidget extends LitElement {
     bariwebWatcher.onStateChange(async (snapshot: any) => {
       try {
         const cid = this.clientId || (window as any).BariwebConfig?.clientId || '';
-        const resp = await fetch('http://localhost:8000/v1/training/match-screen', {
+        const resp = await fetch('https://aidyn-backend.gitlabapp.alem.ai/v1/training/match-screen', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json', 

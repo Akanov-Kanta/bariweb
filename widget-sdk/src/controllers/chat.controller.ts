@@ -39,7 +39,7 @@ export interface SttResponse {
     detected_language?: string;
 }
 
-const API_URL = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL) || 'http://localhost:8000';
+const API_URL = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL) || 'https://aidyn-backend.gitlabapp.alem.ai';
 
 const MAX_AGENT_STEPS = 5;
 

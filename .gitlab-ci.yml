@@ -1,0 +1,36 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  MONO_IMAGE: $CI_REGISTRY_IMAGE/mono:$CI_COMMIT_REF_SLUG
+
+build:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - if [ -z "$CONTAINER_REGISTRY_USER" ]; then export CONTAINER_REGISTRY_USER=$CI_REGISTRY_USER; fi
+    - if [ -z "$CONTAINER_REGISTRY_PASSWORD" ]; then export CONTAINER_REGISTRY_PASSWORD=$CI_JOB_TOKEN; fi
+    - echo "$CONTAINER_REGISTRY_PASSWORD" | docker login -u "$CONTAINER_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  script:
+    - docker build -f backend/Dockerfile -t $MONO_IMAGE .
+    - docker push $MONO_IMAGE
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  image: curlimages/curl
+  script:
+    - |
+      curl -X POST \
+      -F token=$CI_JOB_TOKEN \
+      -F ref=main \
+      -F "variables[DOCKER_IMAGE]=$MONO_IMAGE" \
+      $CI_API_V4_URL/projects/$CI_PROJECT_ID/trigger/pipeline
+  only:
+    - main
+  except:
+    - triggers

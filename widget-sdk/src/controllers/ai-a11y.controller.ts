@@ -2,7 +2,7 @@ import type { ReactiveController, ReactiveControllerHost } from 'lit';
 import { bariwebWatcher } from '../lib/Watcher.js';
 
 // Using the same environment configuration pattern as chat.controller.ts
-const API_URL = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL) || 'http://localhost:8000';
+const API_URL = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL) || 'https://aidyn-backend.gitlabapp.alem.ai';
 
 export class AiA11yController implements ReactiveController {
   host: ReactiveControllerHost;

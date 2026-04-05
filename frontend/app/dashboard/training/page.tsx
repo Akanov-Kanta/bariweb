@@ -46,28 +46,82 @@ function StatusBadge({ isDraft }: { isDraft: boolean }) {
   );
 }
 
-function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: () => void }) {
+// ─── Label format helpers ─────────────────────────────────────────────────
+// DB format:  "PageName | btn:Магазин наград · a:Подробнее · input:Email"
+// For agent:  full label is passed as-is
+// For admin:  split into pageName + funcs[] for easy editing
+
+type ScreenFunc = { type: string; label: string };
+
+function parseLabel(raw: string): { pageName: string; funcs: ScreenFunc[] } {
+  const [pagePart, tokenPart] = raw.split('|').map(s => s.trim());
+  const pageName = pagePart || raw;
+  const funcs: ScreenFunc[] = [];
+  if (tokenPart) {
+    tokenPart.split('·').forEach(t => {
+      const clean = t.trim();
+      const colonIdx = clean.indexOf(':');
+      if (colonIdx > -1) {
+        funcs.push({ type: clean.slice(0, colonIdx), label: clean.slice(colonIdx + 1).trim() });
+      } else if (clean) {
+        funcs.push({ type: 'btn', label: clean });
+      }
+    });
+  }
+  return { pageName, funcs };
+}
+
+function serializeLabel(pageName: string, funcs: ScreenFunc[]): string {
+  if (funcs.length === 0) return pageName.trim();
+  const tokenPart = funcs.map(f => `${f.type}:${f.label}`).join(' · ');
+  return `${pageName.trim()} | ${tokenPart}`;
+}
+
+const TYPE_COLORS: Record<string, string> = {
+  btn:   'bg-violet-500/15 text-violet-300 border-violet-500/30',
+  a:     'bg-blue-500/15 text-blue-300 border-blue-500/30',
+  input: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+};
+const TYPE_LABEL: Record<string, string> = { btn: 'Кнопка', a: 'Ссылка', input: 'Поле' };
+
+function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: (id: string, newLabel: string, newDesc: string) => void }) {
+  const parsed = parseLabel(screen.label);
   const [expanded, setExpanded] = useState(screen.is_draft);
-  const [label, setLabel] = useState(screen.label);
+  const [pageName, setPageName] = useState(parsed.pageName);
+  const [funcs, setFuncs] = useState<ScreenFunc[]>(parsed.funcs);
   const [description, setDescription] = useState(screen.description || '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [newFuncLabel, setNewFuncLabel] = useState('');
+  const [newFuncType, setNewFuncType] = useState('btn');
+
+  const addFunc = () => {
+    if (!newFuncLabel.trim()) return;
+    setFuncs(f => [...f, { type: newFuncType, label: newFuncLabel.trim() }]);
+    setNewFuncLabel('');
+  };
+
+  const removeFunc = (idx: number) => setFuncs(f => f.filter((_, i) => i !== idx));
 
   const handleConfirm = async () => {
-    if (!label.trim()) { setError('Screen Label обязателен'); return; }
+    if (!pageName.trim()) { setError('Название страницы обязательно'); return; }
     setSaving(true);
     setError(null);
+    const fullLabel = serializeLabel(pageName, funcs);
     try {
       const res = await fetch(`${API_BASE}/v1/training/dashboard/confirm/${screen.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ label: label.trim(), description: description.trim() || null }),
+        body: JSON.stringify({ label: fullLabel, description: description.trim() || null }),
       });
       if (res.ok) {
         setSaved(true);
-        setTimeout(() => { setSaved(false); onUpdated(); }, 1400);
+        setTimeout(() => {
+          setSaved(false);
+          onUpdated(screen.id, fullLabel, description.trim() || '');
+        }, 1400);
       } else {
         const d = await res.json().catch(() => ({}));
         setError(d.detail || `Ошибка ${res.status}`);
@@ -86,6 +140,7 @@ function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: () => vo
         ? 'border-amber-400/20 bg-amber-400/[0.03] hover:border-amber-400/40'
         : 'border-emerald-400/20 bg-emerald-400/[0.03] hover:border-emerald-400/40'
     )}>
+      {/* ── Collapsed header ── */}
       <div
         className="flex items-center justify-between p-4 cursor-pointer select-none"
         onClick={() => setExpanded(e => !e)}
@@ -93,18 +148,25 @@ function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: () => vo
         <div className="flex items-center gap-3 min-w-0">
           <StatusBadge isDraft={screen.is_draft} />
           <div className="min-w-0">
-            <p className="text-sm font-bold text-zinc-200 truncate">{screen.label}</p>
-            {screen.page_url && (
-              <p className="text-[10px] text-zinc-500 truncate flex items-center gap-1 mt-0.5">
-                <Globe className="h-3 w-3 flex-shrink-0" />
-                {screen.page_url}
-              </p>
-            )}
+            <p className="text-sm font-bold text-zinc-200 truncate">{pageName}</p>
+            <div className="flex flex-wrap gap-1 mt-1">
+              {funcs.slice(0, 4).map((f, i) => (
+                <span key={i} className={cn(
+                  'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold border',
+                  TYPE_COLORS[f.type] || 'bg-zinc-700/30 text-zinc-400 border-zinc-700/40'
+                )}>
+                  {f.label}
+                </span>
+              ))}
+              {funcs.length > 4 && (
+                <span className="text-[9px] text-zinc-600">+{funcs.length - 4}</span>
+              )}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0 ml-3">
           <span className="text-[10px] font-mono text-zinc-600 hidden sm:block">
-            {screen.fingerprint.slice(0, 12)}…
+            {screen.fingerprint.slice(0, 10)}…
           </span>
           {expanded
             ? <ChevronUp className="h-4 w-4 text-zinc-500" />
@@ -113,24 +175,72 @@ function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: () => vo
       </div>
 
       {expanded && (
-        <div className="px-4 pb-4 space-y-3 border-t border-zinc-800/60 pt-4">
-          <div className="bg-zinc-950 rounded-lg px-3 py-2 border border-zinc-800">
-            <p className="text-[10px] text-zinc-600 mb-1 font-bold uppercase tracking-widest">Fingerprint</p>
-            <p className="font-mono text-[11px] text-zinc-400 break-all">{screen.fingerprint}</p>
-          </div>
+        <div className="px-4 pb-4 space-y-4 border-t border-zinc-800/60 pt-4">
 
+          {/* Page name */}
           <div>
             <label className="block text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">
-              Screen Label *
+              Название страницы *
             </label>
             <Input
-              value={label}
-              onChange={e => setLabel(e.target.value)}
-              placeholder="e.g. Payment Form, User Profile"
+              value={pageName}
+              onChange={e => setPageName(e.target.value)}
+              placeholder="Главная, Форма жалобы, Карточка товара..."
               className="bg-zinc-950 border-zinc-800 text-zinc-100 h-10 text-sm"
             />
           </div>
 
+          {/* Functions tag editor */}
+          <div>
+            <label className="block text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-2">
+              Функции на странице
+              <span className="ml-2 text-zinc-700 normal-case font-normal">(агент использует это для навигации)</span>
+            </label>
+            <div className="flex flex-wrap gap-2 mb-2 min-h-[28px]">
+              {funcs.map((f, idx) => (
+                <span key={idx} className={cn(
+                  'inline-flex items-center gap-1.5 pl-2 pr-1 py-1 rounded-lg text-xs font-semibold border',
+                  TYPE_COLORS[f.type] || 'bg-zinc-700/30 text-zinc-400 border-zinc-700/40'
+                )}>
+                  <span className="text-[9px] opacity-60">{TYPE_LABEL[f.type] || f.type}</span>
+                  {f.label}
+                  <button
+                    onClick={() => removeFunc(idx)}
+                    className="ml-1 opacity-60 hover:opacity-100 hover:text-red-400 transition-colors rounded p-0.5"
+                  >✕</button>
+                </span>
+              ))}
+              {funcs.length === 0 && (
+                <span className="text-[11px] text-zinc-600 italic">Нет функций — добавьте ниже</span>
+              )}
+            </div>
+            {/* Add function row */}
+            <div className="flex gap-2">
+              <select
+                value={newFuncType}
+                onChange={e => setNewFuncType(e.target.value)}
+                className="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-lg px-2 py-1.5 outline-none w-24 flex-shrink-0"
+              >
+                <option value="btn">Кнопка</option>
+                <option value="a">Ссылка</option>
+                <option value="input">Поле</option>
+              </select>
+              <Input
+                value={newFuncLabel}
+                onChange={e => setNewFuncLabel(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && addFunc()}
+                placeholder="Название функции..."
+                className="bg-zinc-950 border-zinc-800 text-zinc-100 h-8 text-sm flex-1"
+              />
+              <Button
+                onClick={addFunc}
+                variant="ghost"
+                className="h-8 px-3 border border-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs"
+              >+ Добавить</Button>
+            </div>
+          </div>
+
+          {/* Description */}
           <div>
             <label className="block text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">
               Описание для ИИ (необязательно)
@@ -139,7 +249,7 @@ function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: () => vo
               value={description}
               onChange={e => setDescription(e.target.value)}
               placeholder="Что может делать пользователь на этой странице? На что обратить внимание ИИ?"
-              rows={3}
+              rows={2}
               className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 resize-none outline-none focus:border-zinc-600 transition-colors"
             />
           </div>
@@ -157,7 +267,7 @@ function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: () => vo
             )}
           >
             {saved ? <><CheckCircle2 className="h-4 w-4 mr-2" />Сохранено!</>
-              : saving ? '⏳ Сохраняем...'
+              : saving ? 'Сохраняем...'
               : screen.is_draft ? <><CheckCircle2 className="h-4 w-4 mr-2" />Подтвердить и добавить в RAG</>
               : <><FileEdit className="h-4 w-4 mr-2" />Обновить</>}
           </Button>
@@ -196,9 +306,8 @@ export default function TrainingPage() {
     if (!selectedClientId) return;
     setLoading(true);
     try {
+      // Fetch all screens regardless of filter, so stats are always accurate
       const params = new URLSearchParams({ client_public_id: selectedClientId });
-      if (filter === 'draft') params.set('is_draft', 'true');
-      if (filter === 'confirmed') params.set('is_draft', 'false');
 
       const res = await fetch(`${API_BASE}/v1/training/dashboard/screens?${params}`, {
         credentials: 'include',
@@ -209,24 +318,34 @@ export default function TrainingPage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedClientId, filter]);
+  }, [selectedClientId]);
 
   useEffect(() => { fetchScreens(); }, [fetchScreens]);
 
-  const filtered = screens.filter(s =>
-    !search ||
-    s.label.toLowerCase().includes(search.toLowerCase()) ||
-    (s.page_url || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const handleScreenUpdated = (id: string, label: string, desc: string) => {
+    setScreens(prev => prev.map(s => s.id === id ? { ...s, is_draft: false, label, description: desc } : s));
+  };
+
+  const filtered = screens.filter(s => {
+    const matchesSearch = !search ||
+      s.label.toLowerCase().includes(search.toLowerCase()) ||
+      (s.page_url || '').toLowerCase().includes(search.toLowerCase());
+    
+    const matchesFilter = filter === 'all' || 
+      (filter === 'draft' && s.is_draft) || 
+      (filter === 'confirmed' && !s.is_draft);
+      
+    return matchesSearch && matchesFilter;
+  });
 
   const draftsCount = screens.filter(s => s.is_draft).length;
   const confirmedCount = screens.filter(s => !s.is_draft).length;
 
   return (
-    <div className="space-y-8 max-w-4xl">
+    <div className="space-y-8 max-w-full">
       {/* Header */}
       <div>
-        <h2 className="text-4xl font-bold tracking-tight text-white mb-2">🧠 Training</h2>
+        <h2 className="text-4xl font-bold tracking-tight text-white mb-2">Training</h2>
         <p className="text-zinc-400 text-lg">
           Просмотр и подтверждение экранов. После подтверждения экран попадает в RAG (Milvus).
         </p>
@@ -237,7 +356,7 @@ export default function TrainingPage() {
         <Card className="dashboard-card border-zinc-800">
           <CardContent className="p-4">
             <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 mb-3">
-              🌐 Фильтр по домену
+              Фильтр по домену
             </p>
             <div className="flex flex-wrap gap-2">
               {clients.map(c => (
@@ -321,7 +440,6 @@ export default function TrainingPage() {
       ) : filtered.length === 0 ? (
         <Card className="dashboard-card border-zinc-800">
           <CardContent className="p-12 text-center">
-            <p className="text-2xl mb-3">📭</p>
             <p className="text-zinc-400 font-bold">
               {search ? 'Ничего не найдено' : 'Экранов пока нет'}
             </p>
@@ -333,26 +451,30 @@ export default function TrainingPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-8">
           {filtered.filter(s => s.is_draft).length > 0 && (
-            <>
-              <p className="text-xs font-bold uppercase tracking-widest text-amber-400/70 px-1">
-                📝 Черновики — ожидают подтверждения
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-amber-400/70 px-1 mb-3">
+                Черновики — ожидают подтверждения
               </p>
-              {filtered.filter(s => s.is_draft).map(s => (
-                <ScreenCard key={s.id} screen={s} onUpdated={fetchScreens} />
-              ))}
-            </>
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                {filtered.filter(s => s.is_draft).map(s => (
+                  <ScreenCard key={s.id} screen={s} onUpdated={handleScreenUpdated} />
+                ))}
+              </div>
+            </div>
           )}
           {filtered.filter(s => !s.is_draft).length > 0 && (
-            <>
-              <p className="text-xs font-bold uppercase tracking-widest text-emerald-400/70 px-1 mt-6">
-                ✅ Активно в RAG (Milvus)
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-emerald-400/70 px-1 mt-6 mb-3">
+                Активно в RAG (Milvus)
               </p>
-              {filtered.filter(s => !s.is_draft).map(s => (
-                <ScreenCard key={s.id} screen={s} onUpdated={fetchScreens} />
-              ))}
-            </>
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                {filtered.filter(s => !s.is_draft).map(s => (
+                  <ScreenCard key={s.id} screen={s} onUpdated={handleScreenUpdated} />
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}

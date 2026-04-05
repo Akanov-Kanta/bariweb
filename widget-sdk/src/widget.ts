@@ -3,6 +3,7 @@ import { customElement, state, query, property } from 'lit/decorators.js';
 import { Icons } from './lib/icons.ts';
 import { widgetStyles } from './widget.styles.ts';
 import { A11yController } from './controllers/a11y.controller.ts';
+import { AiA11yController } from './controllers/ai-a11y.controller.ts';
 import { ChatController, type SttLanguageMode } from './controllers/chat.controller.ts';
 import './components/button/button.js';
 import './components/card/card.js';
@@ -24,6 +25,7 @@ export class BariwebWidget extends LitElement {
   static styles = [widgetStyles];
 
   private _a11y = new A11yController(this);
+  private _aiA11y = new AiA11yController(this);
   private _chat = new ChatController(this);
 
   @property({ type: String, attribute: 'client-id' }) clientId = '';
@@ -668,6 +670,33 @@ export class BariwebWidget extends LitElement {
               Animations
             </bw-button>
           </div>
+        </bw-accordion-item>
+
+        <bw-accordion-item title="AI Accessibility (BETA)" open>
+          <div class="grid" style="margin-top: 0;">
+            <bw-button 
+              vertical 
+              variant="${this._aiA11y.isFixing ? 'primary' : 'outline'}" 
+              @click=${() => this._aiA11y.fixMarkup()}
+              ?disabled=${this._aiA11y.isFixing}
+            >
+              <span slot="icon">${this._aiA11y.isFixing ? Icons.refresh : Icons.visualImpair}</span>
+              ${this._aiA11y.isFixing ? 'Wait...' : 'Fix Markup (AI)'}
+            </bw-button>
+            
+            <bw-button 
+              vertical 
+              variant="${this._aiA11y.simplifyEnabled ? 'primary' : 'outline'}" 
+              @click=${() => this._aiA11y.toggleSimplify()}
+            >
+              <span slot="icon">${Icons.textSize}</span>
+              Simplify Text (AI)
+              ${this._aiA11y.simplifyEnabled ? html`<div class="active-check">${Icons.check}</div>` : ''}
+            </bw-button>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 11px; color: #94a3b8; line-height: 1.4; text-align: center;">
+            ${this._aiA11y.simplifyEnabled ? 'Click on any complex text on the screen to simplify it.' : 'Artificial Intelligence helps you read and use the site.'}
+          </p>
         </bw-accordion-item>
 
         <bw-accordion-item title="Admin Access">

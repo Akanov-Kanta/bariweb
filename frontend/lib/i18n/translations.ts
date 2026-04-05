@@ -58,7 +58,7 @@ export const translations: Record<Lang, any> = {
       title1: "Один скрипт.",
       title2: "Другой",
       title3: "сайт.",
-      desc: "Прокрути, чтобы увидеть как AccessLayer трансформирует любой сайт в реальном времени — без редизайна.",
+      desc: "Прокрути, чтобы увидеть как Bariweb трансформирует любой сайт в реальном времени — без редизайна.",
       stages: [
         "STEP_0 · стандартный интерфейс",
         "STEP_1 · ARIA-навигация инициализирована",
@@ -79,7 +79,7 @@ export const translations: Record<Lang, any> = {
         autofillText: "Автозаполнение...",
         btnSubmit: "Найти задолженности",
         dialogs: {
-          step1: "AccessLayer активен. Скажите что сделать или нажмите на элемент.",
+          step1: "Bariweb активен. Скажите что сделать или нажмите на элемент.",
           step2: "Слушаю... «Оплатить налог на транспорт»",
           step3: "Нашёл нужный раздел. Выбираю «Налоги»...",
           step4: "Заполняю ИИН автоматически из профиля...",
@@ -120,7 +120,7 @@ export const translations: Record<Lang, any> = {
     endUsers: {
       label: "Наши пользователи",
       title: "Кто использует ",
-      titleHighlight: "AccessLayer?",
+      titleHighlight: "Bariweb?",
       desc: "Наш виджет ежедневно помогает тысячам людей комфортно пользоваться цифровыми сервисами.",
       metrics: [
         { val: "3.4x", label: "Увеличение сессий пользователей с инвалидностью" },
@@ -138,11 +138,11 @@ export const translations: Record<Lang, any> = {
       title: "Никаких ",
       titleHighlight: "капитальных",
       title2: " затрат",
-      desc: "Сравните стоимость классического редизайна и мгновенного внедрения AccessLayer.",
+      desc: "Сравните стоимость классического редизайна и мгновенного внедрения Bariweb.",
       th1: "Параметр",
       th2: "Традиционный Редизайн",
       th3: "Игнорирование (Штраф)",
-      thFull: "AccessLayer",
+      thFull: "Bariweb",
       recommended: "Рекомендуемый",
       rows: [
         { name: "Сроки внедрения", r1: "3-6 месяцев", r2: "-", r3: "10 минут" },
@@ -183,14 +183,14 @@ export const translations: Record<Lang, any> = {
       label: "Калькулятор Штрафов",
       title: "Сколько стоит ",
       titleGlitch: "НЕ",
-      titleAfter: " внедрить AccessLayer?",
+      titleAfter: " внедрить Bariweb?",
       desc: "Оцените реальную стоимость игнорирования Цифрового кодекса РК.",
-      sizes: ["Микробизнес", "Малый и средний бизнес", "Крупный бизнес", "Квазигоссектор / Госсектор"],
+      sizes: ["Lite", "SMB/Retail", "Средний/Крупный", "Банки/eGov", "Premium"],
       companySize: "Размер компании",
       monthlyTraffic: "Посещаемость сайта / мес",
       fineRisk: "Риск штрафа",
       redesignCost: "Стоимость редизайна",
-      alCost: "AccessLayer / год",
+      alCost: "Bariweb / год",
       netSavings: "Ваша чистая экономия:",
       protectBtn: "Защитить компанию за",
       year: "год",
@@ -200,9 +200,9 @@ export const translations: Record<Lang, any> = {
       title: "Частые ",
       titleHighlight: "вопросы",
       items: [
-        { q: "Нужно ли переписывать код моего сайта?", a: "Нет. AccessLayer работает поверх вашего существующего сайта. Он анализирует DOM-дерево и добавляет необходимые ARIA-атрибуты, корректирует фокус и стили (например, контрастность) на лету." },
+        { q: "Нужно ли переписывать код моего сайта?", a: "Нет. Bariweb работает поверх вашего существующего сайта. Он анализирует DOM-дерево и добавляет необходимые ARIA-атрибуты, корректирует фокус и стили (например, контрастность) на лету." },
         { q: "Влияет ли виджет на скорость загрузки сайта?", a: "Скрипт загружается асинхронно через CDN и весит менее 20КБ. Он не блокирует основной поток рендеринга и начинает работу только после полной загрузки страницы." },
-        { q: "Как AccessLayer помогает избежать штрафов?", a: "Виджет мгновенно внедряет требования WCAG 2.1 AA, что закрывает технические обязательства по инклюзивности согласно Цифровому кодексу РК." },
+        { q: "Как Bariweb помогает избежать штрафов?", a: "Виджет мгновенно внедряет требования WCAG 2.1 AA, что закрывает технические обязательства по инклюзивности согласно Цифровому кодексу РК." },
         { q: "Можно ли кастомизировать дизайн виджета?", a: "Да, на тарифах Business и Enterprise вы можете изменить цвета, иконки и позицию виджета в личном кабинете, чтобы он соответствовал вашему бренду." }
       ]
     },
@@ -470,7 +470,7 @@ export const translations: Record<Lang, any> = {
       title1: "Бір скрипт.",
       title2: "Басқа",
       title3: "сайт.",
-      desc: "AccessLayer кез-келген сайтты нақты уақытта қалай түрлендіретінін көру үшін төмен айналдырыңыз — редизайнсыз.",
+      desc: "Bariweb кез-келген сайтты нақты уақытта қалай түрлендіретінін көру үшін төмен айналдырыңыз — редизайнсыз.",
       stages: [
         "STEP_0 · стандартты интерфейс",
         "STEP_1 · ARIA-навигация қосылды",
@@ -491,7 +491,7 @@ export const translations: Record<Lang, any> = {
         autofillText: "Автоматты толтыру...",
         btnSubmit: "Қатырыздарды табу",
         dialogs: {
-          step1: "AccessLayer белсенді. Не істеу керектігін айтыңыз немесе элементті басыңыз.",
+          step1: "Bariweb белсенді. Не істеу керектігін айтыңыз немесе элементті басыңыз.",
           step2: "Тыңдап тұрмын... «Көлік салығын төлеу»",
           step3: "Қажетті бөлімді таптым. «Салықтарды» таңдаймын...",
           step4: "Профильден ЖСН автоматты түрде толтырамын...",
@@ -531,7 +531,7 @@ export const translations: Record<Lang, any> = {
     },
     endUsers: {
       label: "Біздің пайдаланушылар",
-      title: "AccessLayer кімге ",
+      title: "Bariweb кімге ",
       titleHighlight: "арналған?",
       desc: "Біздің виджет күн сайын мыңдаған адамға цифрлық қызметтерді ыңғайлы пайдалануға көмектеседі.",
       metrics: [
@@ -550,11 +550,11 @@ export const translations: Record<Lang, any> = {
       title: "Ешқандай ",
       titleHighlight: "күрделі",
       title2: " шығындар жоқ",
-      desc: "Классикалық редизайн мен AccessLayer-ді жылдам енгізудің құнын салыстырыңыз.",
+      desc: "Классикалық редизайн мен Bariweb-ді жылдам енгізудің құнын салыстырыңыз.",
       th1: "Параметр",
       th2: "Дәстүрлі Редизайн",
       th3: "Елемеу (Айыппұл)",
-      thFull: "AccessLayer",
+      thFull: "Bariweb",
       recommended: "Ұсынылатын",
       rows: [
         { name: "Енгізу мерзімі", r1: "3-6 ай", r2: "-", r3: "10 минут" },
@@ -593,16 +593,16 @@ export const translations: Record<Lang, any> = {
     },
     roi: {
       label: "Айыппұлдар калькуляторы",
-      title: "AccessLayer-ді орнатпау ",
+      title: "Bariweb-ді орнатпау ",
       titleGlitch: "ҚАНША",
       titleAfter: " тұрады?",
       desc: "ҚР Цифрлық кодексін елемеудің нақты құнын бағалаңыз.",
-      sizes: ["Микробизнес", "Шағын және орта бизнес", "Ірі бизнес", "Квазимемлекеттік сектор / Мемсектор"],
+      sizes: ["Lite", "SMB/Retail", "Орта/Ірі", "Банктер/eGov", "Premium"],
       companySize: "Компания көлемі",
       monthlyTraffic: "Сайтқа кірушілер / айына",
       fineRisk: "Айыппұл тәуекелі",
       redesignCost: "Редизайн құны",
-      alCost: "AccessLayer / жылына",
+      alCost: "Bariweb / жылына",
       netSavings: "Сіздің таза үнемдеуіңіз:",
       protectBtn: "Компанияны қорғау",
       year: "жылы",
@@ -612,9 +612,9 @@ export const translations: Record<Lang, any> = {
       title: "Жиі қойылатын ",
       titleHighlight: "сұрақтар",
       items: [
-        { q: "Менің сайтымның кодын қайта жазу қажет пе?", a: "Жоқ. AccessLayer сіздің бар сайтыңыздың үстінен жұмыс істейді. Ол DOM ағашын талдайды және қажетті ARIA атрибуттарын қосады, фокус пен стильдерді (мысалы, контраст) лезде түзетеді." },
+        { q: "Менің сайтымның кодын қайта жазу қажет пе?", a: "Жоқ. Bariweb сіздің бар сайтыңыздың үстінен жұмыс істейді. Ол DOM ағашын талдайды және қажетті ARIA атрибуттарын қосады, фокус пен стильдерді (мысалы, контраст) лезде түзетеді." },
         { q: "Виджет сайттың жүктелу жылдамдығына әсер ете ме?", a: "Скрипт CDN арқылы асинхронды түрде жүктеледі және салмағы 20КБ-тан аз. Ол негізгі рендериринг ағынын блоктамайды және парақ толық жүктелгеннен кейін ғана жұмыс істей бастайды." },
-        { q: "AccessLayer айыппұлдардан қалай құтылуға көмектеседі?", a: "Виджет бірден WCAG 2.1 AA талаптарын енгізеді, бұл ҚР Цифрлық кодексіне сәйкес инклюзивтілік бойынша техникалық міндеттемелерді жабады." },
+        { q: "Bariweb айыппұлдардан қалай құтылуға көмектеседі?", a: "Виджет бірден WCAG 2.1 AA талаптарын енгізеді, бұл ҚР Цифрлық кодексіне сәйкес инклюзивтілік бойынша техникалық міндеттемелерді жабады." },
         { q: "Виджет дизайнын өзгертуге бола ма?", a: "Иә, Business және Enterprise тарифтерінде виджеттің түстерін, белгішелерін және орналасуын жеке кабинетте брендіңізге сәйкестендіруге болады." }
       ]
     },
@@ -882,7 +882,7 @@ export const translations: Record<Lang, any> = {
       title1: "One Script.",
       title2: "Different",
       title3: " Site.",
-      desc: "Scroll down to see how AccessLayer transforms any website in real-time — without a redesign.",
+      desc: "Scroll down to see how Bariweb transforms any website in real-time — without a redesign.",
       stages: [
         "STEP_0 · standard interface",
         "STEP_1 · ARIA-navigation initialized",
@@ -903,7 +903,7 @@ export const translations: Record<Lang, any> = {
         autofillText: "Autofilling...",
         btnSubmit: "Find Debts",
         dialogs: {
-          step1: "AccessLayer active. Tell me what to do or click an element.",
+          step1: "Bariweb active. Tell me what to do or click an element.",
           step2: "Listening... «Pay transport tax»",
           step3: "Found the right section. Selecting «Taxes»...",
           step4: "Autofilling IIN from your profile...",
@@ -944,7 +944,7 @@ export const translations: Record<Lang, any> = {
     endUsers: {
       label: "Our Users",
       title: "Who uses ",
-      titleHighlight: "AccessLayer?",
+      titleHighlight: "Bariweb?",
       desc: "Our widget helps thousands of people comfortably use digital services every day.",
       metrics: [
         { val: "3.4x", label: "Increase in sessions by users with disabilities" },
@@ -962,11 +962,11 @@ export const translations: Record<Lang, any> = {
       title: "No heavy ",
       titleHighlight: "capital",
       title2: " expenses",
-      desc: "Compare the cost of a classic redesign versus instant AccessLayer integration.",
+      desc: "Compare the cost of a classic redesign versus instant Bariweb integration.",
       th1: "Parameter",
       th2: "Traditional Redesign",
       th3: "Ignorance (Fine)",
-      thFull: "AccessLayer",
+      thFull: "Bariweb",
       recommended: "Recommended",
       rows: [
         { name: "Time to implement", r1: "3-6 months", r2: "-", r3: "10 minutes" },
@@ -1007,14 +1007,14 @@ export const translations: Record<Lang, any> = {
       label: "Penalty Calculator",
       title: "How much does it cost ",
       titleGlitch: "NOT",
-      titleAfter: " to use AccessLayer?",
+      titleAfter: " to use Bariweb?",
       desc: "Estimate the real cost of ignoring the Digital Code of Kazakhstan.",
-      sizes: ["Microbusiness", "SMB / Small & Medium Business", "Enterprise", "Government / Quasi-Gov"],
+      sizes: ["Lite", "SMB/Retail", "Mid/Large", "Banks/eGov", "Premium"],
       companySize: "Company Size",
       monthlyTraffic: "Website traffic / month",
       fineRisk: "Penalty Risk",
       redesignCost: "Redesign Cost",
-      alCost: "AccessLayer / year",
+      alCost: "Bariweb / year",
       netSavings: "Your Net Savings:",
       protectBtn: "Protect Company for",
       year: "year",
@@ -1024,9 +1024,9 @@ export const translations: Record<Lang, any> = {
       title: "Frequently Asked ",
       titleHighlight: "Questions",
       items: [
-        { q: "Do I need to rewrite my website's code?", a: "No. AccessLayer works on top of your existing website. It analyzes the DOM tree and adding necessary ARIA attributes, adjusting focus and styles (e.g. contrast) on the fly." },
+        { q: "Do I need to rewrite my website's code?", a: "No. Bariweb works on top of your existing website. It analyzes the DOM tree and adding necessary ARIA attributes, adjusting focus and styles (e.g. contrast) on the fly." },
         { q: "Does the widget impact website loading speed?", a: "The script runs asynchronously via CDN and weighs less than 20KB. It does not block the main rendering thread and only activates after the page is fully loaded." },
-        { q: "How does AccessLayer help avoid fines?", a: "The widget instantly implements WCAG 2.1 AA requirements, thereby covering your technical inclusivity obligations under the Digital Code of Kazakhstan." },
+        { q: "How does Bariweb help avoid fines?", a: "The widget instantly implements WCAG 2.1 AA requirements, thereby covering your technical inclusivity obligations under the Digital Code of Kazakhstan." },
         { q: "Can I customize the widget design?", a: "Yes, on Business and Enterprise plans you can change the widget's colors, icons, and position from the dashboard to match your brand." }
       ]
     },

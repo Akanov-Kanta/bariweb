@@ -19,7 +19,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>("ru");
 
   useEffect(() => {
-    const saved = localStorage.getItem("accesslayer_lang") as Lang;
+    const saved = localStorage.getItem("bariweb_lang") as Lang;
     if (saved && ["ru", "kz", "en"].includes(saved)) {
       setTimeout(() => setLangState(saved), 0);
     }
@@ -27,7 +27,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const setLang = (newLang: Lang) => {
     setLangState(newLang);
-    localStorage.setItem("accesslayer_lang", newLang);
+    localStorage.setItem("bariweb_lang", newLang);
   };
 
   const t = translations[lang] || translations.ru;

@@ -8,13 +8,8 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { landingTranslations } from "@/lib/i18n/landingTranslations";
 
 export default function PricingSection() {
-  const [companySize, setCompanySize] = useState(50);
   const { lang } = useLanguage();
   const t = landingTranslations[lang].pricing;
-  
-  // Fake calculation logic for visual impact
-  const potentialPenalty = Math.round(companySize * 1500 + 50000);
-  const potentialSavings = Math.ceil(potentialPenalty * 0.95);
 
   return (
     <section id="pricing" className="section-container bg-[#080808]">
@@ -24,37 +19,6 @@ export default function PricingSection() {
             {t.title1} <br />
             <span className="heading-accent">{t.title2}</span>
           </h2>
-        </div>
-
-        {/* Calculator */}
-        <div className="price-card mx-auto mb-20 max-w-3xl">
-          <h3 className="mb-6 text-xl font-semibold text-white">{t.calcTitle}</h3>
-          <div className="mb-8">
-            <label className="mb-4 flex justify-between text-sm text-neutral-400">
-              <span>{t.calcEmployees}</span>
-              <span className="text-white">{companySize} {t.calcPeople}</span>
-            </label>
-            <input
-              type="range"
-              min="10"
-              max="1000"
-              step="10"
-              value={companySize}
-              onChange={(e) => setCompanySize(Number(e.target.value))}
-              className="h-2 w-full appearance-none rounded-lg bg-neutral-700 accent-lime-400 outline-none"
-            />
-          </div>
-          
-          <div className="flex flex-col gap-4 border-t border-neutral-800 pt-6 md:flex-row md:justify-between">
-            <div>
-              <div className="text-sm text-neutral-500">{t.calcPenalty}</div>
-              <div className="text-2xl font-bold text-red-500">${potentialPenalty.toLocaleString()}</div>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-neutral-500">{t.calcSavings}</div>
-              <div className="text-3xl font-bold heading-accent">${potentialSavings.toLocaleString()}</div>
-            </div>
-          </div>
         </div>
 
         {/* Pricing Cards */}

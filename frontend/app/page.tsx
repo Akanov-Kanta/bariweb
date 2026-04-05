@@ -10,6 +10,7 @@ import Footer from "@/components/sections/Footer";
 import TechStackSection from "@/components/sections/TechStackSection";
 import AIPipelineSection from "@/components/sections/AIPipelineSection";
 import AuditSection from "@/components/sections/AuditSection";
+import { ROICalculator } from "@/components/ROICalculator";
 
 export default function Home() {
   return (
@@ -23,6 +24,7 @@ export default function Home() {
       <AIPipelineSection />
       <BentoFeaturesSection />
       <IntegrationSection />
+      <ROICalculator />
       <PricingSection />
       <AuditSection />
       <Footer />

@@ -8,7 +8,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 export function Integration() {
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
-  const codeSnippet = `<script src="https://cdn.accesslayer.kz/v1/widget.js" data-client-id="YOUR_ID"></script>`;
+  const codeSnippet = `<script src="https://cdn.bariweb.kz/v1/widget.js" data-client-id="YOUR_ID"></script>`;
 
   const copyCode = () => {
     navigator.clipboard.writeText(codeSnippet);
@@ -99,9 +99,9 @@ export function Integration() {
                   <span className="text-zinc-500">2</span>    &lt;<span className="text-pink-400">meta</span> <span className="text-yellow-300">charset</span>=<span className="text-green-400">&quot;UTF-8&quot;</span> /&gt;{"\n"}
                   <span className="text-zinc-500">3</span>    &lt;<span className="text-pink-400">title</span>&gt;My Awesome Website&lt;/<span className="text-pink-400">title</span>&gt;{"\n"}
                   <span className="text-zinc-500">4</span>    {"\n"}
-                  <span className="text-zinc-500">5</span>    <span className="text-zinc-500">{"<!-- AccessLayer Script -->"}</span>{"\n"}
+                  <span className="text-zinc-500">5</span>    <span className="text-zinc-500">{"<!-- Bariweb Script -->"}</span>{"\n"}
                   <span className="text-zinc-500">6</span>    &lt;<span className="text-blue-400">script</span>{"\n"}
-                  <span className="text-zinc-500">7</span>      <span className="text-yellow-300">src</span>=<span className="text-green-400">&quot;https://cdn.accesslayer.kz/v1/widget.js&quot;</span>{"\n"}
+                  <span className="text-zinc-500">7</span>      <span className="text-yellow-300">src</span>=<span className="text-green-400">&quot;https://cdn.bariweb.kz/v1/widget.js&quot;</span>{"\n"}
                   <span className="text-zinc-500">8</span>      <span className="text-yellow-300">data-client-id</span>=<span className="text-green-400">&quot;YOUR_ID&quot;</span>{"\n"}
                   <span className="text-zinc-500">9</span>    &gt;&lt;/<span className="text-blue-400">script</span>&gt;{"\n"}
                   <span className="text-zinc-500">10</span> &lt;/<span className="text-pink-400">head</span>&gt;

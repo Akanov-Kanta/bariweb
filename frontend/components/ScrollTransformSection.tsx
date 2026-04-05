@@ -178,7 +178,7 @@ function BrowserMockup({ stage, progress }: { stage: number, progress: number })
         <div className="mx-auto bg-white border border-zinc-200 rounded-md text-[10px] sm:text-xs text-zinc-500 font-mono px-3 pt-1 pb-0.5 flex items-center gap-2 transition-all duration-300">
           <LockIcon />
           bank.kz/pay
-          {isStage3 && <span className="ml-2 px-1.5 rounded-sm bg-blue-100 text-blue-700 text-[9px] font-bold tracking-wider">✦ AccessLayer</span>}
+          {isStage3 && <span className="ml-2 px-1.5 rounded-sm bg-blue-100 text-blue-700 text-[9px] font-bold tracking-wider">✦ Bariweb</span>}
         </div>
       </div>
 

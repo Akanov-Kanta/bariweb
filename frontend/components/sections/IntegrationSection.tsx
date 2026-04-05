@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { landingTranslations } from "@/lib/i18n/landingTranslations";
 
-const SCRIPT_CODE = '<script src="cdn.accesslayer.kz/v2.js" client_id="YOUR_KEY"></script>';
+const SCRIPT_CODE = '<script src="cdn.bariweb.kz/v2.js" client_id="YOUR_KEY"></script>';
 
 const typewriterVariants = {
   hidden: { opacity: 0 },

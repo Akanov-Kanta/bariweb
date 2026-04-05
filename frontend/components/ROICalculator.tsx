@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export function ROICalculator() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const c = t.roi;
   const [sizeIndex, setSizeIndex] = useState(1);
   const [usersIndex, setUsersIndex] = useState(50); // 0 to 100 representing 1k to 1M
@@ -14,13 +14,19 @@ export function ROICalculator() {
   const users = Math.floor(Math.pow(10, 3 + (usersIndex / 100) * 3)); // 10^3 = 1k, to 10^6 = 1M
 
   const companies = [
-    { label: c.sizes[0], fine: 10000, redesign: 30000, al: 3588, name: "Starter" },
-    { label: c.sizes[1], fine: 50000, redesign: 150000, al: 14400, name: "Business" },
-    { label: c.sizes[2], fine: 200000, redesign: 500000, al: 42000, name: "Enterprise" },
-    { label: c.sizes[3], fine: 500000, redesign: 1500000, al: 42000, name: "Enterprise / Gov" },
+    { label: c.sizes[0], fine: 1000, redesign: 10000, al: 1188, name: "Lite", limit: 5000 },
+    { label: c.sizes[1], fine: 10000, redesign: 30000, al: 3588, name: "Starter", limit: 15000 },
+    { label: c.sizes[2], fine: 50000, redesign: 150000, al: 14400, name: "Business", limit: 50000 },
+    { label: c.sizes[3], fine: 150000, redesign: 500000, al: 42000, name: "Enterprise", limit: 500000 },
+    { label: c.sizes[4], fine: 500000, redesign: 1500000, al: 72000, name: "Enterprise Premium", limit: 10000000 },
   ];
 
-  const current = companies[sizeIndex];
+  // Auto-select plan based on traffic if it exceeds current size limit
+  const requiredIndex = companies.findIndex(comp => comp.limit >= users);
+  const effectiveIndex = Math.max(sizeIndex, requiredIndex === -1 ? 4 : requiredIndex);
+  
+  const current = companies[effectiveIndex];
+  const isUpgradedByTraffic = effectiveIndex > sizeIndex;
   
   // Calculate total alternative cost
   const riskCost = current.fine;
@@ -47,7 +53,7 @@ export function ROICalculator() {
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 lg:gap-16">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 lg:gap-16">
           
           {/* Controls */}
           <div className="space-y-12">
@@ -60,17 +66,18 @@ export function ROICalculator() {
               </div>
               <input 
                 type="range" 
-                min="0" max="3" step="1"
+                min="0" max="4" step="1"
                 value={sizeIndex}
                 onChange={(e) => setSizeIndex(Number(e.target.value))}
                 className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 aria-label={c.companySize}
               />
-              <div className="flex justify-between text-[10px] text-zinc-500 mt-2 font-mono uppercase tracking-wider">
-                <span>{c.sizes[0]}</span>
-                <span>{c.sizes[1]}</span>
-                <span>{c.sizes[2]}</span>
-                <span>{c.sizes[3]}</span>
+              <div className="grid grid-cols-5 text-[8px] md:text-[9px] text-zinc-500 mt-2 font-mono uppercase tracking-tighter">
+                <span className="text-left">{c.sizes[0]}</span>
+                <span className="text-center">{c.sizes[1]}</span>
+                <span className="text-center">{c.sizes[2]}</span>
+                <span className="text-center">{c.sizes[3]}</span>
+                <span className="text-right">{c.sizes[4]}</span>
               </div>
             </div>
 
@@ -104,7 +111,14 @@ export function ROICalculator() {
                 <span className="text-zinc-300 font-mono text-xl">{formatUsd(redesignCost)}</span>
               </div>
               <div className="flex justify-between items-center border-b border-zinc-800 pb-4 font-semibold text-blue-400">
-                <span>AccessLayer ({current.name}) / {c.year}</span>
+                <div className="flex flex-col">
+                  <span>Bariweb ({current.name}) / {c.year}</span>
+                  {isUpgradedByTraffic && (
+                    <span className="text-[10px] text-amber-500 uppercase tracking-widest mt-1">
+                      ↑ {lang === 'ru' ? 'Апгрейд по трафику' : lang === 'kz' ? 'Трафик бойынша жаңарту' : 'Traffic Upgrade'}
+                    </span>
+                  )}
+                </div>
                 <span className="font-mono text-xl">{formatUsd(current.al)}</span>
               </div>
             </div>

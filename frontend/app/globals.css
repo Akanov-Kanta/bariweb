@@ -206,10 +206,12 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(to bottom right, var(--accent-lime), #003311);
   opacity: 0.6;
   filter: blur(100px);
+  will-change: filter, transform;
+  transform: translateZ(0);
 }
 
 .price-card {
-  @apply relative overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-900/50 p-8 backdrop-blur-sm transition-all duration-300;
+  @apply relative overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-900/80 p-8 transition-all duration-300;
 }
 
 .price-card-popular {
@@ -248,7 +250,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .nav-scrolled {
-  @apply border-b border-neutral-800 bg-black/60 backdrop-blur-xl;
+  @apply border-b border-neutral-800 bg-black/80 backdrop-blur-md;
 }
 
 .nav-logo {

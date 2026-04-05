@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { Mic, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { landingTranslations } from "@/lib/i18n/landingTranslations";
@@ -10,6 +10,13 @@ export default function ScrollTourSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { lang } = useLanguage();
   const t = landingTranslations[lang].scroll;
+
+  const textSteps = useMemo(() => [
+    { id: 1, title: t.problem, desc: t.problemDesc, color: "text-white" },
+    { id: 2, title: t.scan, desc: t.scanDesc, color: "text-white" },
+    { id: 3, title: t.voice, desc: t.voiceDesc, color: "text-white" },
+    { id: 4, title: t.result, desc: t.resultDesc, color: "text-lime-400" },
+  ], [t]);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -25,40 +32,45 @@ export default function ScrollTourSection() {
 
   // Read scroll continuously to trigger state changes safely
   useEffect(() => {
-    return scrollYProgress.onChange((latest) => {
-      if (latest < 0.25) setActiveStep(1);
-      else if (latest < 0.50) setActiveStep(2);
-      else if (latest < 0.75) setActiveStep(3);
-      else setActiveStep(4);
+    let lastStep = 1;
+    return scrollYProgress.on("change", (latest) => {
+      let nextStep = 1;
+      if (latest < 0.25) nextStep = 1;
+      else if (latest < 0.45) nextStep = 2;
+      else if (latest < 0.85) nextStep = 3;
+      else nextStep = 4;
+      
+      if (nextStep !== lastStep) {
+        lastStep = nextStep;
+        setActiveStep(nextStep);
+      }
     });
   }, [scrollYProgress]);
 
   // Scanner position matches Step 2
-  const scannerY = useTransform(scrollYProgress, [0.25, 0.50], ["0%", "100%"]);
+  const scannerY = useTransform(scrollYProgress, [0.25, 0.45], ["0%", "100%"]);
   // Step 3 progress matches typing/voice logic
-  const step3Progress = useTransform(scrollYProgress, [0.50, 0.75], [0, 1]);
+  const step3Progress = useTransform(scrollYProgress, [0.45, 0.85], [0, 1]);
 
   // Derive typing string for IIN based on step3 progress
   const fullIIN = "010101500999";
   const [typedIIN, setTypedIIN] = useState("");
   useEffect(() => {
-    return step3Progress.onChange((v) => {
+    let lastLength = 0;
+    return step3Progress.on("change", (v) => {
       const length = Math.floor(v * fullIIN.length);
-      setTypedIIN(fullIIN.substring(0, length));
+      if (length !== lastLength) {
+        lastLength = length;
+        setTypedIIN(fullIIN.substring(0, length));
+      }
     });
   }, [step3Progress]);
 
-  const clipPathVal = useTransform(scrollYProgress, [0.25, 0.50], ["inset(0 0 100% 0)", "inset(0 0 0% 0)"]);
+  const clipPathVal = useTransform(scrollYProgress, [0.25, 0.45], ["inset(0 0 100% 0)", "inset(0 0 0% 0)"]);
 
-  const textSteps = [
-    { id: 1, title: t.problem, desc: t.problemDesc, color: "text-white" },
-    { id: 2, title: t.scan, desc: t.scanDesc, color: "text-white" },
-    { id: 3, title: t.voice, desc: t.voiceDesc, color: "text-white" },
-    { id: 4, title: t.result, desc: t.resultDesc, color: "text-lime-400" },
-  ];
 
   return (
-    <section ref={containerRef} className="relative h-[400vh] w-full bg-[#080808]">
+    <section ref={containerRef} className="relative h-[500vh] w-full bg-[#080808]">
       <div className="sticky top-0 flex h-screen w-full items-center justify-center p-6 md:p-12">
         <div className="grid h-[80vh] w-full max-w-7xl grid-cols-1 gap-8 md:grid-cols-2">
           
@@ -88,7 +100,7 @@ export default function ScrollTourSection() {
           </div>
 
           {/* Right Column: Interactive Mockup */}
-          <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/50 p-4">
+          <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/50 p-4 will-change-transform translate-z-0">
             
             <div className="browser-mockup">
               
@@ -138,7 +150,18 @@ export default function ScrollTourSection() {
                     <h3 className="mb-4 text-sm font-semibold text-neutral-800">{t.demoUI.payTaxes}</h3>
                     <div className="space-y-4">
                       <div>
-                        <label className="text-xs font-medium text-neutral-500 ml-1 mb-1 block">{t.demoUI.iinTarget}</label>
+                        <label className="text-xs font-medium text-neutral-500 ml-1 mb-1 block flex justify-between">
+                          <span>{t.demoUI.iinTarget}</span>
+                          {activeStep === 3 && (
+                            <motion.span 
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              className="text-[10px] font-bold text-lime-500 uppercase tracking-widest animate-pulse"
+                            >
+                              {lang === 'ru' ? 'Анализ поля...' : 'Өрісті талдау...'}
+                            </motion.span>
+                          )}
+                        </label>
                         <div className={`h-10 w-full rounded-lg border flex items-center px-3 font-mono ${activeStep >= 3 ? 'border-lime-500 bg-lime-50/50 shadow-[0_0_0_2px_rgba(200,255,0,0.2)]' : 'border-neutral-200 bg-neutral-50'}`}>
                           {typedIIN}
                           {activeStep >= 3 && typedIIN.length < fullIIN.length && (
@@ -159,7 +182,7 @@ export default function ScrollTourSection() {
                   style={{ top: scannerY, opacity: activeStep === 2 ? 1 : 0 }}
                 />
 
-                {/* AccessLayer Floating AI Agent Widget (Visible in Step 3 & 4) */}
+                {/* Bariweb Floating AI Agent Widget (Visible in Step 3 & 4) */}
                 <AnimatePresence>
                   {activeStep >= 3 && (
                     <motion.div
@@ -168,11 +191,30 @@ export default function ScrollTourSection() {
                       exit={{ opacity: 0, y: 50 }}
                       className="ai-widget"
                     >
-                      <div className="ai-widget-icon">
-                        {activeStep === 4 ? <CheckCircle2 className="h-5 w-5" /> : <Mic className="h-5 w-5 animate-pulse" />}
+                      <div className="ai-widget-icon relative">
+                        {activeStep === 4 ? (
+                          <CheckCircle2 className="h-5 w-5" />
+                        ) : (
+                          <>
+                            <motion.div
+                              className="absolute inset-[-10px] rounded-full bg-lime-400 opacity-60 blur-md"
+                              animate={{ 
+                                scale: [1, 2, 1],
+                                opacity: [0.6, 0.2, 0.6]
+                              }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                            />
+                            <motion.div
+                              className="absolute inset-[-20px] rounded-full border border-lime-400/30"
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            />
+                            <Mic className="h-5 w-5 relative z-10" />
+                          </>
+                        )}
                       </div>
                       <div className="pr-4">
-                        <div className="text-[10px] font-bold text-lime-600 uppercase tracking-widest">AccessLayer Agent</div>
+                        <div className="text-[10px] font-bold text-lime-600 uppercase tracking-widest">Bariweb Agent</div>
                         <div className="text-xs font-medium text-neutral-600">
                           {activeStep === 3 && typedIIN.length < fullIIN.length ? (
                             <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ repeat: Infinity, duration: 1.5 }}>{t.demoUI.voiceMic}</motion.span>

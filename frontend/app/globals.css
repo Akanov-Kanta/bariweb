@@ -181,15 +181,15 @@ h1, h2, h3, h4, h5, h6 {
   inset: 0;
   width: 100%; height: 100%;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.15;
-  animation: noiseAnim 0.3s steps(2) infinite;
+  opacity: 0.08;
+  animation: noiseAnim 0.5s steps(2) infinite;
   pointer-events: none;
 }
 
 @keyframes noiseAnim {
   0%   { transform: translate(0,0); }
-  50%  { transform: translate(-1%, -1%); }
-  100% { transform: translate(1%, 1%); }
+  50%  { transform: translate(-0.5%, -0.5%); }
+  100% { transform: translate(0,0); }
 }
 
 .reveal-glitch {
@@ -271,29 +271,36 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Sidebar Overrides */
 .dashboard-sidebar {
-  background: var(--bg-surface) !important;
+  background: #0a0a0f !important;
   border-right: 1px solid var(--border-main) !important;
 }
 
 /* Global Overrides for common zinc utility classes to match brand palette */
-.bg-zinc-950 { background-color: var(--bg-deep) !important; }
-.bg-zinc-900 { background-color: var(--bg-surface) !important; }
+.bg-zinc-950 { background-color: #05050a !important; }
+.bg-zinc-900 { background-color: #0a0a0f !important; }
 .bg-zinc-900\/50 { background-color: rgba(10, 10, 15, 0.5) !important; }
-.border-zinc-800 { border-color: var(--border-main) !important; }
-.text-zinc-400 { color: var(--text-dim) !important; }
-.text-zinc-100 { color: var(--text-main) !important; }
+.border-zinc-800 { border-color: #1f1f23 !important; }
+.text-zinc-400 { color: #a1a1aa !important; }
+.text-zinc-100 { color: #ffffff !important; }
 
-/* Dashboard Cards (Seamless with ScrollTour/Bento) */
+/* Dashboard Cards (Seamless with ScrollTour/Bento/Pricing) */
 .dashboard-card {
-  @apply relative overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-900/50 p-8 transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.3)];
+  @apply relative overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-900/50 p-8 transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.4)];
 }
 
 /* Navigation Overrides */
 .nav-active-item {
   @apply bg-lime-400/10 text-lime-400;
   background-color: rgba(200, 255, 0, 0.1) !important;
-  color: var(--accent-lime) !important;
-  box-shadow: inset 0 0 10px rgba(200, 255, 0, 0.05);
+  color: #c8ff00 !important;
+  box-shadow: inset 0 0 12px rgba(200, 255, 0, 0.08);
+  border-left: 3px solid #c8ff00;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.nav-hover-item:hover {
+  @apply bg-white/5 text-white;
 }
 
 /* Custom Scrollbar */
@@ -301,14 +308,14 @@ h1, h2, h3, h4, h5, h6 {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-deep);
+  background: #05050a;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-main);
+  background: #1f1f23;
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-dark);
+  background: #71717a;
 }
 
 /* Uniform Dashboard Elements */
@@ -323,9 +330,14 @@ input:focus, select:focus, textarea:focus {
 }
 
 .dashboard-btn-primary {
-  @apply inline-flex items-center justify-center px-6 py-2 rounded-xl text-sm font-bold transition-all;
-  background-color: var(--accent-lime) !important;
+  @apply inline-flex items-center justify-center px-6 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer;
+  background-color: #c8ff00 !important;
   color: black !important;
+}
+
+.dashboard-btn-primary:hover {
+  background-color: #d4ff33 !important;
+  box-shadow: 0 0 20px rgba(200, 255, 0, 0.25);
 }
 
 

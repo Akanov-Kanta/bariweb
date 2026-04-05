@@ -124,19 +124,19 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-8 max-w-5xl">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-zinc-100">{t.title}</h2>
-        <p className="text-zinc-400 mt-1">
+        <h2 className="text-4xl font-bold tracking-tight text-white mb-2">{t.title}</h2>
+        <p className="text-zinc-400 text-lg">
           {t.subtitle}
         </p>
       </div>
 
       {client && (
-        <Card className="border-blue-500/20 bg-blue-500/5">
+        <Card className="dashboard-card border-lime-400/20 bg-lime-400/5 group">
           <CardHeader>
-            <CardTitle className="text-blue-400 flex items-center gap-2">
-              <Zap className="h-5 w-5" />
+            <CardTitle className="text-lime-400 flex items-center gap-2 text-xl font-bold tracking-tight">
+              <Zap className="h-5 w-5 animate-pulse" />
               {t.clientIdTitle}
             </CardTitle>
             <CardDescription className="text-zinc-400">
@@ -156,62 +156,64 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      <Card>
+      <Card className="dashboard-card">
         <CardHeader>
-          <CardTitle>{t.whitelistedDomains}</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl font-bold text-white">{t.whitelistedDomains}</CardTitle>
+          <CardDescription className="text-zinc-400">
             {t.domainsDesc}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-end gap-4 max-w-md">
             <div className="space-y-2 flex-1">
-              <label className="text-sm font-medium leading-none text-zinc-200" htmlFor="domain">
+              <label className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-1 ml-1" htmlFor="domain">
                 {t.addNewDomain}
               </label>
               <div className="relative">
-                <Globe className="absolute left-3 top-2.5 h-4 w-4 text-zinc-500" />
+                <Globe className="absolute left-3 top-2.5 h-4 w-4 text-zinc-600" />
                 <Input
                   id="domain"
                   placeholder={t.domainPlaceholder}
-                  className="pl-9"
+                  className="pl-9 h-11"
                   {...form.register('domain')}
                 />
               </div>
               {form.formState.errors.domain && (
-                <p className="text-sm text-red-400">{form.formState.errors.domain.message}</p>
+                <p className="text-xs text-red-400 font-medium ml-1">{form.formState.errors.domain.message}</p>
               )}
             </div>
-            <Button type="submit" variant="glow" disabled={form.formState.isSubmitting}>
+            <Button type="submit" className="dashboard-btn-primary h-11 px-6 rounded-xl" disabled={form.formState.isSubmitting}>
               <Plus className="mr-2 h-4 w-4" />
-              {t.addButton}
+              <span className="mt-0.5">{t.addButton}</span>
             </Button>
           </form>
 
           {error && (
-            <div className="rounded-md bg-red-500/10 p-3 text-sm text-red-400 font-medium">
+            <div className="rounded-xl bg-red-500/5 border border-red-500/20 p-4 text-sm text-red-500 font-medium">
               {error}
             </div>
           )}
 
-          <div className="rounded-lg border border-zinc-800 bg-zinc-950/50">
+          <div className="rounded-2xl border border-[#1f1f23] bg-black/40 overflow-hidden shadow-inner">
             {domains.length === 0 ? (
-              <div className="p-8 text-center text-sm text-zinc-500">
+              <div className="p-12 text-center text-sm text-zinc-600 italic">
                 {t.noDomains}
               </div>
             ) : (
-              <ul className="divide-y divide-zinc-800">
+              <ul className="divide-y divide-[#1f1f23]">
                 {domains.map((domain) => (
-                  <li key={domain} className="flex items-center justify-between p-4">
+                  <li key={domain} className="flex items-center justify-between p-5 hover:bg-white/[0.02] transition-colors">
                     <div className="flex items-center">
-                      <Globe className="mr-3 h-4 w-4 text-zinc-400" />
-                      <span className="text-sm font-medium text-zinc-200">{domain}</span>
+                      <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-[#1f1f23] flex items-center justify-center mr-4">
+                        <Globe className="h-4 w-4 text-zinc-500" />
+                      </div>
+                      <span className="text-sm font-bold text-zinc-200">{domain}</span>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => removeDomain(domain)}
-                      className="text-zinc-500 hover:text-red-400 hover:bg-red-500/10 h-8"
+                      className="text-zinc-600 hover:text-red-500 hover:bg-red-500/10 rounded-lg h-9 w-9 p-0"
                     >
                       <Trash2 className="h-4 w-4" />
                       <span className="sr-only">{t.removeDomain} {domain}</span>
@@ -224,15 +226,18 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
       
-      <Card>
+      <Card className="dashboard-card opacity-60 border-dashed">
         <CardHeader>
-          <CardTitle>{t.apiConfig}</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl font-bold text-white mb-2">{t.apiConfig}</CardTitle>
+          <CardDescription className="text-zinc-400">
             {t.apiDesc}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-zinc-500">{t.enterpriseOnly}</p>
+          <div className="flex items-center gap-3 p-4 bg-zinc-900/50 border border-[#1f1f23] rounded-xl">
+             <div className="px-2 py-0.5 rounded-md bg-zinc-800 text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-relaxed">Enterprise Only</div>
+             <p className="text-xs text-zinc-600 font-medium">{t.enterpriseOnly}</p>
+          </div>
         </CardContent>
       </Card>
     </div>

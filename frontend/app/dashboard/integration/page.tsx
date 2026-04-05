@@ -43,36 +43,36 @@ export default function IntegrationPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-8 max-w-5xl">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-zinc-100">{t.title}</h2>
-        <p className="text-zinc-400 mt-1">
+        <h2 className="text-4xl font-bold tracking-tight text-white mb-2">{t.title}</h2>
+        <p className="text-zinc-400 text-lg">
           {t.subtitle}
         </p>
       </div>
 
-      <Card>
+      <Card className="dashboard-card">
         <CardHeader>
-          <CardTitle>{t.step1Title}</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl font-bold text-white">{t.step1Title}</CardTitle>
+          <CardDescription className="text-zinc-400">
             {t.step1Desc}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative rounded-lg bg-zinc-950 border border-zinc-800 p-4 font-mono text-sm text-zinc-300">
-            <div className="flex justify-between items-center mb-2 pb-2 border-b border-zinc-800/50">
-              <span className="text-zinc-500 text-xs">{t.htmlLabel}</span>
+          <div className="relative rounded-2xl bg-black/60 border border-[#1f1f23] p-6 font-mono text-sm text-zinc-300 shadow-inner">
+            <div className="flex justify-between items-center mb-4 pb-4 border-b border-[#1f1f23]">
+              <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">{t.htmlLabel}</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={copyToClipboard}
                 disabled={!clientId || loading}
-                className="h-8 text-zinc-400 hover:text-white"
+                className="h-9 px-4 text-zinc-400 hover:text-lime-400 hover:bg-lime-400/10 rounded-lg transition-all"
               >
                 {copied ? (
                   <>
-                    <CheckCircle2 className="mr-2 h-4 w-4 text-green-500" />
-                    {t.copied}
+                    <CheckCircle2 className="mr-2 h-4 w-4 text-lime-400" />
+                    <span className="text-lime-400 font-bold">{t.copied}</span>
                   </>
                 ) : (
                   <>
@@ -82,30 +82,35 @@ export default function IntegrationPage() {
                 )}
               </Button>
             </div>
-            <pre className="overflow-x-auto p-2">
-              <code>{loading ? t.loading : integrationCode}</code>
+            <pre className="overflow-x-auto p-2 scrollbar-thin">
+              <code className={clientId ? "text-lime-400/90" : "text-zinc-600 italic"}>
+                {loading ? t.loading : integrationCode}
+              </code>
             </pre>
           </div>
           {!clientId && !loading && (
-            <p className="mt-4 text-sm text-amber-500 font-medium">
-              {t.noDomainWarning}
-            </p>
+            <div className="mt-6 flex items-center gap-3 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl">
+              <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+              <p className="text-sm text-amber-500/90 font-medium">
+                {t.noDomainWarning}
+              </p>
+            </div>
           )}
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="dashboard-card">
         <CardHeader>
-          <CardTitle>{t.step2Title}</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl font-bold text-white">{t.step2Title}</CardTitle>
+          <CardDescription className="text-zinc-400">
             {t.step2Desc}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-zinc-400 mb-4">
+          <p className="text-sm text-zinc-400 mb-6 leading-relaxed">
             {t.settingsHint}
           </p>
-          <Button variant="outline" asChild>
+          <Button className="dashboard-btn-primary" asChild>
             <a href="/dashboard/settings">{t.goToSettings}</a>
           </Button>
         </CardContent>

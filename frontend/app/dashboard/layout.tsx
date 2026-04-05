@@ -21,7 +21,7 @@ import {
   X
 } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { translations } from '@/lib/i18n/translations';
 
@@ -37,7 +37,24 @@ export default function DashboardLayout({
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { lang, setLang } = useLanguage();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activePlan, setActivePlan] = useState<string | null>(null);
   const t = translations[lang].dashboard.sidebar;
+
+  useEffect(() => {
+    const status = localStorage.getItem('subscription_status');
+    const plan = localStorage.getItem('subscription_plan');
+    if (status !== 'active') {
+      router.push('/payment');
+    } else {
+      // capitalize plan string
+      setActivePlan(plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : "Unknown Plan");
+    }
+  }, [router]);
+
+  // Gate access until plan is read
+  if (activePlan === null) {
+    return <div className="h-screen w-screen bg-[#05050a] flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-lime-400 border-t-transparent animate-spin"/></div>;
+  }
 
   const navigation = [
     { name: t.overview, href: '/dashboard', icon: SquaresFour },
@@ -174,7 +191,7 @@ export default function DashboardLayout({
                   </div>
                   <div className="ml-3 flex-1 overflow-hidden">
                     <p className="text-[13px] font-bold text-zinc-200 truncate">{t.clientName}</p>
-                    <p className="text-[9px] text-zinc-600 truncate uppercase tracking-widest font-black group-hover:text-lime-400/60 transition-colors">{t.planType}</p>
+                    <p className="text-[9px] text-zinc-600 truncate uppercase tracking-widest font-black group-hover:text-lime-400/60 transition-colors">PLAN: {activePlan}</p>
                   </div>
                 </div>
                 <button

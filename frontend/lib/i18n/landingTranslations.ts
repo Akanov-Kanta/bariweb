@@ -104,16 +104,20 @@ export const landingTranslations: Record<string, any> = {
       calcPeople: "сотрудников",
       calcPenalty: "Риск штрафа (МРП-эквивалент):",
       calcSavings: "Чистая экономия с нами:",
-      starter: "Выбрать Starter",
+      freemium: "Выбрать Freemium",
       lite: "Выбрать Lite",
+      starter: "Выбрать Starter",
       business: "Выбрать Business",
       enterprise: "Запросить Enterprise",
+      enterprisePremium: "Запросить Premium",
       hit: "ПОПУЛЯРНЫЙ",
       mo: "/мес",
-      starterFeatures: ["До 10,000 визитов", "Базовое сканирование", "Отчеты об ошибках"],
-      liteFeatures: ["До 50,000 визитов", "Голосовой помощник", "Базовая поддержка"],
-      businessFeatures: ["До 500,000 визитов", "Голосовой автопилот", "SLA & Поддержка 24/7", "Сертификат compliance"],
-      enterpriseFeatures: ["Анлим визиты", "On-premise релиз", "Кастомный ИИ-помощник"]
+      freemiumFeatures: ["До 5,000 сессий", "Базовые настройки интерфейса"],
+      liteFeatures: ["До 15,000 сессий", "Краткий WCAG-отчёт", "Базовый сертификат"],
+      starterFeatures: ["До 50,000 сессий", "Голосовое управление", "Полный PDF сертификат", "SLA 99.5%"],
+      businessFeatures: ["До 500,000 сессий", "AI упроститель", "Расширенный сертификат с подписью", "API-доступ", "SLA 99.9%"],
+      enterpriseFeatures: ["Анлим сессии", "Юридический акт", "White Label", "SLA 99.99%"],
+      enterprisePremiumFeatures: ["Анлим сессии + SLA", "Гос. пакет защиты", "White Label + поддомен", "SLA 99.99% + 24/7"]
     },
     audit: {
       title: "Проверьте свой сайт на ",
@@ -160,7 +164,7 @@ export const landingTranslations: Record<string, any> = {
     },
     docsPage: {
       title: "Документация по интеграции",
-      desc: "Внедрите Bariweb в вашу инфраструктуру за 2 минуты. Здесь собраны инструкции по установке и настройке параметров виджета.",
+      desc: "Внедрите Bariweb в вашу инфраструктуру за 2 минуты. Шаг 1: Скопируйте ваш client_id из дашборда. Шаг 2: Выберите фреймворк. Шаг 3: Вставьте код в ваш проект.",
       quickStart: "Примеры кода",
       html: "HTML / Vanilla JS",
       react: "React / Next.js",
@@ -200,18 +204,18 @@ export const landingTranslations: Record<string, any> = {
         },
         vanilla: {
           title: "Установка для HTML / Vanilla",
-          body: "Для статических сайтов и CMS (WordPress, Tilda) вставьте скрипт прямо перед закрывающимся тегом </head>:",
-          code: "<!-- Bariweb Script -->\n<script src=\"https://cdn.bariweb.kz/v2.js\" client_id=\"YOUR_API_KEY\"></script>"
+          body: "Для статических сайтов и CMS скопируйте ваш client_id в дашборде и вставьте следующий скрипт перед закрывающимся тегом </head>:",
+          code: "<!-- Bariweb Script -->\n<script \n  src=\"https://unpkg.com/bariweb-widget@latest/dist/bariweb.iife.js\" \n  client-id=\"ВАШ_CLIENT_ID\"\n></script>"
         },
         react: {
           title: "Установка для React / Next.js",
-          body: "В Next.js мы рекомендуем использовать встроенный компонент next/script со стратегией beforeInteractive.",
-          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.bariweb.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
+          body: "Для SPA (React / Next.js) установите пакет через NPM (npm install bariweb-widget), скопируйте ваш client_id и добавьте компонент в корневой файл.",
+          code: "// Терминал: npm install bariweb-widget\n\nimport 'bariweb-widget';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <body>\n        {children}\n        <bw-widget client-id=\"ВАШ_CLIENT_ID\"></bw-widget>\n      </body>\n    </html>\n  );\n}"
         },
         vue: {
           title: "Установка для Vue / Nuxt",
-          body: "Для Vue.js или Nuxt.js добавьте директиву в nuxt.config.ts или напрямую в index.html.",
-          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.bariweb.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
+          body: "Для Vue.js / Nuxt проектов установите пакет (npm install bariweb-widget), импортируйте его в точку входа и добавьте тег виджета, указав ваш client_id.",
+          code: "<!-- Терминал: npm install bariweb-widget -->\n\n<template>\n  <div>\n    <NuxtPage />\n    <bw-widget client-id=\"ВАШ_CLIENT_ID\"></bw-widget>\n  </div>\n</template>\n\n<script setup>\nimport 'bariweb-widget';\n</script>"
         },
         config: {
           title: "Объект конфигурации",
@@ -336,16 +340,20 @@ export const landingTranslations: Record<string, any> = {
       calcPeople: "қызметкер",
       calcPenalty: "Айыппұл қаупі (АЕК):",
       calcSavings: "Бізбен бірге таза үнемдеу:",
-      starter: "Starter таңдау",
+      freemium: "Freemium таңдау",
       lite: "Lite таңдау",
+      starter: "Starter таңдау",
       business: "Business таңдау",
       enterprise: "Enterprise сұрау",
+      enterprisePremium: "Premium сұрау",
       hit: "КӨП ТАҢДАЛАТЫН",
       mo: "/ай",
-      starterFeatures: ["10,000 қаралымға дейін", "Базалық сканерлеу", "Қателер туралы есептер"],
-      liteFeatures: ["50,000 қаралымға дейін", "Дауыстық көмекші", "Базалық қолдау"],
-      businessFeatures: ["500,000 қаралымға дейін", "Дауыстық автопилот", "SLA және 24/7 қолдау", "Compliance сертификаты"],
-      enterpriseFeatures: ["Шексіз қаралым", "On-premise нұсқасы", "Жеке ЖИ-көмекші"]
+      freemiumFeatures: ["5,000 сессияға дейін", "Базалық баптаулар"],
+      liteFeatures: ["15,000 сессияға дейін", "Қысқаша WCAG есебі", "Базалық сертификат"],
+      starterFeatures: ["50,000 сессияға дейін", "Дауыспен басқару", "Толық PDF сертификат", "SLA 99.5%"],
+      businessFeatures: ["500,000 сессияға дейін", "AI оңтайландырғыш", "Кеңейтілген сертификат", "API қосылу", "SLA 99.9%"],
+      enterpriseFeatures: ["Шексіз сессиялар", "Заңды кесім", "White Label", "SLA 99.99%"],
+      enterprisePremiumFeatures: ["Шексіз сессиялар + SLA", "Мемлекеттік пакет", "White Label + ішкі домен", "SLA 99.99% + 24/7"]
     },
     audit: {
       title: "Сайтыңызды осалдыққа ",
@@ -392,7 +400,7 @@ export const landingTranslations: Record<string, any> = {
     },
     docsPage: {
       title: "Интеграциялық құжаттама",
-      desc: "Bariweb жүйесін 2 минут ішінде орнатыңыз. Бұл жерде виджетті орнату және баптау нұсқаулары жинақталған.",
+      desc: "Bariweb жүйесін 2 минут ішінде орнатыңыз. 1-қадам: дашбордтан client_id көшіріп алыңыз. 2-қадам: Жоба тілін таңдаңыз. 3-қадам: Кодты жобаңызға қосыңыз.",
       quickStart: "Код мысалдары",
       html: "HTML / Vanilla JS",
       react: "React / Next.js",
@@ -432,18 +440,18 @@ export const landingTranslations: Record<string, any> = {
         },
         vanilla: {
           title: "HTML / Vanilla үшін орнату",
-          body: "Статикалық сайттар мен CMS (WordPress, Tilda) үшін скриптті </head> жабылатын тегінің алдына енгізіңіз:",
-          code: "<!-- Bariweb Script -->\n<script src=\"https://cdn.bariweb.kz/v2.js\" client_id=\"Сіздің_КІЛТІҢІЗ\"></script>"
+          body: "Статикалық сайттар мен CMS үшін дашбордтан client_id көшіріп алып, мына скриптті </head> жабылатын тегінің алдына енгізіңіз:",
+          code: "<!-- Bariweb Script -->\n<script \n  src=\"https://unpkg.com/bariweb-widget@latest/dist/bariweb.iife.js\" \n  client-id=\"СІЗДІҢ_CLIENT_ID\"\n></script>"
         },
         react: {
           title: "React / Next.js үшін орнату",
-          body: "Next.js-те beforeInteractive стратегиясы бар кірістірілген next/script компонентін пайдалануды ұсынамыз.",
-          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.bariweb.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
+          body: "SPA (React / Next.js) үшін NPM арқылы пакетті орнатыңыз (npm install bariweb-widget), өзіңіздің client_id-іңізді көшіріңіз және компонентті негізгі файлға қосыңыз.",
+          code: "// Терминал: npm install bariweb-widget\n\nimport 'bariweb-widget';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <body>\n        {children}\n        <bw-widget client-id=\"СІЗДІҢ_CLIENT_ID\"></bw-widget>\n      </body>\n    </html>\n  );\n}"
         },
         vue: {
           title: "Vue / Nuxt үшін орнату",
-          body: "Vue.js немесе Nuxt.js үшін nuxt.config.ts файлында немесе тікелей index.html ішіне қосыңыз.",
-          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.bariweb.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
+          body: "Vue.js / Nuxt жобалары үшін пакетті орнатыңыз (npm install bariweb-widget), оны кіру нүктесіне импорттаңыз және client_id көрсете отырып, виджет тегін қосыңыз.",
+          code: "<!-- Терминал: npm install bariweb-widget -->\n\n<template>\n  <div>\n    <NuxtPage />\n    <bw-widget client-id=\"СІЗДІҢ_CLIENT_ID\"></bw-widget>\n  </div>\n</template>\n\n<script setup>\nimport 'bariweb-widget';\n</script>"
         },
         config: {
           title: "Конфигурация объектісі",
@@ -568,16 +576,20 @@ export const landingTranslations: Record<string, any> = {
       calcPeople: "employees",
       calcPenalty: "Risk of penalty (MCI equiv):",
       calcSavings: "Net savings with us:",
-      starter: "Select Starter",
+      freemium: "Select Freemium",
       lite: "Select Lite",
+      starter: "Select Starter",
       business: "Select Business",
       enterprise: "Request Enterprise",
+      enterprisePremium: "Request Premium",
       hit: "MOST POPULAR",
       mo: "/mo",
-      starterFeatures: ["Up to 10,000 pageviews/mo", "Basic accessibility widget", "Error reports"],
-      liteFeatures: ["Up to 50,000 pageviews/mo", "Voice assistant", "Basic support"],
-      businessFeatures: ["Up to 500,000 pageviews/mo", "Voice autopilot", "SLA & 24/7 support", "Compliance certificate"],
-      enterpriseFeatures: ["Unlimited traffic", "On-premise option", "Custom AI assistant"]
+      freemiumFeatures: ["Up to 5,000 sessions", "Basic UI adjustments"],
+      liteFeatures: ["Up to 15,000 sessions", "Concise WCAG report", "Basic PDF Certificate"],
+      starterFeatures: ["Up to 50,000 sessions", "Voice control", "Full PDF Certificate", "99.5% SLA"],
+      businessFeatures: ["Up to 500,000 sessions", "AI simplifier", "Extended signed cert", "API Access", "99.9% SLA"],
+      enterpriseFeatures: ["Unlimited sessions", "Legal protection act", "White Label", "99.99% SLA"],
+      enterprisePremiumFeatures: ["Unlimited + SLA", "Government package", "White Label + subdomain", "99.99% SLA + 24/7"]
     },
     audit: {
       title: "Check your site for ",
@@ -624,7 +636,7 @@ export const landingTranslations: Record<string, any> = {
     },
     docsPage: {
       title: "Integration Documentation",
-      desc: "Deploy Bariweb onto your infrastructure in 2 minutes flat. Explore installation guides and advanced configuration parameters.",
+      desc: "Deploy Bariweb onto your infrastructure in 2 minutes flat. Step 1: Copy your client_id from the dashboard. Step 2: Choose your tech stack. Step 3: Insert the code into your project.",
       quickStart: "Code Examples",
       html: "HTML / Vanilla JS",
       react: "React / Next.js",
@@ -664,18 +676,18 @@ export const landingTranslations: Record<string, any> = {
         },
         vanilla: {
           title: "HTML / Vanilla Setup",
-          body: "For static websites and CMS platforms (WordPress, Shopify), insert the script immediately preceding your closing </head> tag:",
-          code: "<!-- Bariweb Script -->\n<script src=\"https://cdn.bariweb.kz/v2.js\" client_id=\"YOUR_API_KEY\"></script>"
+          body: "For static websites and CMS platforms, copy your client_id from the dashboard and insert the following script immediately preceding your closing </head> tag:",
+          code: "<!-- Bariweb Script -->\n<script \n  src=\"https://unpkg.com/bariweb-widget@latest/dist/bariweb.iife.js\" \n  client-id=\"YOUR_CLIENT_ID\"\n></script>"
         },
         react: {
           title: "React / Next.js Setup",
-          body: "For Next.js implementations, utilize the native next/script component specifying a beforeInteractive loading strategy.",
-          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.bariweb.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
+          body: "For Single Page Applications (React / Next.js), install the NPM package (npm install bariweb-widget), copy your client_id, and mount the component in your root layout.",
+          code: "// Terminal: npm install bariweb-widget\n\nimport 'bariweb-widget';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <body>\n        {children}\n        <bw-widget client-id=\"YOUR_CLIENT_ID\"></bw-widget>\n      </body>\n    </html>\n  );\n}"
         },
         vue: {
           title: "Vue / Nuxt Setup",
-          body: "In Vue / Nuxt architectures, simply configure the directive dynamically inside nuxt.config.ts or globally in your index.html definition.",
-          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.bariweb.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
+          body: "For Vue / Nuxt, install the NPM package (npm install bariweb-widget), import it at your entry point, and place the widget tag with your client_id in the layout.",
+          code: "<!-- Terminal: npm install bariweb-widget -->\n\n<template>\n  <div>\n    <NuxtPage />\n    <bw-widget client-id=\"YOUR_CLIENT_ID\"></bw-widget>\n  </div>\n</template>\n\n<script setup>\nimport 'bariweb-widget';\n</script>"
         },
         config: {
           title: "Configuration Object",

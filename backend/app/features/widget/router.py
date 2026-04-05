@@ -137,12 +137,35 @@ async def transcribe_audio(
     content_type = audio.content_type or "audio/webm"
 
     try:
-        result = stt_service.transcribe(
-            audio_bytes=content,
-            filename=filename,
-            content_type=content_type,
-            language_mode=language_mode,
-        )
+        from langfuse import get_client, propagate_attributes
+        langfuse_client = get_client()
+
+        with propagate_attributes(user_id=str(client.public_id), session_id=str(client.public_id)):
+            with langfuse_client.start_as_current_observation(
+                as_type="generation",
+                name="stt-transcribe",
+                model="whisper-approximation"
+            ) as generation:
+                
+                result = stt_service.transcribe(
+                    audio_bytes=content,
+                    filename=filename,
+                    content_type=content_type,
+                    language_mode=language_mode,
+                )
+                
+                estimated_seconds = max(1, len(content) / 3000)
+                stt_cost = (estimated_seconds / 60) * 0.006
+
+                generation.update(
+                    output=result.text,
+                    usage={
+                        "input": int(estimated_seconds),
+                        "output": 0,
+                        "unit": "SECONDS",
+                        "total_cost": stt_cost
+                    }
+                )
     except SttServiceError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
 

@@ -251,7 +251,7 @@ export class BariwebWidget extends LitElement {
   @state() private _inputValue = '';
   @state() private _isAdmin = false;
   @state() private _adminPassword = '';
-  @state() private _authError = ''; // Keep it if intended for future use or remove if strict
+  @state() private _authError = '';
   @state() private _currentScreenLabel = '';
   @state() private _sttState: 'idle' | 'recording' | 'processing' | 'error' = 'idle';
   @state() private _sttLanguageMode: SttLanguageMode = 'auto';
@@ -273,6 +273,7 @@ export class BariwebWidget extends LitElement {
   private _silenceIntervalId: number | null = null;
   private _maxDurationTimeoutId: number | null = null;
   private _adminClickTimer: ReturnType<typeof setTimeout> | null = null;
+  private _hadPendingConfirmation = false;
 
   constructor() {
     super();
@@ -327,12 +328,13 @@ export class BariwebWidget extends LitElement {
 
   private async _handleAdminLogin() {
     this._authError = '';
-    if (!this.clientId) { this._authError = 'Client ID not configured'; return; }
+    const cid = this.clientId || (window as any).BariwebConfig?.clientId || '';
+    if (!cid) { this._authError = 'Client ID not configured'; return; }
     try {
       const resp = await fetch('http://localhost:8000/auth/login/widget', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ client_public_id: this.clientId, admin_key: this._adminPassword })
+        body: JSON.stringify({ client_public_id: cid, admin_key: this._adminPassword })
       });
       if (resp.ok) {
         const { access_token } = await resp.json();
@@ -371,9 +373,13 @@ export class BariwebWidget extends LitElement {
     bariwebWatcher.start();
     bariwebWatcher.onStateChange(async (snapshot: any) => {
       try {
+        const cid = this.clientId || (window as any).BariwebConfig?.clientId || '';
         const resp = await fetch('http://localhost:8000/v1/training/match-screen', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Client-ID': this.clientId || (window as any).__BARIWEB_CLIENT_ID__ || '' },
+          headers: { 
+            'Content-Type': 'application/json', 
+            'X-Client-ID': cid
+          },
           body: JSON.stringify({ fingerprint: snapshot.fingerprint })
         });
         if (resp.ok) {
@@ -384,6 +390,21 @@ export class BariwebWidget extends LitElement {
     });
 
     window.addEventListener('keydown', this._handleGlobalKeydown);
+  }
+
+  updated(changedProperties: Map<string, any>) {
+    super.updated(changedProperties);
+    
+    // Auto-listen for confirmation if voice mode was active
+    const hasPending = !!this._chat.pendingConfirmation;
+    if (hasPending && !this._hadPendingConfirmation) {
+      if (this._chat.isVoiceModeActive()) {
+        setTimeout(() => {
+          if (this._sttState === 'idle') this._startRecording();
+        }, 500); // Small delay to let user hear the question
+      }
+    }
+    this._hadPendingConfirmation = hasPending;
   }
 
   disconnectedCallback() {
@@ -872,11 +893,7 @@ export class BariwebWidget extends LitElement {
             .value=${this._adminPassword}
             @input=${(e: any) => { this._adminPassword = e.target.value; }}
             @keydown=${(e: KeyboardEvent) => { if (e.key === 'Enter') this._handleAdminLogin(); }} />
-<<<<<<< HEAD
           ${this._authError ? html`<p class="auth-error">${this._authError}</p>` : ''}
-=======
-          ${this._authError ? html`<div class="auth-error">${this._authError}</div>` : ''}
->>>>>>> fc079bc (added bariweb widget to landing)
           <button class="admin-login-btn" @click=${this._handleAdminLogin}>${t('adminLogin')}</button>
         `}
         <button class="admin-close-btn" @click=${() => { this._showAdminLogin = false; this._authError = ''; }}>

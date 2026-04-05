@@ -21,3 +21,17 @@ class AdminKeyDisplay(BaseModel):
 
 class AdminKeyStatus(BaseModel):
     has_key: bool
+
+from typing import Optional, List
+
+class ClientDomainMetrics(BaseModel):
+    domain: str
+    tokens: int
+    cost: float
+    traces: int
+
+class ClientMetrics(BaseModel):
+    totalCost: float
+    totalTokens: int
+    totalTraces: int
+    details: List[ClientDomainMetrics]

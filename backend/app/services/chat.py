@@ -208,19 +208,23 @@ class ChatService:
                 
                 content = data["choices"][0]["message"]["content"]
                 usage = data.get("usage", {})
+                
+                input_tokens = usage.get("prompt_tokens", 0)
+                output_tokens = usage.get("completion_tokens", 0)
+                total_tokens = usage.get("total_tokens", 0)
+                
+                # Qwen realistic cost approximation: $1.00 / 1M input, $2.00 / 1M output
+                calculated_cost = (input_tokens * 0.000001) + (output_tokens * 0.000002)
 
                 # Обновляем генерацию: пишем ответ и реальный Usage для расчета Costs
                 generation.update(
                     output=content,
                     usage={
-                        "input": usage.get("prompt_tokens", 0),
-                        "output": usage.get("completion_tokens", 0),
-                        "total": usage.get("total_tokens", 0)
-                    },
-                    cost_details={
-                        "input": 1,
-                        "output": 1,
-                        "total": 1
+                        "input": input_tokens,
+                        "output": output_tokens,
+                        "total": total_tokens,
+                        "unit": "TOKENS",
+                        "total_cost": calculated_cost
                     }
                 )
                 return content

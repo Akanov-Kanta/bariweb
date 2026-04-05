@@ -44,22 +44,6 @@ export class AiA11yController implements ReactiveController {
     }
   }
 
-  private _announce(message: string) {
-    let announcer = document.getElementById('bw-ai-announcer');
-    if (!announcer) {
-      announcer = document.createElement('div');
-      announcer.id = 'bw-ai-announcer';
-      announcer.setAttribute('aria-live', 'polite');
-      announcer.setAttribute('aria-atomic', 'true');
-      Object.assign(announcer.style, {
-        position: 'absolute', width: '1px', height: '1px',
-        padding: '0', margin: '-1px', overflow: 'hidden',
-        clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: '0'
-      });
-      document.body.appendChild(announcer);
-    }
-    announcer.textContent = message;
-  }
 
   async fixMarkup() {
     this.isFixing = true;
@@ -107,7 +91,7 @@ export class AiA11yController implements ReactiveController {
 
       console.log(`BariWeb AI: Found ${brokenElements.length} broken elements. Processing...`);
 
-      const clientId = (window as any).BariwebConfig?.clientId || '';
+      const hostClientId = (this.host as any).clientId || (window as any).BariwebConfig?.clientId || '';
 
       // Process in batches of 10 to avoid token limits
       const BATCH_SIZE = 10;
@@ -117,7 +101,7 @@ export class AiA11yController implements ReactiveController {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Client-ID': clientId
+            'X-Client-ID': hostClientId
           },
           body: JSON.stringify({ elements: batch })
         });
@@ -140,10 +124,6 @@ export class AiA11yController implements ReactiveController {
         }
       }
       
-      this._announce(`Режим для незрячих отработал. AI исправил ${brokenElements.length} элементов.`);
-    } catch (e) {
-      console.error('BariWeb AI: A11y Fix failed', e);
-      this._announce('Произошла ошибка при исправлении элементов.');
     } finally {
       this.isFixing = false;
       this.host.requestUpdate();
@@ -250,7 +230,6 @@ export class AiA11yController implements ReactiveController {
         document.head.appendChild(style);
       }
       document.body.classList.add('bw-simplify-mode');
-      this._announce('Режим AI Упрощение текста включен. Используйте Tab для навигации по тексту и Enter для упрощения.');
     } else {
       document.body.removeEventListener('click', this._onParagraphClick, { capture: true });
       document.body.removeEventListener('keydown', this._onParagraphKeydown, { capture: true });
@@ -260,7 +239,6 @@ export class AiA11yController implements ReactiveController {
       });
       document.body.classList.remove('bw-simplify-mode');
       document.documentElement.style.removeProperty('--bw-simplify-cursor');
-      this._announce('Режим AI Упрощение текста выключен.');
     }
     this.host.requestUpdate();
   }
@@ -341,12 +319,12 @@ export class AiA11yController implements ReactiveController {
         });
 
         try {
-          const clientId = (window as any).BariwebConfig?.clientId || '';
+          const hostClientId = (this.host as any).clientId || (window as any).BariwebConfig?.clientId || '';
           const resp = await fetch(`${API_URL}/v1/widget/a11y/simplify`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'X-Client-ID': clientId
+              'X-Client-ID': hostClientId
             },
             body: JSON.stringify({ text })
           });

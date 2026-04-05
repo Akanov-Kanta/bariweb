@@ -102,7 +102,7 @@ export class ChatController implements ReactiveController {
     }
 
     private _shouldSpeak(): boolean {
-        return this._voiceMode || this._tts.isEnabled();
+        return this._tts.isEnabled();
     }
 
     private _loadMessages() {
@@ -136,6 +136,10 @@ export class ChatController implements ReactiveController {
         } catch (e) {
             console.error('Failed to save chat history', e);
         }
+    }
+    
+    isVoiceModeActive(): boolean {
+        return this._voiceMode;
     }
 
     /**
@@ -400,21 +404,35 @@ export class ChatController implements ReactiveController {
      */
     private _compressedHistory(): Array<{ role: string; text: string }> {
         const all = this.messages.map(m => ({ role: m.role, text: m.text }));
-        if (all.length <= 3) return all;
-
-        // Find the last user message (that's the current task)
+        
         let lastUserIdx = -1;
         for (let i = all.length - 1; i >= 0; i--) {
             if (all[i].role === 'user') { lastUserIdx = i; break; }
         }
-        if (lastUserIdx === -1) return all.slice(-3);
+        if (lastUserIdx === -1) return all.slice(-5);
 
-        const lastUser = all[lastUserIdx];
-        // Get last 2 assistant messages AFTER the last user message
+        let prevUserIdx = -1;
+        for (let i = lastUserIdx - 1; i >= 0; i--) {
+            if (all[i].role === 'user') { prevUserIdx = i; break; }
+        }
+
+        const historyToKeep = [];
+
+        if (prevUserIdx !== -1) {
+            historyToKeep.push(all[prevUserIdx]);
+            // find the last assistant message before the current user question
+            const prevAssistant = all.slice(prevUserIdx + 1, lastUserIdx).filter(m => m.role === 'assistant').pop();
+            if (prevAssistant) historyToKeep.push(prevAssistant);
+        }
+
+        // Current question
+        historyToKeep.push(all[lastUserIdx]);
+
+        // Action steps
         const afterUser = all.slice(lastUserIdx + 1).filter(m => m.role === 'assistant');
-        const recentAssistant = afterUser.slice(-2);
+        historyToKeep.push(...afterUser.slice(-2));
 
-        return [lastUser, ...recentAssistant];
+        return historyToKeep;
     }
 
 

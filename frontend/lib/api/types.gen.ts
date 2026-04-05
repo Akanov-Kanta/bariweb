@@ -5,6 +5,108 @@ export type ClientOptions = {
 };
 
 /**
+ * A11yBrokenElement
+ */
+export type A11yBrokenElement = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Html
+     */
+    html: string;
+};
+
+/**
+ * A11yFixRequest
+ */
+export type A11yFixRequest = {
+    /**
+     * Elements
+     */
+    elements: Array<A11yBrokenElement>;
+};
+
+/**
+ * A11yPatch
+ */
+export type A11yPatch = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Attribute
+     */
+    attribute: string;
+    /**
+     * Value
+     */
+    value: string;
+};
+
+/**
+ * A11ySimplifyRequest
+ */
+export type A11ySimplifyRequest = {
+    /**
+     * Text
+     */
+    text: string;
+};
+
+/**
+ * A11ySimplifyResponse
+ */
+export type A11ySimplifyResponse = {
+    /**
+     * Text
+     */
+    text: string;
+};
+
+/**
+ * ActionPlan
+ */
+export type ActionPlan = {
+    /**
+     * Url
+     */
+    url: string;
+    /**
+     * Goal
+     */
+    goal: string;
+    /**
+     * Steps
+     */
+    steps: Array<ActionStep>;
+};
+
+/**
+ * ActionStep
+ */
+export type ActionStep = {
+    /**
+     * Type
+     */
+    type: 'read' | 'click' | 'input' | 'submit' | 'navigation';
+    /**
+     * Selector
+     */
+    selector: string;
+    /**
+     * Value
+     */
+    value?: string | null;
+    /**
+     * Description
+     */
+    description: string;
+};
+
+/**
  * AdminKeyDisplay
  */
 export type AdminKeyDisplay = {
@@ -43,21 +145,17 @@ export type AdminKeyStatus = {
 };
 
 /**
- * AutoSaveRequest
+ * Body_transcribe_audio
  */
-export type AutoSaveRequest = {
+export type BodyTranscribeAudio = {
     /**
-     * Fingerprint
+     * Language Mode
      */
-    fingerprint: string;
+    language_mode: 'auto' | 'kz' | 'ru' | 'en';
     /**
-     * Tokens
+     * Audio
      */
-    tokens: Array<string>;
-    /**
-     * Page Url
-     */
-    page_url?: string | null;
+    audio: Blob | File;
 };
 
 /**
@@ -85,7 +183,7 @@ export type ChatRequest = {
     /**
      * History
      */
-    history?: Array<ChatMessage>;
+    history?: Array<ChatMessage> | null;
     /**
      * Page Text
      */
@@ -93,7 +191,7 @@ export type ChatRequest = {
     /**
      * Elements
      */
-    elements?: Array<InteractiveElement>;
+    elements?: string;
     /**
      * Page Url
      */
@@ -163,6 +261,50 @@ export type Client = {
 };
 
 /**
+ * ClientDomainMetrics
+ */
+export type ClientDomainMetrics = {
+    /**
+     * Domain
+     */
+    domain: string;
+    /**
+     * Tokens
+     */
+    tokens: number;
+    /**
+     * Cost
+     */
+    cost: number;
+    /**
+     * Traces
+     */
+    traces: number;
+};
+
+/**
+ * ClientMetrics
+ */
+export type ClientMetrics = {
+    /**
+     * Totalcost
+     */
+    totalCost: number;
+    /**
+     * Totaltokens
+     */
+    totalTokens: number;
+    /**
+     * Totaltraces
+     */
+    totalTraces: number;
+    /**
+     * Details
+     */
+    details: Array<ClientDomainMetrics>;
+};
+
+/**
  * ClientRegisterRequest
  */
 export type ClientRegisterRequest = {
@@ -205,6 +347,61 @@ export type ConfirmRequest = {
 };
 
 /**
+ * DiscoverRequest
+ */
+export type DiscoverRequest = {
+    /**
+     * Fingerprint
+     */
+    fingerprint: string;
+    /**
+     * Tokens
+     */
+    tokens?: Array<string>;
+    /**
+     * Page Url
+     */
+    page_url?: string | null;
+};
+
+/**
+ * DiscoverResponse
+ */
+export type DiscoverResponse = {
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Is Trained
+     */
+    is_trained: boolean;
+    /**
+     * Label
+     */
+    label?: string | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+};
+
+/**
+ * ExecuteRequest
+ */
+export type ExecuteRequest = {
+    /**
+     * Request Id
+     */
+    request_id: string;
+    step: ActionStep;
+    /**
+     * Is Final
+     */
+    is_final?: boolean;
+};
+
+/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -215,17 +412,13 @@ export type HttpValidationError = {
 };
 
 /**
- * InteractiveElement
+ * MatchScreenRequest
  */
-export type InteractiveElement = {
+export type MatchScreenRequest = {
     /**
-     * Id
+     * Fingerprint
      */
-    id: string;
-    /**
-     * Label
-     */
-    label: string;
+    fingerprint: string;
 };
 
 /**
@@ -247,25 +440,39 @@ export type MatchScreenResponse = {
 };
 
 /**
- * SaveScreenRequest
+ * PlanRequest
  */
-export type SaveScreenRequest = {
+export type PlanRequest = {
     /**
-     * Fingerprint
+     * Url
      */
-    fingerprint: string;
+    url: string;
     /**
-     * Label
+     * Goal
      */
-    label: string;
+    goal: string;
     /**
-     * Description
+     * Elements Context
      */
-    description?: string | null;
+    elements_context?: string;
+};
+
+/**
+ * SttTranscriptionResponse
+ */
+export type SttTranscriptionResponse = {
     /**
-     * Page Url
+     * Text
      */
-    page_url?: string | null;
+    text: string;
+    /**
+     * Provider
+     */
+    provider: 'kz' | 'generic';
+    /**
+     * Detected Language
+     */
+    detected_language?: string | null;
 };
 
 /**
@@ -392,6 +599,20 @@ export type WidgetLoginErrors = {
 export type WidgetLoginError = WidgetLoginErrors[keyof WidgetLoginErrors];
 
 export type WidgetLoginResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type VerifyWidgetTokenData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/login/widget/verify';
+};
+
+export type VerifyWidgetTokenResponses = {
     /**
      * Successful Response
      */
@@ -642,6 +863,22 @@ export type GetAdminKeyStatusResponses = {
 
 export type GetAdminKeyStatusResponse = GetAdminKeyStatusResponses[keyof GetAdminKeyStatusResponses];
 
+export type GetMyMetricsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/clients/my/metrics';
+};
+
+export type GetMyMetricsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ClientMetrics;
+};
+
+export type GetMyMetricsResponse = GetMyMetricsResponses[keyof GetMyMetricsResponses];
+
 export type ChatData = {
     body: ChatRequest;
     path?: never;
@@ -667,15 +904,168 @@ export type ChatResponses = {
 
 export type ChatResponse2 = ChatResponses[keyof ChatResponses];
 
-export type MatchScreenData = {
+export type FixA11yMarkupData = {
+    body: A11yFixRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/widget/a11y/fix';
+};
+
+export type FixA11yMarkupErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type FixA11yMarkupError = FixA11yMarkupErrors[keyof FixA11yMarkupErrors];
+
+export type FixA11yMarkupResponses = {
+    /**
+     * Response Fix A11Y Markup
+     *
+     * Successful Response
+     */
+    200: Array<A11yPatch>;
+};
+
+export type FixA11yMarkupResponse = FixA11yMarkupResponses[keyof FixA11yMarkupResponses];
+
+export type SimplifyA11yTextData = {
+    body: A11ySimplifyRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/widget/a11y/simplify';
+};
+
+export type SimplifyA11yTextErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SimplifyA11yTextError = SimplifyA11yTextErrors[keyof SimplifyA11yTextErrors];
+
+export type SimplifyA11yTextResponses = {
+    /**
+     * Successful Response
+     */
+    200: A11ySimplifyResponse;
+};
+
+export type SimplifyA11yTextResponse = SimplifyA11yTextResponses[keyof SimplifyA11yTextResponses];
+
+export type TranscribeAudioData = {
+    body: BodyTranscribeAudio;
+    path?: never;
+    query?: never;
+    url: '/v1/stt/transcribe';
+};
+
+export type TranscribeAudioErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type TranscribeAudioError = TranscribeAudioErrors[keyof TranscribeAudioErrors];
+
+export type TranscribeAudioResponses = {
+    /**
+     * Successful Response
+     */
+    200: SttTranscriptionResponse;
+};
+
+export type TranscribeAudioResponse = TranscribeAudioResponses[keyof TranscribeAudioResponses];
+
+export type DiscoverScreenData = {
+    body: DiscoverRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/training/discover';
+};
+
+export type DiscoverScreenErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DiscoverScreenError = DiscoverScreenErrors[keyof DiscoverScreenErrors];
+
+export type DiscoverScreenResponses = {
+    /**
+     * Successful Response
+     */
+    200: DiscoverResponse;
+};
+
+export type DiscoverScreenResponse = DiscoverScreenResponses[keyof DiscoverScreenResponses];
+
+export type ListScreensBearerData = {
     body?: never;
     path?: never;
-    query: {
+    query?: {
         /**
-         * Fingerprint
+         * Is Draft
          */
-        fingerprint: string;
+        is_draft?: boolean | null;
     };
+    url: '/v1/training/screens';
+};
+
+export type ListScreensBearerErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListScreensBearerError = ListScreensBearerErrors[keyof ListScreensBearerErrors];
+
+export type ListScreensBearerResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type ConfirmScreenBearerData = {
+    body: ConfirmRequest;
+    path: {
+        /**
+         * Screen Id
+         */
+        screen_id: string;
+    };
+    query?: never;
+    url: '/v1/training/confirm/{screen_id}';
+};
+
+export type ConfirmScreenBearerErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ConfirmScreenBearerError = ConfirmScreenBearerErrors[keyof ConfirmScreenBearerErrors];
+
+export type ConfirmScreenBearerResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type MatchScreenData = {
+    body: MatchScreenRequest;
+    path?: never;
+    query?: never;
     url: '/v1/training/match-screen';
 };
 
@@ -696,57 +1086,6 @@ export type MatchScreenResponses = {
 };
 
 export type MatchScreenResponse2 = MatchScreenResponses[keyof MatchScreenResponses];
-
-export type SaveScreenContextData = {
-    body: SaveScreenRequest;
-    path?: never;
-    query?: {
-        /**
-         * Client Id
-         */
-        client_id?: string;
-    };
-    url: '/v1/training/save-screen-context';
-};
-
-export type SaveScreenContextErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type SaveScreenContextError = SaveScreenContextErrors[keyof SaveScreenContextErrors];
-
-export type SaveScreenContextResponses = {
-    /**
-     * Successful Response
-     */
-    200: unknown;
-};
-
-export type AutoSaveData = {
-    body: AutoSaveRequest;
-    path?: never;
-    query?: never;
-    url: '/v1/training/auto-save';
-};
-
-export type AutoSaveErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type AutoSaveError = AutoSaveErrors[keyof AutoSaveErrors];
-
-export type AutoSaveResponses = {
-    /**
-     * Successful Response
-     */
-    200: unknown;
-};
 
 export type SuggestNameData = {
     body: SuggestNameRequest;
@@ -771,7 +1110,53 @@ export type SuggestNameResponses = {
     200: unknown;
 };
 
-export type ConfirmScreenData = {
+export type DashboardGetClientsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/training/dashboard/clients';
+};
+
+export type DashboardGetClientsResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type DashboardListScreensData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Client Public Id
+         */
+        client_public_id?: string | null;
+        /**
+         * Is Draft
+         */
+        is_draft?: boolean | null;
+    };
+    url: '/v1/training/dashboard/screens';
+};
+
+export type DashboardListScreensErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DashboardListScreensError = DashboardListScreensErrors[keyof DashboardListScreensErrors];
+
+export type DashboardListScreensResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type DashboardConfirmScreenData = {
     body: ConfirmRequest;
     path: {
         /**
@@ -780,21 +1165,80 @@ export type ConfirmScreenData = {
         screen_id: string;
     };
     query?: never;
-    url: '/v1/training/confirm/{screen_id}';
+    url: '/v1/training/dashboard/confirm/{screen_id}';
 };
 
-export type ConfirmScreenErrors = {
+export type DashboardConfirmScreenErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type ConfirmScreenError = ConfirmScreenErrors[keyof ConfirmScreenErrors];
+export type DashboardConfirmScreenError = DashboardConfirmScreenErrors[keyof DashboardConfirmScreenErrors];
 
-export type ConfirmScreenResponses = {
+export type DashboardConfirmScreenResponses = {
     /**
      * Successful Response
      */
     200: unknown;
 };
+
+export type GeneratePlanData = {
+    body: PlanRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/agent/plan';
+};
+
+export type GeneratePlanErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GeneratePlanError = GeneratePlanErrors[keyof GeneratePlanErrors];
+
+export type GeneratePlanResponses = {
+    /**
+     * Successful Response
+     */
+    200: ActionPlan;
+};
+
+export type GeneratePlanResponse = GeneratePlanResponses[keyof GeneratePlanResponses];
+
+export type ExecuteStepData = {
+    body: ExecuteRequest;
+    path?: never;
+    query?: {
+        /**
+         * Confirm
+         */
+        confirm?: boolean;
+    };
+    url: '/v1/agent/execute';
+};
+
+export type ExecuteStepErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ExecuteStepError = ExecuteStepErrors[keyof ExecuteStepErrors];
+
+export type ExecuteStepResponses = {
+    /**
+     * Response Execute Step
+     *
+     * Successful Response
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type ExecuteStepResponse = ExecuteStepResponses[keyof ExecuteStepResponses];

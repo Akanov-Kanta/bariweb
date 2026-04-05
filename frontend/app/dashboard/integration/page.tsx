@@ -18,6 +18,7 @@ interface ClientData {
 export default function IntegrationPage() {
   const [copied, setCopied] = useState(false);
   const [copiedNpm, setCopiedNpm] = useState(false);
+  const [copiedUsage, setCopiedUsage] = useState(false);
   const [clients, setClients] = useState<ClientData[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,21 +44,24 @@ export default function IntegrationPage() {
   }, []);
 
   const integrationCode = selectedClientId 
-    ? `<script src="https://widget.bariweb.org/bariweb.js" data-client-id="${selectedClientId}"></script>`
+    ? `<script \n  src="https://unpkg.com/bariweb-widget@latest/dist/bariweb.iife.js" \n  client-id="${selectedClientId}"\n></script>`
     : t.noDomainWarning;
 
-  const npmInstallCode = "npm install bariweb";
-  const npmUsageCode = `import { Bariweb } from 'bariweb';\n\n// Initialize in your root layout or app component\n<Bariweb clientId="${selectedClientId || 'YOUR_CLIENT_ID'}" />`;
+  const npmInstallCode = "npm install bariweb-widget";
+  const npmUsageCode = `// 1. Import it in your root layout or entry point\nimport 'bariweb-widget';\n\n// 2. Add the custom element to your application\n<bw-widget client-id="${selectedClientId || 'YOUR_CLIENT_ID'}"></bw-widget>`;
 
-  const copyToClipboard = (text: string, type: 'script' | 'npm') => {
+  const copyToClipboard = (text: string, type: 'script' | 'npm' | 'usage') => {
     if (!selectedClientId && type === 'script') return;
     navigator.clipboard.writeText(text);
     if (type === 'script') {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } else {
+    } else if (type === 'npm') {
       setCopiedNpm(true);
       setTimeout(() => setCopiedNpm(false), 2000);
+    } else if (type === 'usage') {
+      setCopiedUsage(true);
+      setTimeout(() => setCopiedUsage(false), 2000);
     }
   };
 
@@ -93,7 +97,8 @@ export default function IntegrationPage() {
                     <BracketsCurly weight="fill" className="w-6 h-6 text-lime-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-white text-lg font-bold">{t.universalScriptTitle}</CardTitle>
+                    <div className="inline-block px-2 py-0.5 rounded border border-lime-400/30 bg-lime-400/10 text-[9px] font-black text-lime-400 uppercase tracking-widest mb-2">Option 1 / Basic HTML</div>
+                    <CardTitle className="text-white text-lg font-bold block">{t.universalScriptTitle}</CardTitle>
                     <CardDescription className="text-xs text-zinc-500">{t.universalScriptDesc}</CardDescription>
                   </div>
                </div>
@@ -119,13 +124,13 @@ export default function IntegrationPage() {
                     <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
                     <div className="w-2.5 h-2.5 rounded-full bg-amber-500/50" />
                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/50" />
-                    <div className="ml-2 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em]">{t.scriptInjection}</div>
+                    <div className="ml-2 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em]">{t.scriptInjection || "HTML Snippet"}</div>
                   </div>
                   
                   <div className="bg-[#05050a] border border-zinc-800 rounded-b-2xl p-6 md:p-8 font-mono text-[13px] leading-relaxed relative overflow-x-auto group-hover:border-lime-400/20 transition-colors">
-                    <code className="text-lime-400/90 block break-all whitespace-pre-wrap min-w-[200px]">
+                    <pre className="text-lime-400/90 block break-all whitespace-pre-wrap min-w-[200px] m-0">
                       {loading ? t.fetchingSnippet : integrationCode}
-                    </code>
+                    </pre>
                     
                     <div className="md:absolute top-4 right-4 mt-6 md:mt-0 md:translate-y-[-10px] md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 transition-all duration-300">
                        <Button 
@@ -175,7 +180,8 @@ export default function IntegrationPage() {
                     <Package weight="fill" className="w-6 h-6 text-blue-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-white text-lg font-bold">{t.npmFrameworksTitle}</CardTitle>
+                    <div className="inline-block px-2 py-0.5 rounded border border-blue-400/30 bg-blue-400/10 text-[9px] font-black text-blue-400 uppercase tracking-widest mb-2">Option 2 / Modern Frameworks</div>
+                    <CardTitle className="text-white text-lg font-bold block">{t.npmFrameworksTitle}</CardTitle>
                     <CardDescription className="text-xs text-zinc-500">{t.npmFrameworksDesc}</CardDescription>
                   </div>
                </div>
@@ -193,7 +199,7 @@ export default function IntegrationPage() {
                       </div>
                       <Button 
                         onClick={() => copyToClipboard(npmInstallCode, 'npm')}
-                        className="bg-zinc-900 hover:bg-blue-500 text-zinc-500 hover:text-white border border-zinc-800 rounded-xl px-4 h-9 h-9 transition-all text-[10px] font-black uppercase"
+                        className="bg-zinc-900 hover:bg-blue-500 text-zinc-500 hover:text-white border border-zinc-800 rounded-xl px-4 h-9 transition-all text-[10px] font-black uppercase"
                       >
                          {copiedNpm ? <CheckCircle weight="bold" className="mr-2 h-3.5 w-3.5" /> : <Copy weight="fill" className="mr-2 h-3.5 w-3.5" />}
                          {copiedNpm ? t.copied : 'Copy'}
@@ -203,11 +209,29 @@ export default function IntegrationPage() {
                </div>
 
                <div className="space-y-4">
-                  <h4 className="text-xs font-black text-zinc-400 uppercase tracking-widest ml-1">{t.stepInitializeApp}</h4>
-                  <div className="bg-[#05050a] border border-zinc-800 rounded-2xl p-6 font-mono text-[13px] leading-relaxed text-zinc-300">
-                    <pre className="whitespace-pre-wrap">
-                      {npmUsageCode}
-                    </pre>
+                  <h4 className="text-xs font-black text-zinc-400 uppercase tracking-widest ml-1">{t.stepInitializeApp || "Import & Use"}</h4>
+                  <div className="group relative">
+                    <div className="h-10 bg-[#1a1a23] rounded-t-2xl flex items-center px-4 gap-2 border-x border-t border-zinc-800">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-amber-500/50" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/50" />
+                      <div className="ml-2 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em]">{t.scriptInjection || "Code"}</div>
+                    </div>
+                    <div className="bg-[#05050a] border border-zinc-800 rounded-b-2xl p-6 font-mono text-[13px] leading-relaxed text-zinc-300 group-hover:border-blue-400/30 transition-all duration-300 overflow-x-auto relative">
+                      <pre className="whitespace-pre-wrap">
+                        {npmUsageCode}
+                      </pre>
+                      
+                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                         <Button 
+                           onClick={() => copyToClipboard(npmUsageCode, 'usage')}
+                           className="bg-zinc-900 hover:bg-blue-500 text-zinc-500 hover:text-white border border-zinc-800 rounded-xl px-4 h-9 transition-all text-[10px] font-black uppercase"
+                         >
+                           {copiedUsage ? <CheckCircle weight="bold" className="mr-2 h-3.5 w-3.5" /> : <Copy weight="fill" className="mr-2 h-3.5 w-3.5" />}
+                           {copiedUsage ? t.copied : 'Copy'}
+                         </Button>
+                      </div>
+                    </div>
                   </div>
                </div>
             </CardContent>

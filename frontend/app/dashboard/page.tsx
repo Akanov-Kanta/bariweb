@@ -24,6 +24,7 @@ export default function DashboardOverview() {
   const [userData, setUserData] = useState<any>(null);
   const [clientsCount, setClientsCount] = useState(0);
   const [isIntegrated, setIsIntegrated] = useState(false);
+  const [metrics, setMetrics] = useState<any>({ totalCost: 0, totalTokens: 0, totalTraces: 0, details: [] });
   const [loading, setLoading] = useState(true);
   const { lang } = useLanguage();
   const t = translations[lang].dashboard.overview;
@@ -31,9 +32,10 @@ export default function DashboardOverview() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userRes, clientsRes] = await Promise.all([
+        const [userRes, clientsRes, metricsRes] = await Promise.all([
           Auth.me(),
-          Organizations.getMyClients()
+          Organizations.getMyClients(),
+          Organizations.getMyMetrics()
         ]);
 
         if (!userRes.error) {
@@ -43,6 +45,10 @@ export default function DashboardOverview() {
         if (!clientsRes.error && Array.isArray(clientsRes.data)) {
           setClientsCount(clientsRes.data.length);
           setIsIntegrated(clientsRes.data.length > 0);
+        }
+        
+        if (!metricsRes.error && metricsRes.data) {
+          setMetrics(metricsRes.data);
         }
       } catch (error) {
         console.error('Failed to fetch dashboard data', error);
@@ -55,30 +61,24 @@ export default function DashboardOverview() {
 
   const stats = [
     {
-      title: t.activeIntegrations,
+      title: t.activeIntegrations || 'Active Integrations',
       value: clientsCount.toString(),
       icon: Globe,
       color: 'text-lime-400',
       bg: 'bg-lime-400/5',
     },
     {
-      title: t.sessionsUsed,
-      value: '0',
+      title: 'Widget Sessions',
+      value: metrics.totalTraces.toString(),
       icon: Users,
       color: 'text-zinc-400',
       bg: 'bg-zinc-400/5',
     },
+
     {
-      title: t.accessibilityScore,
-      value: 'N/A',
+      title: 'Total Spent',
+      value: `$${metrics.totalCost.toFixed(4)}`,
       icon: ShieldCheck,
-      color: 'text-zinc-400',
-      bg: 'bg-zinc-400/5',
-    },
-    {
-      title: t.avgLoadImpact,
-      value: '< 5ms',
-      icon: Lightning,
       color: 'text-lime-400',
       bg: 'bg-lime-400/5',
     },
@@ -87,7 +87,6 @@ export default function DashboardOverview() {
   const onboardingSteps = [
     { id: 1, title: t.stepAddDomain, desc: t.stepAddDomainDesc, completed: clientsCount > 0, href: '/dashboard/settings' },
     { id: 2, title: t.stepInstallScript, desc: t.stepInstallScriptDesc, completed: false, href: '/dashboard/integration' },
-    { id: 3, title: t.stepCheckStatus, desc: t.stepCheckStatusDesc, completed: false, href: '/dashboard/reports' },
   ];
 
   if (loading) {
@@ -158,31 +157,37 @@ export default function DashboardOverview() {
             ))}
           </div>
 
-          {/* Large Main View */}
+          {/* Large Main View: Domain Metrics */}
           <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 overflow-hidden relative group">
-            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-               <Pulse weight="thin" className="w-32 h-32 text-lime-400" />
-            </div>
             <CardHeader className="border-b border-zinc-800 pb-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg font-bold text-white mb-1">{t.globalActivity}</CardTitle>
-                  <CardDescription className="text-xs text-zinc-500">{t.realtimeMonitoring}</CardDescription>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-lg">
-                   <Clock weight="thin" className="w-4 h-4 text-zinc-400" />
-                   <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Last 24h</span>
+                  <CardTitle className="text-lg font-bold text-white mb-1">Токены по доменам</CardTitle>
+                  <CardDescription className="text-xs text-zinc-500">Детализация использования ИИ</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="h-[300px] flex flex-col items-center justify-center p-12 text-center">
-               <div className="w-16 h-16 rounded-full bg-zinc-900/50 border border-zinc-800 flex items-center justify-center mb-6 relative">
-                  <Pulse weight="thin" className="w-8 h-8 text-zinc-700 animate-pulse" />
-               </div>
-               <h4 className="text-zinc-500 italic text-sm font-medium mb-2">{t.waitingForData}</h4>
-               <p className="text-zinc-600 text-xs max-w-xs leading-relaxed">
-                 {t.integrationRequiredDesc}
-               </p>
+            <CardContent className="flex flex-col p-6">
+              {!metrics.details || metrics.details.length === 0 ? (
+                <div className="h-[200px] flex flex-col items-center justify-center text-center">
+                  <h4 className="text-zinc-500 italic text-sm font-medium mb-2">{t.waitingForData || 'Ожидание данных...'}</h4>
+                  <p className="text-zinc-600 text-xs max-w-xs">{t.integrationRequiredDesc}</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {metrics.details.map((detail: any, idx: number) => (
+                    <div key={idx} className="flex items-center justify-between p-4 bg-zinc-900/40 border border-zinc-800/50 rounded-xl hover:bg-zinc-800/50 transition-colors">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-white">{detail.domain}</span>
+                        <span className="text-[10px] text-zinc-500 uppercase tracking-wider">{detail.traces} сессий</span>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-[17px] font-black text-lime-400 font-mono">${Number(detail.cost || 0).toFixed(4)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

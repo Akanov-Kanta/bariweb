@@ -8,9 +8,11 @@ export function WidgetLoader() {
   useEffect(() => {
     console.log('Loading bariweb-widget...');
     // Dynamically import the widget only on the client side
+    // @ts-ignore
     import('bariweb-widget')
       .then(() => {
         console.log('bariweb-widget loaded successfully');
+        (window as any).BariwebConfig = { clientId: 'yj8x8HW5' };
         setIsLoaded(true);
       })
       .catch((err) => {

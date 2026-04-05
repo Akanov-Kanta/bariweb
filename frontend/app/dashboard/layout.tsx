@@ -42,7 +42,7 @@ export default function DashboardLayout({
   const navigation = [
     { name: t.overview, href: '/dashboard', icon: SquaresFour },
     { name: t.integration, href: '/dashboard/integration', icon: Code },
-    { name: t.reports, href: '/dashboard/reports', icon: FileText },
+
     { name: t.training, href: '/dashboard/training', icon: Brain },
     { name: t.billing, href: '/payment', icon: CreditCard },
     { name: t.settings, href: '/dashboard/settings', icon: Gear },

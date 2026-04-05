@@ -35,7 +35,7 @@ export const Icons = {
   textSize: createIcon('<polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/>'),
   contrast: createIcon('<circle cx="12" cy="12" r="10"/><path d="M12 18a6 6 0 0 0 0-12v12z"/>'),
   grayscale: createIcon('<circle cx="12" cy="12" r="10"/><path d="M12 2v20"/><path d="M12 18a6 6 0 0 0 0-12"/><path d="M12 14a2 2 0 0 0 0-4"/>'),
-  cursor: createIcon('<path d="M4 4l11.73 4.58a0.5 0 0 1 0 0.94l-4.47 1.35 1.35 4.47a0.5 0 0 1-0.94 0L6.7 9.61 4 4z"/>'),
+  cursor: createIcon('<path d="M4 3l7 17 2.2-6.2L20 11 4 3z"/>'),
   screenReader: createIcon('<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>'),
   visualImpair: createIcon('<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/>'),
   seizureSafe: createIcon('<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>'),

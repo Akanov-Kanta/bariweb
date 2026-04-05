@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit';
+import { bariwebWatcher } from '../lib/Watcher.js';
 
 // Using the same environment configuration pattern as chat.controller.ts
 const API_URL = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL) || 'http://localhost:8000';
@@ -7,9 +8,31 @@ export class AiA11yController implements ReactiveController {
   host: ReactiveControllerHost;
   isFixing = false;
   simplifyEnabled = false;
+  autoA11yEnabled = false;
 
   constructor(host: ReactiveControllerHost) {
     (this.host = host).addController(this);
+    this.simplifyEnabled = localStorage.getItem('bw-ai-simplify') === 'true';
+    this.autoA11yEnabled = localStorage.getItem('bw-ai-autofix') === 'true';
+
+    bariwebWatcher.onStateChange(() => {
+      if (this.autoA11yEnabled && !this.isFixing) {
+        this.fixMarkup();
+      }
+    });
+
+    if (this.autoA11yEnabled) {
+      setTimeout(() => this.fixMarkup(), 1000);
+    }
+  }
+
+  toggleAutoA11y() {
+    this.autoA11yEnabled = !this.autoA11yEnabled;
+    localStorage.setItem('bw-ai-autofix', this.autoA11yEnabled ? 'true' : 'false');
+    if (this.autoA11yEnabled && !this.isFixing) {
+      this.fixMarkup();
+    }
+    this.host.requestUpdate();
   }
 
   hostConnected() {}

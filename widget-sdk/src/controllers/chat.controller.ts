@@ -80,6 +80,7 @@ export class ChatController implements ReactiveController {
     isLoading = false;
     error: string | null = null;
     private _tts = new TtsController();
+    private _voiceMode = false; // Whether the current interaction started via voice
 
     // ─── Confirmation flow ──────────────────────────────────────────
     /** When non-null, the agent is paused waiting for user confirmation */
@@ -142,7 +143,8 @@ export class ChatController implements ReactiveController {
         const page_text = document.body?.innerText?.slice(0, 3000) ?? '';
 
         const interactiveSelectors = 'a[href], button, [role="button"], input:not([type="hidden"]), textarea, select';
-        const rawElements = Array.from(document.querySelectorAll(interactiveSelectors));
+        const rawElements = Array.from(document.querySelectorAll(interactiveSelectors))
+            .filter(el => !el.hasAttribute('bw-private'));
 
         const elements: InteractiveElement[] = rawElements
             .map((el) => {
@@ -154,9 +156,19 @@ export class ChatController implements ReactiveController {
                     || (tagName === 'input' ? 'text' : (tagName === 'button' ? 'button' : tagName));
                 const name = htmlEl.getAttribute('name') || '';
                 const placeholder = htmlEl.getAttribute('placeholder') || '';
-                const currentValue = isFormField
+                let currentValue = isFormField
                     ? ((htmlEl as HTMLInputElement).value || '').slice(0, 80)
                     : '';
+
+                // Local masking for sensitive data
+                if (currentValue) {
+                    // Mask 16-digit card numbers
+                    currentValue = currentValue.replace(/\b\d{13,19}\b/g, (match) => 
+                        match.slice(0, 4) + ' **** **** ' + match.slice(-4)
+                    );
+                    // Mask 12-digit IIN
+                    currentValue = currentValue.replace(/\b\d{12}\b/g, '**** **** ****');
+                }
 
                 let id = htmlEl.id && !htmlEl.getAttribute('data-bw-auto')
                     ? htmlEl.id
@@ -229,7 +241,12 @@ export class ChatController implements ReactiveController {
             })
             .join('');
 
-        return { page_text, elements: compressedElements, page_url };
+        // Mask sensitive data in page text as well
+        let maskedPageText = page_text;
+        maskedPageText = maskedPageText.replace(/\b\d{13,19}\b/g, '**** **** **** ****');
+        maskedPageText = maskedPageText.replace(/\b\d{12}\b/g, '**** **** ****');
+
+        return { page_text: maskedPageText, elements: compressedElements, page_url };
     }
 
     /**
@@ -400,10 +417,11 @@ export class ChatController implements ReactiveController {
     /**
      * Main agentic loop with CONFIRMATION for critical actions.
      */
-    private async _agentLoop(initialQuery: string, addUserMessage: boolean): Promise<void> {
+    private async _agentLoop(initialQuery: string, addUserMessage: boolean, isVoice = false): Promise<void> {
         if (this.isLoading) return;
         this.isLoading = true;
         this.error = null;
+        this._voiceMode = isVoice;
 
         if (addUserMessage) {
             this.messages = [...this.messages, { role: 'user', text: initialQuery, timestamp: Date.now() }];
@@ -439,7 +457,7 @@ export class ChatController implements ReactiveController {
                             { role: 'assistant', text: `${data.text}\n\n🛑 **Подтвердите действие:** нажать «${btnLabel}»?`, timestamp: Date.now() },
                         ];
                         this._saveMessages();
-                        this._tts.speak(data.text);
+                        if (this._voiceMode) this._tts.speak(data.text);
                         this.isLoading = false;
                         this.host.requestUpdate();
                         return; // Pause loop — user must call confirmAction() or cancelAction()
@@ -451,7 +469,7 @@ export class ChatController implements ReactiveController {
                     if (data.action.type === 'continue') {
                         this.messages = [...this.messages, { role: 'assistant', text: '🔄 Анализирую...', timestamp: Date.now() }];
                         this._saveMessages();
-                        this._tts.speak('Анализирую...');
+                        if (this._voiceMode) this._tts.speak('Анализирую...');
                         this.host.requestUpdate();
                         await this._waitForDom(800);
                         currentQuery = "Страница обновилась. Продолжай задачу, прочитай DOM.";
@@ -463,7 +481,7 @@ export class ChatController implements ReactiveController {
                     if (causesNavigation) {
                         this.messages = [...this.messages, { role: 'assistant', text: displayText, timestamp: Date.now() }];
                         this._saveMessages();
-                        this._tts.speak(displayText);
+                        if (this._voiceMode) this._tts.speak(displayText);
                         this.host.requestUpdate();
                         await this._waitForDom(1500);
                         
@@ -480,7 +498,7 @@ export class ChatController implements ReactiveController {
 
                     this.messages = [...this.messages, { role: 'assistant', text: displayText, timestamp: Date.now() }];
                     this._saveMessages();
-                    this._tts.speak(displayText);
+                    if (this._voiceMode) this._tts.speak(displayText);
                     this.host.requestUpdate();
 
                     if (data.action.type === 'input_text' && data.action.element_id) {
@@ -508,7 +526,7 @@ export class ChatController implements ReactiveController {
                 // No action — final answer
                 this.messages = [...this.messages, { role: 'assistant', text: displayText, timestamp: Date.now() }];
                 this._saveMessages();
-                this._tts.speak(displayText);
+                if (this._voiceMode) this._tts.speak(displayText);
                 break;
             }
         } catch (e: any) {
@@ -518,7 +536,7 @@ export class ChatController implements ReactiveController {
                 { role: 'assistant', text: `❌ Ошибка: ${this.error}`, timestamp: Date.now() },
             ];
             this._saveMessages();
-            this._tts.speak(`Ошибка: ${this.error}`);
+            if (this._voiceMode) this._tts.speak(`Ошибка: ${this.error}`);
         } finally {
             this.isLoading = false;
             this.host.requestUpdate();
@@ -541,7 +559,7 @@ export class ChatController implements ReactiveController {
         const { result, causesNavigation } = this.executeAction(action);
         this.messages = [...this.messages, { role: 'assistant', text: result, timestamp: Date.now() }];
         this._saveMessages();
-        this._tts.speak(result);
+        if (this._voiceMode) this._tts.speak(result);
         this.host.requestUpdate();
 
         if (causesNavigation) {
@@ -565,7 +583,7 @@ export class ChatController implements ReactiveController {
             { role: 'assistant', text: '🚫 Действие отменено. Чем ещё могу помочь?', timestamp: Date.now() },
         ];
         this._saveMessages();
-        this._tts.speak('Действие отменено. Чем ещё могу помочь?');
+        if (this._voiceMode) this._tts.speak('Действие отменено. Чем ещё могу помочь?');
         this.host.requestUpdate();
     }
 
@@ -577,9 +595,9 @@ export class ChatController implements ReactiveController {
     /**
      * Public API: send a user message and start the agentic loop.
      */
-    async sendMessage(query: string): Promise<void> {
+    async sendMessage(query: string, isVoice = false): Promise<void> {
         if (!query.trim() || this.isLoading) return;
-        await this._agentLoop(query, true);
+        await this._agentLoop(query, true, isVoice);
         (this.host as any).updateComplete?.then(() => {
             const messagesEl = (this.host as any).renderRoot?.querySelector('.chat-messages');
             if (messagesEl) messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -587,7 +605,7 @@ export class ChatController implements ReactiveController {
     }
 
     private async _agentStep(sysMsg: string): Promise<void> {
-        await this._agentLoop(sysMsg, false);
+        await this._agentLoop(sysMsg, false, this._voiceMode);
         (this.host as any).updateComplete?.then(() => {
             const messagesEl = (this.host as any).renderRoot?.querySelector('.chat-messages');
             if (messagesEl) messagesEl.scrollTop = messagesEl.scrollHeight;

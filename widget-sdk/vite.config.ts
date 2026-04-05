@@ -6,7 +6,7 @@ export default defineConfig({
       entry: 'src/index.ts',
       name: 'BariwebWidget',
       fileName: 'bariweb',
-      formats: ['iife'], // Independent executable for script tag
+      formats: ['iife', 'es'], // Independent executable and ES module
     },
     rollupOptions: {
       output: {

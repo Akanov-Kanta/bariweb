@@ -1,8 +1,19 @@
 {
-  "name": "widget-sdk",
-  "private": true,
-  "version": "0.0.0",
+  "name": "bariweb-widget",
+  "version": "0.1.10",
   "type": "module",
+  "main": "./dist/bariweb.iife.js",
+  "module": "./dist/bariweb.js",
+  "files": [
+    "dist"
+  ],
+  "description": "BariWeb AI-powered Accessibility Widget",
+  "author": "BariWeb Team",
+  "license": "Proprietary",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arif-alta/bariweb-widget"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

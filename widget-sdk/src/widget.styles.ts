@@ -8,13 +8,20 @@ export const widgetStyles = css`
 
     --bw-primary: #6d28d9;
     --bw-primary-light: #7c3aed;
-    --bw-primary-fg: #ffffff;
+    --bw-primary-fg: #05050a; /* Changed default to charcoal */
+    --bw-primary-faded: rgba(109, 40, 217, 0.08);
     --bw-bg: #ffffff;
     --bw-fg: #0f172a;
     --bw-fg-muted: #64748b;
     --bw-border: #e2e8f0;
     --bw-bg-hover: #f8fafc;
     --bw-bg-subtle: #f1f5f9;
+    --bw-danger: #ef4444;
+    --bw-danger-bg: #fee2e2;
+    --bw-danger-border: #fecaca;
+    --bw-success: #10b981;
+    --bw-success-bg: rgba(16, 185, 129, 0.08);
+    --bw-success-border: rgba(16, 185, 129, 0.2);
     --bw-radius: 14px;
     --bw-radius-sm: 8px;
     --bw-shadow-panel: 0 20px 60px -10px rgba(0,0,0,0.18), 0 8px 24px -4px rgba(0,0,0,0.1);
@@ -127,7 +134,7 @@ export const widgetStyles = css`
     transition: all 0.2s;
     color: var(--bw-fg-muted);
   }
-  .close-btn:hover { background: #fee2e2; color: #ef4444; transform: rotate(90deg); }
+  .close-btn:hover { background: var(--bw-danger-bg); color: var(--bw-danger); transform: rotate(90deg); }
   .close-btn svg { width: 18px; height: 18px; }
 
   /* ─── Segmented Tab Control ─── */
@@ -161,10 +168,11 @@ export const widgetStyles = css`
   .bw-tab:hover { background: var(--bw-bg-hover); color: var(--bw-fg); }
   .bw-tab[active] {
     background: var(--bw-primary);
-    color: white;
-    box-shadow: 0 2px 8px rgba(109, 40, 217, 0.3);
+    color: var(--bw-primary-fg);
+    box-shadow: none;
   }
   .bw-tab svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .bw-tab[active] svg { color: var(--bw-primary-fg); }
 
   /* ─── Content area ─── */
   .bw-content {
@@ -258,7 +266,7 @@ export const widgetStyles = css`
   .chat-bubble.user {
     align-self: flex-end;
     background: var(--bw-primary);
-    color: white;
+    color: var(--bw-primary-fg);
     border-bottom-right-radius: 4px;
   }
   .chat-bubble.assistant {
@@ -270,12 +278,12 @@ export const widgetStyles = css`
   }
 
   .screen-label-badge {
-    background: rgba(16, 185, 129, 0.08);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: var(--bw-success-bg);
+    border: 1px solid var(--bw-success-border);
     border-radius: var(--bw-radius-sm);
     padding: 6px 12px;
     font-size: 12px;
-    color: #059669;
+    color: var(--bw-success);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -339,17 +347,17 @@ export const widgetStyles = css`
   }
   .btn-confirm {
     width: 100%; min-height: 46px; border-radius: var(--bw-radius-sm);
-    background: var(--bw-primary); color: white; border: none;
+    background: var(--bw-primary); color: var(--bw-primary-fg); border: none;
     font-weight: 700; font-size: 14px; cursor: pointer;
-    transition: all 0.2s; box-shadow: 0 4px 12px rgba(109, 40, 217, 0.25);
+    transition: all 0.2s; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
   .btn-confirm:hover { filter: brightness(1.1); transform: translateY(-1px); }
   .btn-cancel {
     width: 100%; min-height: 44px; border-radius: var(--bw-radius-sm);
-    background: transparent; color: #ef4444; border: 1px solid #fecaca;
+    background: transparent; color: var(--bw-danger); border: 1px solid var(--bw-danger-border);
     font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;
   }
-  .btn-cancel:hover { background: #fef2f2; }
+  .btn-cancel:hover { background: var(--bw-danger-bg); }
 
   /* Chat input area */
   .chat-input-area {
@@ -428,14 +436,14 @@ export const widgetStyles = css`
   }
   #bw-voice-btn:hover { background: rgba(109, 40, 217, 0.08); transform: scale(1.05); }
   #bw-voice-btn.recording {
-    background: #fef2f2;
-    border-color: #dc2626;
-    color: #dc2626;
+    background: var(--bw-danger-bg);
+    border-color: var(--bw-danger);
+    color: var(--bw-danger);
     animation: micPulse 1.5s infinite;
   }
   @keyframes micPulse {
-    0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); transform: scale(1.05); }
-    100% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); transform: scale(1.05); }
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); transform: scale(1.05); }
+    100% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); transform: scale(1.05); }
   }
 
   .chat-icon-btn.tts-on { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.4); color: #059669; }
@@ -447,13 +455,13 @@ export const widgetStyles = css`
     border-radius: 50%;
     border: none;
     background: var(--bw-primary);
-    color: white;
+    color: var(--bw-primary-fg);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(109,40,217,0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     margin-left: 6px;
   }
   .chat-send-btn:hover:not(:disabled) { transform: scale(1.08); filter: brightness(1.1); }
@@ -504,11 +512,11 @@ export const widgetStyles = css`
     user-select: none;
     overflow: hidden;
   }
-  .settings-card:hover { border-color: var(--bw-primary); background: var(--bw-bg); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.07); }
+  .settings-card:hover { border-color: var(--bw-primary); background: var(--bw-bg-subtle); transform: translateY(-1px); }
   .settings-card[active] {
     border-color: var(--bw-primary);
-    background: rgba(109, 40, 217, 0.06);
-    box-shadow: 0 0 0 1px var(--bw-primary);
+    background: var(--bw-primary-faded);
+    box-shadow: inset 0 0 0 1px var(--bw-primary);
   }
   .settings-card[active] svg { color: var(--bw-primary); }
   .settings-card svg { width: 22px; height: 22px; color: var(--bw-fg-muted); transition: color 0.18s; }
@@ -528,7 +536,7 @@ export const widgetStyles = css`
     align-items: center;
     justify-content: center;
   }
-  .active-badge svg { width: 10px; height: 10px; color: white; stroke-width: 3; }
+  .active-badge svg { width: 10px; height: 10px; color: var(--bw-primary-fg); stroke-width: 3; }
 
   /* Color section */
   .color-section {
@@ -566,7 +574,7 @@ export const widgetStyles = css`
     color: var(--bw-fg-muted);
     transition: all 0.15s;
   }
-  .color-tab[active] { background: var(--bw-primary); color: white; border-color: var(--bw-primary); }
+  .color-tab[active] { background: var(--bw-primary); color: var(--bw-primary-fg) !important; border-color: var(--bw-primary); }
 
   .hue-row {
     display: flex;
@@ -669,11 +677,11 @@ export const widgetStyles = css`
     min-height: 46px;
   }
   .ai-tool-btn:hover { border-color: var(--bw-primary); color: var(--bw-primary); background: rgba(109,40,217,0.04); }
-  .ai-tool-btn.active { background: rgba(109,40,217,0.08); border-color: var(--bw-primary); color: var(--bw-primary); }
+  .ai-tool-btn.active { background: var(--bw-primary-faded); border-color: var(--bw-primary); color: var(--bw-primary); }
   .ai-tool-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
   .ai-tool-btn-label { flex: 1; }
-  .ai-tool-badge { font-size: 10px; background: var(--bw-primary); color: white; padding: 2px 7px; border-radius: 99px; font-weight: 700; }
-  .ai-tool-badge.on { background: #059669; }
+  .ai-tool-badge { font-size: 10px; background: var(--bw-primary); color: var(--bw-primary-fg); padding: 2px 7px; border-radius: 99px; font-weight: 700; }
+  .ai-tool-badge.on { background: #059669; color: var(--bw-fg, white); }
 
   /* ════════════════════════════════ */
   /* ADMIN PANEL                      */
@@ -706,7 +714,7 @@ export const widgetStyles = css`
   .admin-overlay input:focus { border-color: var(--bw-primary); }
   .admin-login-btn {
     width: 100%; padding: 12px; border-radius: var(--bw-radius-sm);
-    background: var(--bw-primary); color: white; border: none;
+    background: var(--bw-primary); color: var(--bw-primary-fg); border: none;
     font-weight: 700; font-size: 14px; cursor: pointer; margin-bottom: 8px;
     transition: all 0.2s;
   }

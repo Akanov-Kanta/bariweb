@@ -51,7 +51,7 @@ class A11yAiService:
                         "temperature": 0.2,
                     },
                     headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-                    timeout=30,
+                    timeout=90,
                 )
                 resp.raise_for_status()
                 data = resp.json()

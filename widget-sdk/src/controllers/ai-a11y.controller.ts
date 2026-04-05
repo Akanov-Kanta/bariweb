@@ -44,6 +44,23 @@ export class AiA11yController implements ReactiveController {
     }
   }
 
+  private _announce(message: string) {
+    let announcer = document.getElementById('bw-ai-announcer');
+    if (!announcer) {
+      announcer = document.createElement('div');
+      announcer.id = 'bw-ai-announcer';
+      announcer.setAttribute('aria-live', 'polite');
+      announcer.setAttribute('aria-atomic', 'true');
+      Object.assign(announcer.style, {
+        position: 'absolute', width: '1px', height: '1px',
+        padding: '0', margin: '-1px', overflow: 'hidden',
+        clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: '0'
+      });
+      document.body.appendChild(announcer);
+    }
+    announcer.textContent = message;
+  }
+
   async fixMarkup() {
     this.isFixing = true;
     this.host.requestUpdate();
@@ -122,8 +139,11 @@ export class AiA11yController implements ReactiveController {
           });
         }
       }
+      
+      this._announce(`Режим для незрячих отработал. AI исправил ${brokenElements.length} элементов.`);
     } catch (e) {
       console.error('BariWeb AI: A11y Fix failed', e);
+      this._announce('Произошла ошибка при исправлении элементов.');
     } finally {
       this.isFixing = false;
       this.host.requestUpdate();
@@ -134,6 +154,16 @@ export class AiA11yController implements ReactiveController {
     this.simplifyEnabled = !this.simplifyEnabled;
     if (this.simplifyEnabled) {
       document.body.addEventListener('click', this._onParagraphClick, { capture: true });
+      document.body.addEventListener('keydown', this._onParagraphKeydown, { capture: true });
+      
+      // Make text elements focusable
+      document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li, article').forEach(el => {
+        if (!el.hasAttribute('tabindex') && el.textContent?.trim().length! > 20) {
+          el.setAttribute('tabindex', '0');
+          el.classList.add('bw-simplify-focusable');
+        }
+      });
+      
       document.documentElement.style.setProperty('--bw-simplify-cursor', 'help');
       // Inject global style if not exists
       if (!document.getElementById('bw-simplify-mode-style')) {
@@ -220,12 +250,33 @@ export class AiA11yController implements ReactiveController {
         document.head.appendChild(style);
       }
       document.body.classList.add('bw-simplify-mode');
+      this._announce('Режим AI Упрощение текста включен. Используйте Tab для навигации по тексту и Enter для упрощения.');
     } else {
       document.body.removeEventListener('click', this._onParagraphClick, { capture: true });
+      document.body.removeEventListener('keydown', this._onParagraphKeydown, { capture: true });
+      document.querySelectorAll('.bw-simplify-focusable').forEach(el => {
+        el.removeAttribute('tabindex');
+        el.classList.remove('bw-simplify-focusable');
+      });
       document.body.classList.remove('bw-simplify-mode');
       document.documentElement.style.removeProperty('--bw-simplify-cursor');
+      this._announce('Режим AI Упрощение текста выключен.');
     }
     this.host.requestUpdate();
+  }
+
+  private _onParagraphKeydown = (e: KeyboardEvent) => {
+    if (!this.simplifyEnabled) return;
+    if ((e.key === 'Enter' || e.key === ' ') && e.target instanceof HTMLElement) {
+      if (e.target.closest('bw-widget') || e.target.closest('.bw-ai-tooltip')) return;
+      const tag = e.target.tagName.toLowerCase();
+      if (['p', 'span', 'div', 'li', 'article', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tag)) {
+        e.preventDefault();
+        e.stopPropagation();
+        const rect = e.target.getBoundingClientRect();
+        this._triggerSimplify(e.target, rect.left + window.scrollX, rect.bottom + window.scrollY);
+      }
+    }
   }
 
   private _onParagraphClick = async (e: MouseEvent) => {
@@ -244,32 +295,37 @@ export class AiA11yController implements ReactiveController {
       if (text && text.length > 20) {
         e.preventDefault();
         e.stopPropagation();
+        this._triggerSimplify(target, e.pageX, e.pageY);
+      }
+    }
+  }
+
+  private async _triggerSimplify(target: HTMLElement, posX: number, posY: number) {
+    const text = target.innerText?.trim();
+    if (!text) return;
 
         // Remove any existing tooltip
         document.querySelectorAll('.bw-ai-tooltip').forEach(el => el.remove());
 
-        // Infer basic theme
-        const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
         // Create tooltip container
         const tooltip = document.createElement('div');
         tooltip.className = 'bw-ai-tooltip bw-ai-tooltip-loading';
-        if (isDark) tooltip.setAttribute('data-theme', 'dark');
+        tooltip.tabIndex = -1;
         
         tooltip.innerHTML = `
           <div class="bw-ai-tooltip-header">
             <span>✨ AI Упрощение</span>
-            <button class="bw-ai-tooltip-close">✕</button>
+            <button class="bw-ai-tooltip-close" aria-label="Закрыть">✕</button>
           </div>
-          <div class="bw-ai-tooltip-content">
+          <div class="bw-ai-tooltip-content" role="status" aria-live="polite">
             Ожидаем ответ от ИИ...
           </div>
         `;
         document.body.appendChild(tooltip);
 
         // Position tooltip near the click
-        tooltip.style.left = `${Math.max(10, e.pageX - 160)}px`;
-        tooltip.style.top = `${e.pageY + 20}px`;
+        tooltip.style.left = `${Math.max(10, posX - 160)}px`;
+        tooltip.style.top = `${posY + 20}px`;
 
         // Gentle highlight of original text
         const oldOutline = target.style.outline;
@@ -300,6 +356,8 @@ export class AiA11yController implements ReactiveController {
             if (data.text) {
               tooltip.classList.remove('bw-ai-tooltip-loading');
               tooltip.querySelector('.bw-ai-tooltip-content')!.innerHTML = data.text;
+              // Set focus so screen reader reads it
+              tooltip.focus();
             } else {
               throw new Error("Empty response");
             }
@@ -310,8 +368,7 @@ export class AiA11yController implements ReactiveController {
           console.error('BariWeb AI: Simplify failed', err);
           tooltip.classList.remove('bw-ai-tooltip-loading');
           tooltip.querySelector('.bw-ai-tooltip-content')!.innerHTML = '<span style="color:#ef4444; font-size:13px;">Ошибка создания упрощенного текста. Попробуйте еще раз.</span>';
+          tooltip.focus();
         }
-      }
-    }
   }
 }

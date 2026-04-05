@@ -342,7 +342,31 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 20px rgba(200, 255, 0, 0.25);
 }
 
+/* BariWeb Widget Customization */
+bw-widget {
+  --bw-primary: var(--accent-lime);
+  --bw-primary-light: #d4ff33;
+  --bw-primary-fg: #05050a;
+  --bw-primary-faded: rgba(200, 255, 0, 0.15);
+  --bw-bg: #0a0a0f;
+  --bw-fg: #ffffff;
+  --bw-fg-muted: #a1a1aa;
+  --bw-border: #1f1f23;
+  --bw-bg-hover: #121217;
+  --bw-bg-subtle: #05050a;
+  --bw-radius: 1.5rem;
+  --bw-radius-sm: 0.75rem;
+  --bw-shadow-panel: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  --bw-danger: var(--accent-rose);
+  --bw-danger-bg: rgba(244, 63, 94, 0.1);
+  --bw-danger-border: rgba(244, 63, 94, 0.2);
+  --bw-success: var(--accent-lime);
+  --bw-success-bg: rgba(200, 255, 0, 0.1);
+  --bw-success-border: rgba(200, 255, 0, 0.2);
+}
 
-
-
-
+/* Ensure the widget trigger button doesn't have the custom cursor applied if we want native feel, 
+   or ensure it works with the custom cursor system */
+bw-widget button {
+  cursor: none !important;
+}

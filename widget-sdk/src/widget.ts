@@ -1,4 +1,4 @@
-﻿import { LitElement, html } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
 import { Icons } from './lib/icons.ts';
 import { widgetStyles } from './widget.styles.ts';
@@ -84,7 +84,7 @@ const UI_TEXT: Record<UiLang, Record<string, string>> = {
     inclusion: 'Инклюзия',
     tabChat: 'Чат',
     tabSettings: 'Настройки',
-    madeInKazakhstan: 'Сделано в Казахстане',
+    madeInKazakhstan: 'Сделано в Казахстане 🇰🇿',
     closeWidgetAria: 'Закрыть',
     widgetDialogAria: 'BariWeb Accessibility Widget',
     triggerAria: 'Открыть/Закрыть меню доступности',
@@ -156,7 +156,7 @@ const UI_TEXT: Record<UiLang, Record<string, string>> = {
     inclusion: 'Инклюзия',
     tabChat: 'Чат',
     tabSettings: 'Баптаулар',
-    madeInKazakhstan: 'Қазақстанда жасалған',
+    madeInKazakhstan: 'Қазақстанда жасалған 🇰🇿',
     closeWidgetAria: 'Жабу',
     widgetDialogAria: 'BariWeb қолжетімділік виджеті',
     triggerAria: 'Қолжетімділік мәзірін ашу/жабу',
@@ -228,7 +228,7 @@ const UI_TEXT: Record<UiLang, Record<string, string>> = {
     inclusion: 'Inclusion',
     tabChat: 'Chat',
     tabSettings: 'Settings',
-    madeInKazakhstan: 'Made in Kazakhstan',
+    madeInKazakhstan: 'Made in Kazakhstan 🇰🇿',
     closeWidgetAria: 'Close',
     widgetDialogAria: 'BariWeb Accessibility Widget',
     triggerAria: 'Open/close accessibility menu',
@@ -278,7 +278,7 @@ export class BariwebWidget extends LitElement {
     super();
     try {
       const raw = localStorage.getItem(STT_LANG_STORAGE_KEY);
-      if (raw === 'auto' || raw === 'kz' || raw === 'ru' || raw === 'en') this._sttLanguageMode = raw;
+      if (raw === 'auto' || raw === 'kz' || raw === 'ru' || raw === 'en') this._sttLanguageMode = raw as SttLanguageMode;
     } catch {}
     this._checkAuthStatus();
   }
@@ -401,31 +401,25 @@ export class BariwebWidget extends LitElement {
     }
   };
 
-  private _announce(text: string) {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = this._uiLang() === 'kz' ? 'kk-KZ' : this._uiLang() === 'en' ? 'en-US' : 'ru-RU';
-      window.speechSynthesis.speak(utterance);
-    }
+  private _beep(freq: number) {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      g.gain.setValueAtTime(0.1, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
+      osc.connect(g);
+      g.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.1);
+    } catch {}
   }
 
-  private _beep(freq: number) {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const g = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-    g.gain.setValueAtTime(0.1, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
-    osc.connect(g);
-    g.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.1);
-  }
   private _toggle() {
     this._isOpen = !this._isOpen;
     if (this._isOpen) {
-      setTimeout(() => this._announce(this._t('announceVoiceInputAvailable')), 500);
       this._scrollMessages();
     }
   }
@@ -433,7 +427,6 @@ export class BariwebWidget extends LitElement {
   public setOpen(v: boolean) {
     this._isOpen = v;
     if (v) {
-      this._announce(this._t('announceWidgetOpened'));
       this._scrollMessages();
     }
   }
@@ -441,8 +434,11 @@ export class BariwebWidget extends LitElement {
   private _setTab(tab: Tab) {
     this._activeTab = tab;
     if (tab === 'chat') {
-      this._announce(this._t('announceSwitchedToChat'));
       this._scrollMessages();
+      // Accessibility: Focus Mic button first
+      setTimeout(() => {
+        this.renderRoot?.querySelector<HTMLElement>('#bw-voice-btn')?.focus();
+      }, 300);
     }
   }
 
@@ -488,7 +484,6 @@ export class BariwebWidget extends LitElement {
     this.requestUpdate();
   }
 
-  // в”Ђв”Ђв”Ђ STT в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   private _clearSttTimers() {
     if (this._silenceIntervalId !== null) { window.clearInterval(this._silenceIntervalId); this._silenceIntervalId = null; }
     if (this._maxDurationTimeoutId !== null) { window.clearTimeout(this._maxDurationTimeoutId); this._maxDurationTimeoutId = null; }
@@ -612,7 +607,7 @@ export class BariwebWidget extends LitElement {
     if ('vibrate' in navigator) navigator.vibrate(20);
   }
 
-  // в”Ђв”Ђв”Ђ Chat tab в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ  private _renderChatTab() {
+  private _renderChatTab() {
     const msgs = this._chat.messages;
     const isLoading = this._chat.isLoading;
     const pending = this._chat.pendingConfirmation;
@@ -644,17 +639,27 @@ export class BariwebWidget extends LitElement {
             const short = msg.text.split('\n')[0];
             return html`
               <details class="system-log">
-                <summary class="system-log-header"><span>${short}</span></summary>
+                <summary class="system-log-header">
+                  <span>${short}</span>
+                </summary>
                 <div class="system-log-details">${msg.text}</div>
-              </details>`;
+              </details>
+            `;
           }
-          return html`<div class="chat-bubble ${msg.role}">${msg.text}</div>`;
+          return html`
+            <div class="chat-bubble ${msg.role}">
+              ${msg.text}
+            </div>
+          `;
         })}
 
         ${isLoading ? html`
           <div class="typing-indicator">
-            <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
-          </div>` : ''}
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        ` : ''}
       </div>
 
       ${pending ? html`
@@ -718,7 +723,9 @@ export class BariwebWidget extends LitElement {
         </div>
       `}
     `;
-  }  private _renderA11yTab() {
+  }
+
+  private _renderA11yTab() {
     const s = this._a11y.settings;
     const t = (key: string) => this._t(key);
     const tiles = [
@@ -766,6 +773,23 @@ export class BariwebWidget extends LitElement {
 
     return html`
       <div class="a11y-scroller">
+        <div style="padding: 16px 16px 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--bw-bg-subtle, #f8fafc); border-radius: var(--bw-radius, 14px); margin-bottom: 0px;">
+            <div style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; color: var(--bw-fg, #1e293b);">
+               ${Icons.languages} ${t('recognitionLanguage')}
+            </div>
+            <select style="height: 34px; padding: 0 8px; border: 1px solid var(--bw-primary, #6d28d9); border-radius: 8px; background: rgba(109, 40, 217, 0.05); color: var(--bw-primary, #6d28d9); cursor: pointer; outline: none; font-size: 13px; font-weight: 600;"
+              .value=${this._sttLanguageMode}
+              @change=${(e: any) => { this._setSttLanguageMode(e.target.value); this.requestUpdate(); }}
+              aria-label=${t('changeRecognitionLanguage')}>
+              <option value="auto">${t('languageAuto')}</option>
+              <option value="kz">${t('languageKz')}</option>
+              <option value="ru">${t('languageRu')}</option>
+              <option value="en">${t('languageEn')}</option>
+            </select>
+          </div>
+        </div>
+
         <div class="settings-grid">
           ${tiles.map(ti => html`
             <button class="settings-card" ?active=${ti.active} @click=${ti.action} id=${ti.id}
@@ -802,21 +826,6 @@ export class BariwebWidget extends LitElement {
         </div>
 
         <div class="ai-tools-section" style="margin-top: 16px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--bw-bg-subtle, #f8fafc); border-radius: var(--bw-radius, 14px); margin-bottom: 12px;">
-            <div class="lang-row-label" style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; color: var(--bw-fg, #1e293b);">
-               <span class="lang-row-icon">${Icons.languages}</span>${t('recognitionLanguage')}
-            </div>
-            <select style="height: 34px; padding: 0 8px; border: 1px solid var(--bw-border); border-radius: 8px; background: #fff; cursor: pointer; outline: none; font-size: 13px;"
-              .value=${this._sttLanguageMode}
-              @change=${(e: any) => { this._setSttLanguageMode(e.target.value); this.requestUpdate(); }}
-              aria-label=${t('changeRecognitionLanguage')}>
-              <option value="auto">${t('languageAuto')}</option>
-              <option value="kz">${t('languageKz')}</option>
-              <option value="ru">${t('languageRu')}</option>
-              <option value="en">${t('languageEn')}</option>
-            </select>
-          </div>
-
           <button class="ai-tool-btn ${this._aiA11y.simplifyEnabled ? 'active' : ''}"
             @click=${() => this._aiA11y.toggleSimplify()} id="bw-ai-simplify">
             ${Icons.textSize}
@@ -926,11 +935,10 @@ export class BariwebWidget extends LitElement {
 
         <button class="trigger" @click=${this._toggle}
           aria-expanded=${this._isOpen} aria-label=${t('triggerAria')}
-          id="bw-trigger" style="position:fixed; bottom:24px; left:24px; width:60px; height:60px; border-radius:50%; background:var(--bw-primary,#6d28d9); color:white; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; pointer-events:auto; box-shadow:0 4px 20px rgba(109,40,217,0.4); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s;">
+          id="bw-trigger" style="position:fixed; bottom:24px; left:24px; width:60px; height:60px; border-radius:50%; background:var(--bw-primary,#6d28d9); color:var(--bw-primary-fg, #05050a); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; pointer-events:auto; box-shadow:0 4px 20px rgba(0,0,0,0.3); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s;">
           ${this._isOpen ? Icons.close : Icons.accessibility}
         </button>
       </div>
     `;
   }
 }
-

@@ -22,7 +22,7 @@ const createIcon = (svgPath: string) => html`${unsafeHTML(`
 `)}`;
 
 export const Icons = {
-  accessibility: createIcon('<circle cx="12" cy="12" r="10" stroke-width="1.5" stroke-dasharray="3 3" stroke-linecap="butt"/><circle cx="12" cy="5" r="1.5"/><path d="M12 7v5"/><path d="M6 8h12"/><path d="M12 12l-3 5"/><path d="M12 12l3 5"/>'),
+  accessibility: createIcon('<circle cx="12" cy="4.5" r="2"/><path d="M4 9.5h16"/><path d="M12 6.5v6"/><path d="M9.5 20.5 12 12.5l2.5 8"/>'),
   chat: createIcon('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'),
   settings: createIcon('<path d="M10.325 4.317a1.724 1.724 0 0 1 3.35 0 1.724 1.724 0 0 0 2.573 1.066 1.724 1.724 0 0 1 2.305 2.305 1.724 1.724 0 0 0 1.066 2.573 1.724 1.724 0 0 1 0 3.35 1.724 1.724 0 0 0-1.066 2.573 1.724 1.724 0 0 1-2.305 2.305 1.724 1.724 0 0 0-2.573 1.066 1.724 1.724 0 0 1-3.35 0 1.724 1.724 0 0 0-2.573-1.066 1.724 1.724 0 0 1-2.305-2.305 1.724 1.724 0 0 0-1.066-2.573 1.724 1.724 0 0 1 0-3.35 1.724 1.724 0 0 0 1.066-2.573 1.724 1.724 0 0 1 2.305-2.305 1.724 1.724 0 0 0 2.573-1.066z"/><circle cx="12" cy="12" r="3"/>'),
   mic: createIcon('<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>'),

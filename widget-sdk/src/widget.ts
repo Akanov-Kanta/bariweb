@@ -3,7 +3,7 @@ import { customElement, state, query, property } from 'lit/decorators.js';
 import { Icons } from './lib/icons.ts';
 import { widgetStyles } from './widget.styles.ts';
 import { A11yController } from './controllers/a11y.controller.ts';
-import { ChatController } from './controllers/chat.controller.ts';
+import { ChatController, type SttLanguageMode } from './controllers/chat.controller.ts';
 import './components/button/button.js';
 import './components/card/card.js';
 import './components/accordion/accordion-item.js';
@@ -11,6 +11,12 @@ import { bariwebWatcher } from './lib/Watcher.js';
 
 
 type Tab = 'a11y' | 'chat';
+
+const STT_SILENCE_CHECK_MS = 200;
+const STT_SILENCE_THRESHOLD = 0.015;
+const STT_SILENCE_STOP_MS = 1200;
+const STT_MAX_DURATION_MS = 20_000;
+const STT_MIN_DURATION_MS = 350;
 
 @customElement('bw-widget')
 export class BariwebWidget extends LitElement {
@@ -30,8 +36,22 @@ export class BariwebWidget extends LitElement {
   @state() private _adminPassword = '';
   @state() private _authError = '';
   @state() private _currentScreenLabel = '';
+  @state() private _sttState: 'idle' | 'recording' | 'processing' | 'error' = 'idle';
+  @state() private _sttLanguageMode: SttLanguageMode = 'auto';
+  @state() private _sttError = '';
 
   @query('.chat-messages') private _messagesEl!: HTMLElement;
+
+  private _mediaStream: MediaStream | null = null;
+  private _audioContext: AudioContext | null = null;
+  private _analyser: AnalyserNode | null = null;
+  private _scriptProcessor: ScriptProcessorNode | null = null;
+  private _pcmChunks: Float32Array[] = [];
+  private _sampleRate = 44100;
+  private _recordingStartTs = 0;
+  private _silenceStartedTs: number | null = null;
+  private _silenceIntervalId: number | null = null;
+  private _maxDurationTimeoutId: number | null = null;
 
   constructor() {
     super();
@@ -150,6 +170,7 @@ export class BariwebWidget extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     bariwebWatcher.stop();
+    this._cleanupRecordingResources();
   }
 
 
@@ -178,7 +199,7 @@ export class BariwebWidget extends LitElement {
 
   private async _handleSend() {
     const query = this._inputValue.trim();
-    if (!query || this._chat.isLoading) return;
+    if (!query || this._chat.isLoading || this._sttState === 'processing') return;
     this._inputValue = '';
     await this._chat.sendMessage(query);
     // Scroll to bottom after render
@@ -194,6 +215,219 @@ export class BariwebWidget extends LitElement {
       e.preventDefault();
       this._handleSend();
     }
+  }
+
+  private _toggleTts() {
+    this._chat.setTtsEnabled(!this._chat.isTtsEnabled());
+  }
+
+  private _micIcon() {
+    return html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+      <line x1="12" y1="19" x2="12" y2="23"></line>
+      <line x1="8" y1="23" x2="16" y2="23"></line>
+    </svg>`;
+  }
+
+  private _clearSttTimers() {
+    if (this._silenceIntervalId !== null) {
+      window.clearInterval(this._silenceIntervalId);
+      this._silenceIntervalId = null;
+    }
+    if (this._maxDurationTimeoutId !== null) {
+      window.clearTimeout(this._maxDurationTimeoutId);
+      this._maxDurationTimeoutId = null;
+    }
+  }
+
+  private _cleanupRecordingResources() {
+    this._clearSttTimers();
+    this._analyser = null;
+    if (this._scriptProcessor) {
+      this._scriptProcessor.disconnect();
+      this._scriptProcessor.onaudioprocess = null;
+      this._scriptProcessor = null;
+    }
+    if (this._audioContext) {
+      this._audioContext.close().catch(() => {});
+      this._audioContext = null;
+    }
+    if (this._mediaStream) {
+      this._mediaStream.getTracks().forEach(track => track.stop());
+      this._mediaStream = null;
+    }
+    this._pcmChunks = [];
+    this._silenceStartedTs = null;
+  }
+
+  private async _toggleVoiceRecording() {
+    if (this._sttState === 'processing') return;
+    if (this._sttState === 'recording') {
+      this._stopRecording();
+      return;
+    }
+    await this._startRecording();
+  }
+
+  private async _startRecording() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      this._sttState = 'error';
+      this._sttError = 'Микрофон не поддерживается в этом браузере.';
+      return;
+    }
+
+    try {
+      this._cleanupRecordingResources();
+      this._sttError = '';
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this._mediaStream = stream;
+      this._pcmChunks = [];
+      this._recordingStartTs = Date.now();
+      this._silenceStartedTs = null;
+
+      this._audioContext = new AudioContext();
+      this._sampleRate = this._audioContext.sampleRate;
+      const source = this._audioContext.createMediaStreamSource(stream);
+      this._analyser = this._audioContext.createAnalyser();
+      this._analyser.fftSize = 2048;
+      source.connect(this._analyser);
+      this._scriptProcessor = this._audioContext.createScriptProcessor(4096, 1, 1);
+      source.connect(this._scriptProcessor);
+      this._scriptProcessor.connect(this._audioContext.destination);
+      this._scriptProcessor.onaudioprocess = (event: AudioProcessingEvent) => {
+        if (this._sttState !== 'recording') return;
+        const input = event.inputBuffer.getChannelData(0);
+        this._pcmChunks.push(new Float32Array(input));
+        const output = event.outputBuffer.getChannelData(0);
+        output.fill(0);
+      };
+
+      this._sttState = 'recording';
+
+      this._maxDurationTimeoutId = window.setTimeout(() => {
+        if (this._sttState === 'recording') this._stopRecording();
+      }, STT_MAX_DURATION_MS);
+
+      const audioBuffer = new Uint8Array(this._analyser.fftSize);
+      this._silenceIntervalId = window.setInterval(() => {
+        if (!this._analyser || this._sttState !== 'recording') return;
+        this._analyser.getByteTimeDomainData(audioBuffer);
+
+        let sum = 0;
+        for (let i = 0; i < audioBuffer.length; i++) {
+          const normalized = (audioBuffer[i] - 128) / 128;
+          sum += normalized * normalized;
+        }
+        const rms = Math.sqrt(sum / audioBuffer.length);
+
+        if (rms < STT_SILENCE_THRESHOLD) {
+          if (this._silenceStartedTs === null) {
+            this._silenceStartedTs = Date.now();
+          } else if (Date.now() - this._silenceStartedTs >= STT_SILENCE_STOP_MS) {
+            this._stopRecording();
+          }
+        } else {
+          this._silenceStartedTs = null;
+        }
+      }, STT_SILENCE_CHECK_MS);
+    } catch (e) {
+      this._sttState = 'error';
+      this._sttError = 'Доступ к микрофону запрещен.';
+      this._cleanupRecordingResources();
+    }
+  }
+
+  private _stopRecording() {
+    if (this._sttState !== 'recording') return;
+    this._clearSttTimers();
+    this._sttState = 'processing';
+    this._finalizeRecording().catch((e) => {
+      this._sttState = 'error';
+      this._sttError = e?.message || 'Ошибка обработки аудио.';
+    });
+  }
+
+  private async _finalizeRecording() {
+    const durationMs = Date.now() - this._recordingStartTs;
+    const pcm = this._mergePcmChunks(this._pcmChunks);
+    const blob = this._encodeWavBlob(pcm, this._sampleRate);
+    this._cleanupRecordingResources();
+
+    if (durationMs < STT_MIN_DURATION_MS || blob.size === 0) {
+      this._sttState = 'error';
+      this._sttError = 'Запись слишком короткая. Попробуйте еще раз.';
+      return;
+    }
+
+    this._sttState = 'processing';
+
+    try {
+      const transcription = await this._chat.transcribeAudio(blob, this._sttLanguageMode);
+      const transcriptText = transcription.text?.trim();
+      if (!transcriptText) {
+        this._sttState = 'error';
+        this._sttError = 'Не удалось распознать речь.';
+        return;
+      }
+
+      await this._chat.sendMessage(transcriptText);
+      this._sttState = 'idle';
+      this._sttError = '';
+      this._inputValue = '';
+    } catch (e: any) {
+      this._sttState = 'error';
+      this._sttError = e?.message || 'Ошибка распознавания речи.';
+    }
+  }
+
+  private _mergePcmChunks(chunks: Float32Array[]): Float32Array {
+    const total = chunks.reduce((sum, arr) => sum + arr.length, 0);
+    const merged = new Float32Array(total);
+    let offset = 0;
+    for (const chunk of chunks) {
+      merged.set(chunk, offset);
+      offset += chunk.length;
+    }
+    return merged;
+  }
+
+  private _encodeWavBlob(samples: Float32Array, sampleRate: number): Blob {
+    const bytesPerSample = 2;
+    const blockAlign = bytesPerSample;
+    const byteRate = sampleRate * blockAlign;
+    const dataSize = samples.length * bytesPerSample;
+    const buffer = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(buffer);
+
+    const writeString = (offset: number, text: string) => {
+      for (let i = 0; i < text.length; i++) {
+        view.setUint8(offset + i, text.charCodeAt(i));
+      }
+    };
+
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + dataSize, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true); // PCM chunk size
+    view.setUint16(20, 1, true); // PCM format
+    view.setUint16(22, 1, true); // mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, byteRate, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, 16, true); // bits per sample
+    writeString(36, 'data');
+    view.setUint32(40, dataSize, true);
+
+    let offset = 44;
+    for (let i = 0; i < samples.length; i++) {
+      const s = Math.max(-1, Math.min(1, samples[i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+      offset += 2;
+    }
+
+    return new Blob([buffer], { type: 'audio/wav' });
   }
 
   private _renderChatTab() {
@@ -244,7 +478,44 @@ export class BariwebWidget extends LitElement {
           >❌ Отмена</button>
         </div>
       ` : html`
+        ${this._sttState === 'recording' ? html`
+          <div class="stt-status stt-recording">🎙️ Слушаю... остановлю по тишине</div>
+        ` : ''}
+        ${this._sttState === 'processing' ? html`
+          <div class="stt-status stt-processing">⏳ Распознаю речь...</div>
+        ` : ''}
+        ${this._sttState === 'error' && this._sttError ? html`
+          <div class="stt-status stt-error">${this._sttError}</div>
+        ` : ''}
         <div class="chat-input-bar">
+          <select
+            class="chat-lang-select"
+            .value=${this._sttLanguageMode}
+            ?disabled=${isLoading || this._sttState === 'recording' || this._sttState === 'processing'}
+            @change=${(e: Event) => { this._sttLanguageMode = (e.target as HTMLSelectElement).value as SttLanguageMode; }}
+            aria-label="STT language mode"
+          >
+            <option value="auto">Auto</option>
+            <option value="kz">KZ</option>
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+          </select>
+          <button
+            class="chat-mic-btn ${this._sttState === 'recording' ? 'recording' : ''}"
+            @click=${this._toggleVoiceRecording}
+            ?disabled=${isLoading || this._sttState === 'processing'}
+            aria-label=${this._sttState === 'recording' ? 'Stop recording' : 'Start voice recording'}
+          >
+            ${this._micIcon()}
+          </button>
+          <button
+            class="chat-tts-btn ${this._chat.isTtsEnabled() ? 'enabled' : 'disabled'}"
+            @click=${this._toggleTts}
+            aria-label=${this._chat.isTtsEnabled() ? 'Disable speech output' : 'Enable speech output'}
+            title=${this._chat.isTtsEnabled() ? 'Озвучивание включено' : 'Озвучивание выключено'}
+          >
+            ${this._chat.isTtsEnabled() ? '🔊' : '🔇'}
+          </button>
           <input
             class="chat-input"
             type="text"
@@ -252,13 +523,13 @@ export class BariwebWidget extends LitElement {
             .value=${this._inputValue}
             @input=${this._handleInput}
             @keydown=${this._handleKeydown}
-            ?disabled=${isLoading}
+            ?disabled=${isLoading || this._sttState === 'processing'}
             aria-label="Chat input"
           />
           <button
             class="chat-send-btn"
             @click=${this._handleSend}
-            ?disabled=${isLoading || !this._inputValue.trim()}
+            ?disabled=${isLoading || this._sttState === 'processing' || this._sttState === 'recording' || !this._inputValue.trim()}
             aria-label="Send message"
           >
             ${sendIcon}

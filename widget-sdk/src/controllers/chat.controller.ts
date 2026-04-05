@@ -1,5 +1,6 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit';
 import { getScreenFingerprint } from '../lib/Fingerprint.js';
+import { TtsController } from './tts.controller.js';
 
 
 export interface ChatMessage {
@@ -28,6 +29,14 @@ export interface ChatAction {
 export interface ChatResponse {
     text: string;
     action: ChatAction | null;
+}
+
+export type SttLanguageMode = 'auto' | 'kz' | 'ru' | 'en';
+
+export interface SttResponse {
+    text: string;
+    provider: 'kz' | 'generic';
+    detected_language?: string;
 }
 
 const API_URL = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL) || 'http://localhost:8000';
@@ -70,6 +79,7 @@ export class ChatController implements ReactiveController {
     messages: ChatMessage[] = [];
     isLoading = false;
     error: string | null = null;
+    private _tts = new TtsController();
 
     // ─── Confirmation flow ──────────────────────────────────────────
     /** When non-null, the agent is paused waiting for user confirmation */
@@ -86,7 +96,9 @@ export class ChatController implements ReactiveController {
     }
 
     hostConnected() {}
-    hostDisconnected() {}
+    hostDisconnected() {
+        this._tts.stop();
+    }
 
     private _loadMessages() {
         try {
@@ -492,6 +504,7 @@ export class ChatController implements ReactiveController {
                 // No action — final answer
                 this.messages = [...this.messages, { role: 'assistant', text: displayText, timestamp: Date.now() }];
                 this._saveMessages();
+                this._tts.speak(displayText);
                 break;
             }
         } catch (e: any) {
@@ -580,5 +593,45 @@ export class ChatController implements ReactiveController {
         this.pendingConfirmation = null;
         this._saveMessages();
         this.host.requestUpdate();
+    }
+
+    isTtsEnabled(): boolean {
+        return this._tts.isEnabled();
+    }
+
+    setTtsEnabled(value: boolean): void {
+        this._tts.setEnabled(value);
+        this.host.requestUpdate();
+    }
+
+    async transcribeAudio(audioBlob: Blob, languageMode: SttLanguageMode): Promise<SttResponse> {
+        const hostClientId = (this.host as any).clientId
+            || (window as any).__BARIWEB_CLIENT_ID__
+            || '';
+
+        const formData = new FormData();
+        formData.append('language_mode', languageMode);
+        formData.append('audio', audioBlob, 'speech.wav');
+
+        const resp = await fetch(`${API_URL}/v1/stt/transcribe`, {
+            method: 'POST',
+            headers: {
+                'X-Client-ID': hostClientId,
+            },
+            body: formData,
+        });
+
+        if (!resp.ok) {
+            let detail = `HTTP ${resp.status}`;
+            try {
+                const err = await resp.json();
+                detail = err?.detail || detail;
+            } catch {
+                // keep fallback detail
+            }
+            throw new Error(detail);
+        }
+
+        return await resp.json() as SttResponse;
     }
 }

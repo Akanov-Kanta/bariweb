@@ -57,6 +57,10 @@ class Settings(BaseSettings):
     KAZLLM_API_KEY: Optional[str] = None
     SPEACH_TO_TEXT_KZ_API_KEY: Optional[str] = None
     SPEACH_TO_TEXT_API_KEY: Optional[str] = None
+    # Backward-compatible aliases with corrected spelling
+    SPEECH_TO_TEXT_KZ_API_KEY: Optional[str] = None
+    SPEECH_TO_TEXT_API_KEY: Optional[str] = None
+    STT_BASE_URL: str = "https://llm.alem.ai/v1"
     DEEPSEEK_OCR_API_KEY: Optional[str] = None
     QWEN3_API_KEY: Optional[str] = None
     QWEN3_BASE_URL: str = "https://llm.alem.ai/v1"

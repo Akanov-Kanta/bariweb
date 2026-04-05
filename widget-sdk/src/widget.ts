@@ -7,6 +7,8 @@ import { ChatController } from './controllers/chat.controller.ts';
 import './components/button/button.js';
 import './components/card/card.js';
 import './components/accordion/accordion-item.js';
+import { bariwebWatcher } from './lib/Watcher.js';
+
 
 type Tab = 'a11y' | 'chat';
 
@@ -22,11 +24,109 @@ export class BariwebWidget extends LitElement {
   @state() private _isOpen = false;
   @state() private _activeTab: Tab = 'chat';
   @state() private _inputValue = '';
+  
+  // Enterprise Auth State
+  @state() private _isAdmin = false;
+  @state() private _adminPassword = '';
+  @state() private _authError = '';
+  @state() private _currentScreenLabel = '';
 
   @query('.chat-messages') private _messagesEl!: HTMLElement;
 
+  constructor() {
+    super();
+    // No more public initAdminMode() - we only load it via dynamic import after auth
+    this._checkAuthStatus();
+  }
+
+  private async _checkAuthStatus() {
+    const token = localStorage.getItem('bw_admin_token');
+    if (!token) return;
+
+    try {
+      const resp = await fetch('http://localhost:8000/auth/status', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (resp.ok) {
+        this._isAdmin = true;
+        this._loadAdminUI();
+      } else {
+        localStorage.removeItem('bw_admin_token');
+      }
+    } catch (e) {
+      console.error('Auth sync failed', e);
+    }
+  }
+
+  private async _loadAdminUI() {
+    try {
+      // Dynamic import for Enterprise security
+      const { initAdminMode } = await import('./lib/AdminUI.js');
+      initAdminMode();
+      bariwebWatcher.isAutoDiscoveryEnabled = true;
+    } catch (e) {
+      console.error('Failed to load Admin UI', e);
+    }
+  }
+
+  private async _handleAdminLogin() {
+    this._authError = '';
+    try {
+      const resp = await fetch('http://localhost:8000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: this._adminPassword })
+      });
+
+      if (resp.ok) {
+        const { access_token } = await resp.json();
+        localStorage.setItem('bw_admin_token', access_token);
+        this._isAdmin = true;
+        this._loadAdminUI();
+      } else {
+        this._authError = 'Invalid password';
+      }
+    } catch (e) {
+      this._authError = 'Connection failed';
+    }
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    bariwebWatcher.start();
+    bariwebWatcher.onStateChange(async (snapshot) => {
+      console.log('SPA State Shift Detected:', snapshot.fingerprint);
+      
+      // Auto-update screen label in UI
+      try {
+        const resp = await fetch('http://localhost:8000/v1/training/match-screen', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-Client-ID': this.clientId || (window as any).__BARIWEB_CLIENT_ID__ || ''
+          },
+          body: JSON.stringify({ fingerprint: snapshot.fingerprint })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          this._currentScreenLabel = data.matched ? data.label : '';
+        }
+      } catch (e) {}
+    });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    bariwebWatcher.stop();
+  }
+
+
   private _toggle() {
     this._isOpen = !this._isOpen;
+  }
+
+  public setOpen(isOpen: boolean) {
+    this._isOpen = isOpen;
   }
 
   private _setTab(tab: Tab) {
@@ -73,6 +173,12 @@ export class BariwebWidget extends LitElement {
 
     return html`
       <div class="chat-messages">
+        ${this._currentScreenLabel ? html`
+          <div style="background: rgba(74, 222, 128, 0.1); border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 8px; padding: 6px 10px; margin-bottom: 10px; font-size: 11px; color: #4ade80; display: flex; align-items: center; gap: 6px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Опознано: <strong>${this._currentScreenLabel}</strong>
+          </div>
+        ` : ''}
         ${messages.length === 0 ? html`
           <div class="chat-empty">
             ${chatIcon}
@@ -222,6 +328,36 @@ export class BariwebWidget extends LitElement {
             </bw-button>
           </div>
         </bw-accordion-item>
+
+        <bw-accordion-item title="Admin Access">
+          <div style="padding: 10px 0;">
+            ${this._isAdmin ? html`
+              <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 8px; padding: 12px; text-align: center;">
+                <p style="margin: 0 0 10px; color: #4ade80; font-size: 12px; font-weight: 600;">✅ Admin Mode Active</p>
+                <div style="font-size: 10px; color: #94a3b8; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                  <span style="width: 8px; height: 8px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80;"></span>
+                  Auto-discovery recording...
+                </div>
+              </div>
+            ` : html`
+              <p style="margin: 0 0 12px; font-size: 12px; color: #94a3b8; line-height: 1.4;">Enter admin password to enable training tools and screen identification.</p>
+              <input 
+                type="password" 
+                placeholder="Admin Password" 
+                style="width: 100%; box-sizing: border-box; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; color: white; margin-bottom: 12px; outline: none;"
+                .value=${this._adminPassword}
+                @input=${(e: any) => this._adminPassword = e.target.value}
+              />
+              ${this._authError ? html`<p style="color: #f87171; font-size: 11px; margin-bottom: 10px; text-align: center;">${this._authError}</p>` : ''}
+              <button 
+                style="width: 100%; background: #7c3aed; color: white; border: none; border-radius: 8px; padding: 10px; font-size: 13px; font-weight: 600; cursor: pointer;"
+                @click=${this._handleAdminLogin}
+              >
+                Login to Admin
+              </button>
+            `}
+          </div>
+        </bw-accordion-item>
       </div>
     `;
   }
@@ -256,7 +392,7 @@ export class BariwebWidget extends LitElement {
            </div>
  
            <!-- Panel Content -->
-           <div class="panel-body" style="flex: 1; overflow-y: auto;">
+           <div class="panel-body" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
              <div class="tab-panel" ?active=${this._activeTab === 'chat'}>
                ${this._renderChatTab()}
              </div>
@@ -264,14 +400,6 @@ export class BariwebWidget extends LitElement {
                ${this._renderA11yTab()}
              </div>
            </div>
- 
-           <bw-accordion-item title="Как это работает?">
-             <p>Этот виджет помогает адаптировать сайт под ваши нужды (увеличение текста, смена контрастности и др.).</p>
-           </bw-accordion-item>
-           
-           <bw-accordion-item title="О нас">
-             <p>BariWeb — лидер в области инклюзивных технологий в Казахстане.</p>
-           </bw-accordion-item>
  
            <div slot="footer" class="footer-content">
              <div class="footer-brand">

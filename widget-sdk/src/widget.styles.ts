@@ -2,7 +2,13 @@ import { css } from 'lit';
 
 export const widgetStyles = css`
   :host {
-    display: inline-block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2147483647;
+    pointer-events: none; /* Let clicks pass through empty areas */
     
     /* Base Accessibility Variables */
     --bw-grayscale: 0%;
@@ -91,8 +97,11 @@ export const widgetStyles = css`
 
   /* --- Base Layout --- */
 
-  /* The trigger button fills the host element */
+  /* The trigger button */
   .trigger {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
     width: var(--bw-trigger-size, 64px);
     height: var(--bw-trigger-size, 64px);
     --bw-button-icon-size: calc(var(--bw-trigger-size, 64px) * 0.5); /* Adaptive icon size */
@@ -116,31 +125,33 @@ export const widgetStyles = css`
     width: 400px;
     max-width: 85vw; /* Respect small screens */
     height: 100vh;
-    max-height: 100vh;
     margin: 0;
     border-top: none;
     border-bottom: none;
     border-left: none; /* Attached to left edge */
     border-right: 1px solid var(--bw-border);
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease, visibility 0.4s, box-shadow 0.3s;
     display: flex;
     flex-direction: column;
     pointer-events: auto;
     z-index: 2147483647; /* Maximum safe z-index to overlay everything */
-    box-shadow: 10px 0 30px rgba(0,0,0,0.1);
   }
 
   /* Slide from the left edge */
   .panel-hidden {
     opacity: 0;
+    visibility: hidden;
     transform: translateX(-100%);
     pointer-events: none;
+    box-shadow: none;
   }
 
   .panel-visible {
     opacity: 1;
+    visibility: visible;
     transform: translateX(0);
     pointer-events: auto;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.1);
   }
 
   /* Hide the trigger button gently when panel is open */
@@ -156,7 +167,8 @@ export const widgetStyles = css`
   }
 
   .widget-container {
-    display: contents; /* Allows fixed bw-card and relative trigger to act independently */
+    display: block;
+    pointer-events: none;
   }
 
   /* Header styling */
@@ -424,8 +436,10 @@ export const widgetStyles = css`
   .tab-panel {
     display: none;
     flex: 1;
-    overflow-y: auto;
+    min-height: 0;
     flex-direction: column;
+    position: relative;
+    height: 100%; /* Fill panel-body */
   }
   .tab-panel[active] {
     display: flex;
@@ -514,10 +528,14 @@ export const widgetStyles = css`
   .chat-input-bar {
     display: flex;
     gap: 8px;
-    padding: 12px;
+    padding: 1rem;
     border-top: 1px solid var(--bw-border);
     flex-shrink: 0;
     background: var(--bw-bg);
+    margin-top: auto; /* Push to bottom of tab-panel */
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
   }
 
   .chat-input {

@@ -9,6 +9,8 @@ from app.core.langfuse import langfuse_manager
 from app.features.auth.router import auth_router
 from app.features.organizations.router import org_router
 from app.features.widget.router import chat_router
+from app.features.training.router import training_router
+from app.features.training.models import TrainedScreen  # noqa: F401 — ensures SQLModel creates table
 
 from app.features.auth.schemas import User
 from app.features.organizations.models import Client
@@ -43,3 +45,4 @@ app.add_middleware(
 app.include_router(auth_router, prefix="/auth")
 app.include_router(org_router, prefix="/clients")
 app.include_router(chat_router, prefix="")
+app.include_router(training_router, prefix="/v1/training")

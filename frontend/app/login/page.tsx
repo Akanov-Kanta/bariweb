@@ -6,6 +6,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Auth } from '@/lib/api/sdk.gen';
+import { client } from '@/lib/api/client.gen';
+
+client.setConfig({ credentials: 'include' });
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';

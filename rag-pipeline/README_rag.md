@@ -68,24 +68,24 @@ Output: `index/combined_index.json`
 python run_server.py
 ```
 
-API docs: http://localhost:8000/docs
+API docs: http://localhost:8001/docs
 
 ### 8. Query the API
 
 ```bash
 # Health check
-curl http://localhost:8000/health
+curl http://localhost:8001/health
 
 # Semantic search
-curl -X POST http://localhost:8000/search \
+curl -X POST http://localhost:8001/search \
   -H "Content-Type: application/json" \
   -d '{"query": "search Wikipedia", "top_k": 3}'
 
 # Look up a specific element
-curl http://localhost:8000/elements/<element_id>
+curl http://localhost:8001/elements/<element_id>
 
 # Reindex enriched files
-curl -X POST http://localhost:8000/index \
+curl -X POST http://localhost:8001/index \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
@@ -267,3 +267,20 @@ Each enriched element has this structure:
 | `ALEM_EMBEDDINGS_API_KEY` | Yes | — | API key for the Alem embeddings service |
 | `ALEM_EMBEDDINGS_BASE_URL` | No | `https://llm.alem.ai/v1` | Embeddings API base URL |
 | `ALEM_EMBEDDINGS_MODEL` | No | `text-1024` | Embedding model name |
+
+---
+
+## Troubleshooting
+
+### Port Already In Use (Error [Errno 48])
+If you see `[Errno 48] error while attempting to bind on address ('0.0.0.0', 8000)`, it means the main backend or another process is already using that port. 
+
+RAG Pipeline now uses **8001** by default. To kill a process on a specific port:
+
+```bash
+# Find and kill process on port 8000
+lsof -i :8000 -t | xargs kill -9
+
+# Find and kill process on port 8001
+lsof -i :8001 -t | xargs kill -9
+```

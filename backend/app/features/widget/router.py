@@ -14,11 +14,19 @@ class InteractiveElement(BaseModel):
     label: str
 
 
+class ChatMessage(BaseModel):
+    role: str
+    text: str
+
+
 class ChatRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=1000)
+    history: List[ChatMessage] = Field(default_factory=list)
     page_text: str = Field(default="", max_length=5000)
     elements: List[InteractiveElement] = Field(default_factory=list)
     page_url: Optional[str] = Field(default="")
+    screen_label: Optional[str] = Field(default=None)       # From Admin Training Mode
+    screen_fingerprint: Optional[str] = Field(default=None) # Element Blueprint hash
 
 
 class ActionPayload(BaseModel):
@@ -42,9 +50,12 @@ async def chat(
     calls Qwen3, and returns a structured { text, action } response.
     """
     result = chat_service.chat(
+        client_id=client.public_id,
         query=request.query,
+        history=[m.model_dump() for m in request.history],
         page_text=request.page_text,
         elements=[el.model_dump() for el in request.elements],
         page_url=request.page_url or "",
+        screen_label=request.screen_label,
     )
     return ChatResponse(**result)

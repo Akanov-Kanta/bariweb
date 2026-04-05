@@ -16,6 +16,7 @@ from vectorstore.base import SearchResult, VectorStoreBase
 from embeddings.schema import IndexedRecord
 from core.milvus import get_milvus_client
 import config
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,8 @@ class MilvusVectorStore(VectorStoreBase):
                 schema.add_field(field_name="element_id", datatype=DataType.VARCHAR, is_primary=True, max_length=256)
                 schema.add_field(field_name="action_type", datatype=DataType.VARCHAR, max_length=128)
                 schema.add_field(field_name="page_url", datatype=DataType.VARCHAR, max_length=2048)
+                schema.add_field(field_name="domain", datatype=DataType.VARCHAR, max_length=512)
+                schema.add_field(field_name="route", datatype=DataType.VARCHAR, max_length=1024)
                 schema.add_field(field_name="tag", datatype=DataType.VARCHAR, max_length=128)
                 schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=self.dimension)
                 schema.add_field(field_name="payload", datatype=DataType.JSON, description="Full serialized record")
@@ -96,10 +99,15 @@ class MilvusVectorStore(VectorStoreBase):
             rec_dict = record.to_dict()
             rec_dict.pop("embedding", None)
             
+            url = record.page_url or ""
+            parsed_url = urlparse(url)
+            
             data_to_insert.append({
                 "element_id": eid,
                 "action_type": record.action_type or "",
-                "page_url": record.page_url or "",
+                "page_url": url,
+                "domain": parsed_url.netloc or "",
+                "route": parsed_url.path or "/",
                 "tag": record.tag or "",
                 "vector": record.embedding,
                 "payload": rec_dict
@@ -132,7 +140,7 @@ class MilvusVectorStore(VectorStoreBase):
         if filters:
             conditions = []
             for k, v in filters.items():
-                if k in ["action_type", "page_url", "tag"]:
+                if k in ["action_type", "page_url", "domain", "route", "tag"]:
                     sanitized_v = v.replace("'", "\\'")
                     conditions.append(f"{k} == '{sanitized_v}'")
             if conditions:

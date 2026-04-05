@@ -28,8 +28,8 @@ def main():
         help="Host to bind to (default: 0.0.0.0)",
     )
     parser.add_argument(
-        "--port", type=int, default=8000,
-        help="Port to listen on (default: 8000)",
+        "--port", type=int, default=8001,
+        help="Port to listen on (default: 8001)",
     )
     parser.add_argument(
         "--reload", action="store_true",

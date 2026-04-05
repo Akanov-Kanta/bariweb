@@ -1,13 +1,19 @@
+import logging
 import urllib.parse
 import uuid
 from typing import Generator, Annotated
 
+logger = logging.getLogger(__name__)
+
+
 from jose import jwt
 from jose.exceptions import JWTError
 from fastapi import Depends, HTTPException, status, Request
-from fastapi.security import APIKeyCookie
+from fastapi.security import APIKeyCookie, HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import ValidationError
 from sqlmodel import Session, select
+
+from app.features.auth.security import decode_access_token
 
 from app.features.auth.models import TokenPayload
 from app.features.organizations.models import Client
@@ -53,8 +59,10 @@ async def validate_widget_request(request: Request, db: Session = Depends(get_db
     origin = request.headers.get("Origin")
 
     if not client_id:
+        logger.warning(f"BariWeb Auth: Missing X-Client-ID header from {origin}")
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Missing X-Client-ID header")
     if not origin:
+        logger.warning(f"BariWeb Auth: Missing Origin header for client {client_id}")
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Missing Origin header")
 
     # Clean origin to get domain without protocol
@@ -67,11 +75,42 @@ async def validate_widget_request(request: Request, db: Session = Depends(get_db
     stmt = select(Client).where(Client.public_id == client_id)
     client = db.exec(stmt).first()
 
-    if not client or not client.is_active:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or inactive client ID")
+    if not client:
+        logger.warning(f"BariWeb Auth: Client ID '{client_id}' not found in database. Origin: {domain}")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Client ID '{client_id}' not found")
+    if not client.is_active:
+        logger.warning(f"BariWeb Auth: Client account '{client_id}' is inactive. Origin: {domain}")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Client account is inactive")
 
-    allowed_domains_list = [d.strip() for d in client.allowed_domains.split(",")]
-    if domain not in allowed_domains_list:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Origin not allowed")
+    # Normalize allowed domains to netloc for comparison
+    allowed_list = []
+    for d in client.allowed_domains.split(","):
+        d = d.strip()
+        if not d: continue
+        if "://" not in d:
+            d = f"http://{d}"
+        try:
+            allowed_list.append(urllib.parse.urlparse(d).netloc)
+        except Exception:
+            allowed_list.append(d)
+
+    if domain not in allowed_list:
+        logger.warning(f"BariWeb Auth: Origin '{domain}' not in {allowed_list} for client '{client_id}'")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Origin '{domain}' not authorized")
 
     return client
+
+security_scheme = HTTPBearer()
+
+def get_current_admin(token: Annotated[HTTPAuthorizationCredentials, Depends(security_scheme)]) -> dict:
+    """
+    Dependency to validate the Admin JWT token from the Authorization header.
+    """
+    payload = decode_access_token(token.credentials)
+    if not payload or payload.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate admin credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return payload

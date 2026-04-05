@@ -54,12 +54,16 @@ export const accordionStyles = css`
   .content-container {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 0.3s ease;
+    transition: grid-template-rows 0.3s ease, visibility 0.3s;
     overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .trigger[aria-expanded="true"] + .content-container {
     grid-template-rows: 1fr;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .content {

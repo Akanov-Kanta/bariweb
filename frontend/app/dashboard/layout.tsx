@@ -3,6 +3,10 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Auth } from '@/lib/api/sdk.gen';
+import { client } from '@/lib/api/client.gen';
+
+client.setConfig({ credentials: 'include' });
+
 import {
   LayoutDashboard,
   Code,

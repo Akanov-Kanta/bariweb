@@ -7,9 +7,17 @@ const getClientId = () => {
     const widgetId = widget?.getAttribute('client-id');
     if (widgetId) return widgetId;
 
-    // 2. Fallback to script tag
-    const currentScript = document.currentScript as HTMLScriptElement || document.querySelector('script[src*="bariweb.js"]');
-    return currentScript?.getAttribute('data-client-id') || (window as any).__BARIWEB_CLIENT_ID__ || '';
+    // 2. Fallback to current script or script with bariweb.js in the name
+    const currentScript = document.currentScript as HTMLScriptElement || document.querySelector('script[src*="bariweb"]');
+    let id = currentScript?.getAttribute('data-client-id');
+    
+    if (!id) {
+        // 3. Last resort: just find ANY script with the data-client-id attribute
+        const anyScript = document.querySelector('script[data-client-id]');
+        id = anyScript?.getAttribute('data-client-id') || '';
+    }
+
+    return (id as string) || (window as any).__BARIWEB_CLIENT_ID__ || '';
 };
 
 const initialClientId = getClientId();
@@ -31,3 +39,5 @@ client.interceptors.request.use((request) => {
 });
 
 import './widget.js';
+
+

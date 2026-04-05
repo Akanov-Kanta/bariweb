@@ -6,6 +6,6 @@ alembic
 asyncpg
 greenlet
 pymilvus
-langfuse
+langfuse<4.0.0
 passlib[bcrypt]
 bcrypt==4.3.0

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, BackgroundTasks, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from pydantic import BaseModel
 from typing import Optional
@@ -26,7 +26,11 @@ async def trigger_rag_crawl(domains: str, client_id: str):
         
     target_url = domain_list[0]
     if not target_url.startswith("http"):
-        target_url = f"https://{target_url}"
+        # For localhost/127.0.0.1, default to http:// 
+        if "localhost" in target_url or "127.0.0.1" in target_url:
+            target_url = f"http://{target_url}"
+        else:
+            target_url = f"https://{target_url}"
         
     try:
         crawl_endpoint = f"{settings.RAG_API_URL.rstrip('/')}/crawl"
@@ -44,9 +48,8 @@ async def trigger_rag_crawl(domains: str, client_id: str):
         logger.error(f"Failed to connect to RAG pipeline for domain {target_url}: {e}")
 
 @org_router.post("/register")
-def register_client(
+async def register_client(
     client_in: ClientRegisterRequest,
-    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -59,8 +62,8 @@ def register_client(
     db.commit()
     db.refresh(new_client)
     
-    # Trigger RAG pipeline asynchronously
-    background_tasks.add_task(trigger_rag_crawl, new_client.allowed_domains, str(new_client.public_id))
+    # Trigger RAG pipeline directly
+    await trigger_rag_crawl(new_client.allowed_domains, str(new_client.public_id))
     
     script_snippet = f'<script src="https://widget.bariweb.org/bariweb.js" data-client-id="{new_client.public_id}"></script>'
     
@@ -69,7 +72,7 @@ def register_client(
         "script_snippet": script_snippet
     }
 
-@org_router.get("/my")
+@org_router.get("/my", response_model=list[Client])
 def get_my_clients(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -103,3 +106,18 @@ def update_client(
     db.commit()
     db.refresh(client)
     return client
+
+@org_router.delete("/{client_id}")
+def delete_client(
+    client_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    stmt = select(Client).where(Client.id == client_id, Client.owner_id == current_user.id)
+    client = db.exec(stmt).first()
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    db.delete(client)
+    db.commit()
+    return {"status": "deleted"}

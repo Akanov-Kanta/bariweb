@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetMyClientsData, GetMyClientsResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutResponses, MeData, MeResponses, RegisterClientData, RegisterClientErrors, RegisterClientResponses, RegisterData, RegisterErrors, RegisterResponses, VerifyTokenData, VerifyTokenResponses } from './types.gen';
+import type { ChatData, ChatErrors, ChatResponses, DeleteClientData, DeleteClientErrors, DeleteClientResponses, GetMyClientsData, GetMyClientsResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutResponses, MeData, MeResponses, RegisterClientData, RegisterClientErrors, RegisterClientResponses, RegisterData, RegisterErrors, RegisterResponses, UpdateClientData, UpdateClientErrors, UpdateClientResponses, VerifyTokenData, VerifyTokenResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -117,6 +117,59 @@ export class Organizations {
                 }],
             url: '/clients/my',
             ...options
+        });
+    }
+    
+    /**
+     * Delete Client
+     */
+    public static deleteClient<ThrowOnError extends boolean = false>(options: Options<DeleteClientData, ThrowOnError>) {
+        return (options.client ?? client).delete<DeleteClientResponses, DeleteClientErrors, ThrowOnError>({
+            security: [{
+                    in: 'cookie',
+                    name: 'access_token',
+                    type: 'apiKey'
+                }],
+            url: '/clients/{client_id}',
+            ...options
+        });
+    }
+    
+    /**
+     * Update Client
+     */
+    public static updateClient<ThrowOnError extends boolean = false>(options: Options<UpdateClientData, ThrowOnError>) {
+        return (options.client ?? client).patch<UpdateClientResponses, UpdateClientErrors, ThrowOnError>({
+            security: [{
+                    in: 'cookie',
+                    name: 'access_token',
+                    type: 'apiKey'
+                }],
+            url: '/clients/{client_id}',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+}
+
+export class Chat {
+    /**
+     * Chat
+     *
+     * Main chat endpoint. Validates widget origin, retrieves context from Milvus,
+     * calls Qwen3, and returns a structured { text, action } response.
+     */
+    public static chat<ThrowOnError extends boolean = false>(options: Options<ChatData, ThrowOnError>) {
+        return (options.client ?? client).post<ChatResponses, ChatErrors, ThrowOnError>({
+            url: '/v1/chat',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
         });
     }
 }

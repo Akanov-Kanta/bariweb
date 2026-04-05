@@ -108,6 +108,14 @@ class SearchRequest(BaseModel):
         default=None,
         description="Filter results by page URL",
     )
+    domain: Optional[str] = Field(
+        default=None,
+        description="Filter results by domain",
+    )
+    route: Optional[str] = Field(
+        default=None,
+        description="Filter results by path/route",
+    )
     tag: Optional[str] = Field(
         default=None,
         description="Filter results by HTML tag (e.g., 'button', 'a')",

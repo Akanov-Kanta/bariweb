@@ -43,7 +43,7 @@ class SearchService:
         if filters:
             conditions = []
             for k, v in filters.items():
-                if k in ["action_type", "page_url", "tag"]:
+                if k in ["action_type", "page_url", "domain", "route", "tag"]:
                     sanitized_v = str(v).replace("'", "\\'")
                     conditions.append(f"{k} == '{sanitized_v}'")
             if conditions:

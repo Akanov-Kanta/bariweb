@@ -116,20 +116,27 @@ async def index_records(request: IndexRequest):
 )
 async def crawl(request: CrawlRequest, background_tasks: BackgroundTasks):
     from main import run_crawl_pipeline
+    from enrich import enrich_file
+    import config
 
     async def _run_crawl():
         try:
             logger.info("Starting background crawl for %s", request.url)
-            await run_crawl_pipeline(
+            paths = await run_crawl_pipeline(
                 url=request.url,
                 max_pages=request.max_pages,
                 max_depth=request.max_depth
             )
-            logger.info("Completed background crawl for %s", request.url)
+            logger.info("Completed background crawl for %s. Found %d raw paths.", request.url, len(paths))
             
-            # Autotrigger index right away
+            # Enrich and index
             service = _get_service()
-            service.index_files(clear_existing=False)
+            for raw_path in paths:
+                try:
+                    enriched_path = enrich_file(raw_path, config.ENRICHED_OUTPUT_DIR)
+                    service.index_files(file_path=enriched_path, clear_existing=False)
+                except Exception as e:
+                    logger.error("Failed to enrich/index %s: %s", raw_path, e)
         except Exception as e:
             logger.error("Error in background crawl for %s: %s", request.url, e)
 

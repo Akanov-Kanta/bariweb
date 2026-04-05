@@ -5,6 +5,96 @@ export type ClientOptions = {
 };
 
 /**
+ * ChatMessage
+ */
+export type ChatMessage = {
+    /**
+     * Role
+     */
+    role: string;
+    /**
+     * Text
+     */
+    text: string;
+};
+
+/**
+ * ChatRequest
+ */
+export type ChatRequest = {
+    /**
+     * Query
+     */
+    query: string;
+    /**
+     * History
+     */
+    history?: Array<ChatMessage>;
+    /**
+     * Page Text
+     */
+    page_text?: string;
+    /**
+     * Elements
+     */
+    elements?: Array<InteractiveElement>;
+    /**
+     * Page Url
+     */
+    page_url?: string | null;
+};
+
+/**
+ * ChatResponse
+ */
+export type ChatResponse = {
+    /**
+     * Text
+     */
+    text: string;
+    /**
+     * Action
+     */
+    action?: {
+        [key: string]: unknown;
+    } | null;
+};
+
+/**
+ * Client
+ */
+export type Client = {
+    /**
+     * Id
+     */
+    id?: string | null;
+    /**
+     * Public Id
+     */
+    public_id?: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Allowed Domains
+     */
+    allowed_domains: string;
+    /**
+     * Owner Id
+     */
+    owner_id: string;
+    /**
+     * Is Active
+     */
+    is_active?: boolean;
+    /**
+     * Created At
+     */
+    created_at?: string;
+};
+
+/**
  * ClientRegisterRequest
  */
 export type ClientRegisterRequest = {
@@ -19,6 +109,20 @@ export type ClientRegisterRequest = {
 };
 
 /**
+ * ClientUpdate
+ */
+export type ClientUpdate = {
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Domains
+     */
+    domains?: string | null;
+};
+
+/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -26,6 +130,20 @@ export type HttpValidationError = {
      * Detail
      */
     detail?: Array<ValidationError>;
+};
+
+/**
+ * InteractiveElement
+ */
+export type InteractiveElement = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Label
+     */
+    label: string;
 };
 
 /**
@@ -228,7 +346,92 @@ export type GetMyClientsData = {
 
 export type GetMyClientsResponses = {
     /**
+     * Response Get My Clients
+     *
+     * Successful Response
+     */
+    200: Array<Client>;
+};
+
+export type GetMyClientsResponse = GetMyClientsResponses[keyof GetMyClientsResponses];
+
+export type DeleteClientData = {
+    body?: never;
+    path: {
+        /**
+         * Client Id
+         */
+        client_id: string;
+    };
+    query?: never;
+    url: '/clients/{client_id}';
+};
+
+export type DeleteClientErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteClientError = DeleteClientErrors[keyof DeleteClientErrors];
+
+export type DeleteClientResponses = {
+    /**
      * Successful Response
      */
     200: unknown;
 };
+
+export type UpdateClientData = {
+    body: ClientUpdate;
+    path: {
+        /**
+         * Client Id
+         */
+        client_id: string;
+    };
+    query?: never;
+    url: '/clients/{client_id}';
+};
+
+export type UpdateClientErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateClientError = UpdateClientErrors[keyof UpdateClientErrors];
+
+export type UpdateClientResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type ChatData = {
+    body: ChatRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/chat';
+};
+
+export type ChatErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ChatError = ChatErrors[keyof ChatErrors];
+
+export type ChatResponses = {
+    /**
+     * Successful Response
+     */
+    200: ChatResponse;
+};
+
+export type ChatResponse2 = ChatResponses[keyof ChatResponses];

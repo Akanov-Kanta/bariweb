@@ -24,6 +24,9 @@ BROWSER_TYPE = "chromium"
 # Run the browser without a visible window.
 HEADLESS = True
 
+# Ignore SSL errors (useful for local development sites like localhost:5173)
+IGNORE_HTTPS_ERRORS = os.environ.get("IGNORE_HTTPS_ERRORS", "true").lower() == "true"
+
 # User Agent to avoid being blocked as a bot.
 BROWSER_USER_AGENT = os.environ.get(
     "BROWSER_USER_AGENT",

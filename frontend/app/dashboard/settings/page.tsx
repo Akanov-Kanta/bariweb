@@ -26,11 +26,10 @@ interface ClientData {
 }
 
 export default function SettingsPage() {
-  const [client, setClient] = useState<ClientData | null>(null);
-  const [domains, setDomains] = useState<string[]>([]);
+  const [clients, setClients] = useState<ClientData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const form = useForm<DomainFormValues>({
     resolver: zodResolver(domainSchema),
@@ -38,19 +37,17 @@ export default function SettingsPage() {
   });
 
   useEffect(() => {
-    fetchClient();
+    fetchClients();
   }, []);
 
-  const fetchClient = async () => {
+  const fetchClients = async () => {
     try {
       const res = await Organizations.getMyClients();
-      if (res.data && Array.isArray(res.data) && res.data.length > 0) {
-        const clientData = res.data[0] as ClientData;
-        setClient(clientData);
-        setDomains(clientData.allowed_domains ? clientData.allowed_domains.split(',').map(d => d.trim()).filter(Boolean) : []);
+      if (res.data && Array.isArray(res.data)) {
+        setClients(res.data as ClientData[]);
       }
     } catch (err) {
-      console.error('Failed to fetch client', err);
+      console.error('Failed to fetch clients', err);
     } finally {
       setLoading(false);
     }
@@ -59,60 +56,45 @@ export default function SettingsPage() {
   const onSubmit = async (data: DomainFormValues) => {
     setError(null);
     try {
-      const newDomains = [...domains, data.domain];
-      const domainsString = newDomains.join(',');
-
-      if (client) {
-        // Update existing client
-        await Organizations.updateClient({
-          path: { client_id: client.id },
-          body: { domains: domainsString }
-        });
-        setDomains(newDomains);
-      } else {
-        // Register new client
-        const res = await Organizations.registerClient({
-          body: {
-            name: data.domain, // Use domain as name for now
-            domains: data.domain
-          }
-        });
-        if (res.data && (res.data as any).client) {
-          const newClient = (res.data as any).client;
-          setClient(newClient);
-          setDomains([data.domain]);
+      const res = await Organizations.registerClient({
+        body: {
+          name: data.domain,
+          domains: data.domain
         }
+      });
+      if (res.error) {
+        setError(JSON.stringify(res.error));
+        return;
+      }
+      if (res.data && (res.data as any).client) {
+        const newClient = (res.data as any).client as ClientData;
+        setClients((prev) => [...prev, newClient]);
+      } else {
+        setError("Invalid response from server: " + JSON.stringify(res.data));
       }
       form.reset();
     } catch (err: any) {
+      console.error("Register Error:", err);
       setError(err.message || 'Failed to save domain');
     }
   };
 
-  const removeDomain = async (domainToRemove: string) => {
-    if (!client) return;
-    
+  const removeClient = async (clientId: string) => {
     setError(null);
-    const newDomains = domains.filter(d => d !== domainToRemove);
-    const domainsString = newDomains.join(',');
-
     try {
-      await Organizations.updateClient({
-        path: { client_id: client.id },
-        body: { domains: domainsString }
+      await Organizations.deleteClient({
+        path: { client_id: clientId }
       });
-      setDomains(newDomains);
+      setClients((prev) => prev.filter(c => c.id !== clientId));
     } catch (err: any) {
       setError(err.message || 'Failed to remove domain');
     }
   };
 
-  const copyClientId = () => {
-    if (client?.public_id) {
-      navigator.clipboard.writeText(client.public_id);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+  const copyClientId = (publicId: string) => {
+    navigator.clipboard.writeText(publicId);
+    setCopiedId(publicId);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   if (loading) {
@@ -124,39 +106,15 @@ export default function SettingsPage() {
       <div>
         <h2 className="text-3xl font-bold tracking-tight text-zinc-100">Settings</h2>
         <p className="text-zinc-400 mt-1">
-          Manage your account preferences and security configuration.
+          Manage your account preferences and your registered domains.
         </p>
       </div>
-
-      {client && (
-        <Card className="border-blue-500/20 bg-blue-500/5">
-          <CardHeader>
-            <CardTitle className="text-blue-400 flex items-center gap-2">
-              <Zap className="h-5 w-5" />
-              Your Client ID
-            </CardTitle>
-            <CardDescription className="text-zinc-400">
-              This is your unique identifier for the Bariweb widget. Keep it safe.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <div className="bg-zinc-950 border border-zinc-800 rounded-md px-4 py-2 font-mono text-zinc-200 flex-1">
-                {client.public_id}
-              </div>
-              <Button variant="outline" size="icon" onClick={copyClientId}>
-                {copied ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       <Card>
         <CardHeader>
           <CardTitle>Whitelisted Domains</CardTitle>
           <CardDescription>
-            The Bariweb widget will ONLY load on domains listed below. Attempts to load the widget on unauthorized domains will be blocked.
+            Register each domain separately. Each domain gets its own unique Client ID, and adding a domain triggers automatic processing.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -191,27 +149,35 @@ export default function SettingsPage() {
           )}
 
           <div className="rounded-lg border border-zinc-800 bg-zinc-950/50">
-            {domains.length === 0 ? (
+            {clients.length === 0 ? (
               <div className="p-8 text-center text-sm text-zinc-500">
                 No domains whitelisted yet. The widget will not load anywhere.
               </div>
             ) : (
               <ul className="divide-y divide-zinc-800">
-                {domains.map((domain) => (
-                  <li key={domain} className="flex items-center justify-between p-4">
+                {clients.map((client) => (
+                  <li key={client.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4">
                     <div className="flex items-center">
                       <Globe className="mr-3 h-4 w-4 text-zinc-400" />
-                      <span className="text-sm font-medium text-zinc-200">{domain}</span>
+                      <span className="text-sm font-medium text-zinc-200">{client.allowed_domains}</span>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeDomain(domain)}
-                      className="text-zinc-500 hover:text-red-400 hover:bg-red-500/10 h-8"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Remove {domain}</span>
-                    </Button>
+                    <div className="flex items-center gap-2 text-sm text-zinc-400">
+                       <span className="font-mono text-xs bg-zinc-900 border border-zinc-700 px-2 py-1 rounded">
+                         ID: {client.public_id}
+                       </span>
+                       <Button variant="ghost" size="icon" onClick={() => copyClientId(client.public_id)} className="h-8 w-8 hover:text-white" title="Copy Client ID">
+                         {copiedId === client.public_id ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                       </Button>
+                       <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeClient(client.id)}
+                        className="text-zinc-500 hover:text-red-400 hover:bg-red-500/10 h-8 ml-2"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Remove {client.allowed_domains}</span>
+                      </Button>
+                    </div>
                   </li>
                 ))}
               </ul>

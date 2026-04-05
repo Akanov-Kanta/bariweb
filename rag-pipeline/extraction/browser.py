@@ -44,7 +44,8 @@ async def open_page(url: str) -> Page:
 
     # Create a new browser context (isolated cookies/storage)
     context = await browser.new_context(
-        user_agent=config.BROWSER_USER_AGENT
+        user_agent=config.BROWSER_USER_AGENT,
+        ignore_https_errors=config.IGNORE_HTTPS_ERRORS
     )
 
     page = await context.new_page()

@@ -1,86 +1,39 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response
-from sqlmodel import Session, select
 from datetime import timedelta
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 
-from app.features.auth.models import UserCreate, UserRead, Token, UserLogin
-from app.features.auth.schemas import User
-from app.features.auth.dependencies import get_db, get_current_user
 from app.core.config import settings
-from app.core.security import verify_password, create_access_token, get_password_hash
+from app.features.auth.security import create_access_token
+from app.features.auth.dependencies import get_current_admin
 
 auth_router = APIRouter(tags=["auth"])
 
+class LoginRequest(BaseModel):
+    password: str
 
-@auth_router.post("/login")
-def login(
-    user_in: UserLogin, 
-    response: Response,
-    db: Session = Depends(get_db),
-):
-    stmt = select(User).where(User.email == user_in.email)
-    user = db.exec(stmt).first()
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
 
-    if not user or not verify_password(user_in.password, user.hashed_password):
+@auth_router.post("/login", response_model=LoginResponse)
+async def login(body: LoginRequest):
+    """
+    Simple Admin Login: validates against ADMIN_PASSWORD from settings.
+    """
+    if body.password != settings.ADMIN_PASSWORD:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Incorrect admin password",
         )
-
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    
     access_token = create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=access_token_expires,
+        data={"sub": "admin", "role": "admin"}
     )
+    return LoginResponse(access_token=access_token)
 
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        path="/",
-        secure=settings.ENVIRONMENT != 'local',
-        samesite="lax",
-        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-    )
-
-    return {"detail": "Login successful", "user": UserRead.model_validate(user)}
-
-
-@auth_router.get("/users/me", response_model=UserRead)
-def me(current_user: User = Depends(get_current_user)):
-    return current_user
-
-
-@auth_router.post("/users/", response_model=UserRead)
-def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    stmt = select(User).where(User.email == user_in.email)
-    user = db.exec(stmt).first()
-    if user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
-    new_user = User(
-        email=user_in.email,
-        hashed_password=get_password_hash(user_in.password),
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
-
-
-@auth_router.post("/logout")
-def logout(response: Response):
-    response.delete_cookie(
-        key="access_token",
-        path="/",
-        httponly=True,
-        secure=settings.ENVIRONMENT != 'local',
-        samesite="lax",
-    )
-    return {"detail": "Successfully logged out"}
-
-
-@auth_router.get("/verify", response_model=UserRead)
-def verify_token(current_user: User = Depends(get_current_user)):
-    return current_user
-
+@auth_router.get("/status")
+async def get_status(current_admin: dict = Depends(get_current_admin)):
+    """
+    Used by the widget to check if the user is a logged-in admin.
+    """
+    return {"is_admin": True, "role": current_admin.get("role")}

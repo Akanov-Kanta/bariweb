@@ -6,33 +6,43 @@ import { Button } from '@/components/ui/button';
 import { Copy, CheckCircle2 } from 'lucide-react';
 import { Organizations } from '@/lib/api/sdk.gen';
 
+interface ClientData {
+  id: string;
+  public_id: string;
+  name: string;
+  allowed_domains: string;
+}
+
 export default function IntegrationPage() {
   const [copied, setCopied] = useState(false);
-  const [clientId, setClientId] = useState<string | null>(null);
+  const [clients, setClients] = useState<ClientData[]>([]);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchClient = async () => {
+    const fetchClients = async () => {
       try {
         const res = await Organizations.getMyClients();
         if (res.data && Array.isArray(res.data) && res.data.length > 0) {
-          setClientId((res.data[0] as any).public_id);
+          const fetchedClients = res.data as ClientData[];
+          setClients(fetchedClients);
+          setSelectedClientId(fetchedClients[0].public_id);
         }
       } catch (err) {
-        console.error('Failed to fetch client', err);
+        console.error('Failed to fetch clients', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchClient();
+    fetchClients();
   }, []);
 
-  const integrationCode = clientId 
-    ? `<script src="https://widget.bariweb.org/bariweb.js" data-client-id="${clientId}"></script>`
+  const integrationCode = selectedClientId 
+    ? `<script src="https://widget.bariweb.org/bariweb.js" data-client-id="${selectedClientId}"></script>`
     : '<!-- Register your domain in Settings to get your Client ID -->';
 
   const copyToClipboard = () => {
-    if (!clientId) return;
+    if (!selectedClientId) return;
     navigator.clipboard.writeText(integrationCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -51,10 +61,28 @@ export default function IntegrationPage() {
         <CardHeader>
           <CardTitle>1. Add to your HTML</CardTitle>
           <CardDescription>
-            Copy the script tag below and paste it just before the closing <code>&lt;/body&gt;</code> tag of every page where you want the widget to appear.
+            Select your registered domain to get the correct integration code. Each domain has its own unique Client ID.
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {clients.length > 0 && (
+            <div className="mb-4">
+              <label htmlFor="domain-select" className="block text-sm font-medium text-zinc-300 mb-2">
+                Select Domain
+              </label>
+              <select
+                id="domain-select"
+                className="w-full max-w-sm rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                value={selectedClientId || ''}
+                onChange={(e) => setSelectedClientId(e.target.value)}
+              >
+                {clients.map(c => (
+                  <option key={c.public_id} value={c.public_id}>{c.allowed_domains}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div className="relative rounded-lg bg-zinc-950 border border-zinc-800 p-4 font-mono text-sm text-zinc-300">
             <div className="flex justify-between items-center mb-2 pb-2 border-b border-zinc-800/50">
               <span className="text-zinc-500 text-xs">HTML</span>
@@ -62,7 +90,7 @@ export default function IntegrationPage() {
                 variant="ghost" 
                 size="sm" 
                 onClick={copyToClipboard}
-                disabled={!clientId || loading}
+                disabled={!selectedClientId || loading}
                 className="h-8 text-zinc-400 hover:text-white"
               >
                 {copied ? (
@@ -78,13 +106,13 @@ export default function IntegrationPage() {
                 )}
               </Button>
             </div>
-            <pre className="overflow-x-auto p-2">
+            <pre className="overflow-x-auto p-2 text-zinc-300">
               <code>{loading ? 'Loading...' : integrationCode}</code>
             </pre>
           </div>
-          {!clientId && !loading && (
+          {!selectedClientId && !loading && (
             <p className="mt-4 text-sm text-amber-500 font-medium">
-              ⚠️ You need to add at least one domain in Settings to generate your Client ID.
+              ⚠️ You need to add at least one domain in Settings to generate your integration code.
             </p>
           )}
         </CardContent>
@@ -92,15 +120,12 @@ export default function IntegrationPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>2. Whitelist your domains</CardTitle>
+          <CardTitle>2. Manage your domains</CardTitle>
           <CardDescription>
-            For security reasons, the widget will only load on domains that have been whitelisted in your account.
+            You can register additional domains in the settings panel. Each new domain will receive its own individual tracking ID.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-zinc-400 mb-4">
-            Head over to your settings to manage allowed domains. The widget will be completely invisible on any unauthorized domains.
-          </p>
           <Button variant="outline" asChild>
             <a href="/dashboard/settings">Go to Domain Settings</a>
           </Button>

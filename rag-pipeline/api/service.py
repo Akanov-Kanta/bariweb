@@ -214,6 +214,8 @@ class RetrievalService:
         action_type: Optional[str] = None,
         page_url: Optional[str] = None,
         tag: Optional[str] = None,
+        domain: Optional[str] = None,
+        route: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Perform semantic search over indexed elements.
@@ -222,9 +224,10 @@ class RetrievalService:
             query: Natural-language query.
             top_k: Maximum number of results.
             min_score: Minimum similarity score threshold.
-            action_type: Filter by action type.
             page_url: Filter by page URL.
             tag: Filter by HTML tag.
+            domain: Filter by domain.
+            route: Filter by path/route.
 
         Returns:
             Dict with query, matches, timing, etc.
@@ -243,12 +246,16 @@ class RetrievalService:
 
         # Build filters dict from optional parameters.
         filters: Optional[Dict[str, Any]] = None
-        if any([action_type, page_url, tag]):
+        if any([action_type, page_url, tag, domain, route]):
             filters = {}
             if action_type:
                 filters["action_type"] = action_type
             if page_url:
                 filters["page_url"] = page_url
+            if domain:
+                filters["domain"] = domain
+            if route:
+                filters["route"] = route
             if tag:
                 filters["tag"] = tag
 

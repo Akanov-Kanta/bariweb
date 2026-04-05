@@ -387,7 +387,7 @@ export default function TrainingPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
           { label: t.statsTotal, value: screens.length, color: 'text-zinc-300' },
           { label: t.statsDrafts, value: draftsCount, color: 'text-amber-400' },

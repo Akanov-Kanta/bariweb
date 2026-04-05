@@ -87,9 +87,9 @@ export default function IntegrationPage() {
           
           {/* SCRIPT TAG METHOD */}
           <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 p-0 overflow-hidden">
-            <div className="flex items-center justify-between px-8 py-6 border-b border-zinc-800 bg-zinc-900/10">
+            <div className="flex flex-wrap items-center justify-between gap-4 px-6 md:px-8 py-6 border-b border-zinc-800 bg-zinc-900/10">
                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-lime-400/10 border border-lime-400/30 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-2xl bg-lime-400/10 border border-lime-400/30 flex items-center justify-center shrink-0">
                     <BracketsCurly weight="fill" className="w-6 h-6 text-lime-400" />
                   </div>
                   <div>
@@ -99,9 +99,9 @@ export default function IntegrationPage() {
                </div>
                
                {clients.length > 0 && (
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 w-full md:w-auto">
                     <select
-                      className="bg-zinc-950 border border-zinc-800 text-zinc-300 text-[10px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-lime-400/50 outline-none cursor-pointer transition-all"
+                      className="w-full md:w-64 bg-zinc-950 border border-zinc-800 text-zinc-300 text-[10px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-lime-400/50 outline-none cursor-pointer transition-all"
                       value={selectedClientId || ''}
                       onChange={(e) => setSelectedClientId(e.target.value)}
                     >
@@ -122,16 +122,16 @@ export default function IntegrationPage() {
                     <div className="ml-2 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em]">{t.scriptInjection}</div>
                   </div>
                   
-                  <div className="bg-[#05050a] border border-zinc-800 rounded-b-2xl p-8 font-mono text-[13px] leading-relaxed relative overflow-hidden group-hover:border-lime-400/20 transition-colors">
-                    <code className="text-lime-400/90 block break-all whitespace-pre-wrap">
+                  <div className="bg-[#05050a] border border-zinc-800 rounded-b-2xl p-6 md:p-8 font-mono text-[13px] leading-relaxed relative overflow-x-auto group-hover:border-lime-400/20 transition-colors">
+                    <code className="text-lime-400/90 block break-all whitespace-pre-wrap min-w-[200px]">
                       {loading ? t.fetchingSnippet : integrationCode}
                     </code>
                     
-                    <div className="absolute top-4 right-4 translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className="md:absolute top-4 right-4 mt-6 md:mt-0 md:translate-y-[-10px] md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 transition-all duration-300">
                        <Button 
                          onClick={() => copyToClipboard(integrationCode, 'script')}
                          disabled={!selectedClientId}
-                         className="bg-white/5 hover:bg-lime-400 text-white hover:text-black border border-white/10 rounded-xl px-5 h-11 transition-all font-black text-[10px] uppercase tracking-widest"
+                         className="w-full md:w-auto bg-white/5 hover:bg-lime-400 text-white hover:text-black border border-white/10 rounded-xl px-5 h-11 transition-all font-black text-[10px] uppercase tracking-widest"
                        >
                          {copied ? <CheckCircle weight="bold" className="mr-2 h-4 w-4" /> : <Copy weight="fill" className="mr-2 h-4 w-4" />}
                          {copied ? t.copied : t.copySnippet}

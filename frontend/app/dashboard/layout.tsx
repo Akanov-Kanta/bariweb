@@ -16,7 +16,9 @@ import {
   Gear,
   SignOut,
   User,
-  Globe
+  Globe,
+  List,
+  X
 } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -34,6 +36,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { lang, setLang } = useLanguage();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const t = translations[lang].dashboard.sidebar;
 
   const navigation = [
@@ -58,9 +61,40 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-[#05050a] text-zinc-100 font-sans selection:bg-lime-400 selection:text-black">
+    <div className="flex min-h-screen bg-[#05050a] text-zinc-100 font-sans selection:bg-lime-400 selection:text-black relative">
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#0a0a0f] border-b border-[#1f1f23] flex items-center justify-between px-4 z-50">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <Logo />
+        </Link>
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          className="p-2 text-zinc-400 hover:text-white transition-colors"
+        >
+          <List weight="thin" className="h-6 w-6" />
+        </button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="w-64 border-r border-[#1f1f23] bg-[#0a0a0f] flex flex-col dashboard-sidebar relative overflow-hidden shrink-0">
+      <div className={cn(
+        "fixed inset-y-0 left-0 z-[70] w-64 border-r border-[#1f1f23] bg-[#0a0a0f] flex flex-col transition-transform duration-300 lg:relative lg:translate-x-0 shrink-0 h-full",
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        {/* Close Button (Mobile Only) */}
+        <button 
+          onClick={() => setIsSidebarOpen(false)}
+          className="lg:hidden absolute top-6 right-6 p-2 text-zinc-500 hover:text-white transition-colors"
+        >
+          <X weight="thin" className="h-5 w-5" />
+        </button>
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-lime-400/20 to-transparent" />
         
         <div className="flex h-20 items-center px-6 mb-2">
@@ -157,11 +191,11 @@ export default function DashboardLayout({
       </div>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col min-w-0 bg-[#05050a] relative overflow-y-auto">
+      <main className="flex-1 flex flex-col min-w-0 bg-[#05050a] relative overflow-y-auto lg:h-screen pt-16 lg:pt-0">
         {/* Subtle background glow to match landing */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-lime-400/5 blur-[120px] pointer-events-none" />
         
-        <div className="flex-1 p-8 md:p-12 z-10">
+        <div className="flex-1 p-5 md:p-8 lg:p-12 z-10">
           {children}
         </div>
       </main>

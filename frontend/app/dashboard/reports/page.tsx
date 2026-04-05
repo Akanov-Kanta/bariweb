@@ -51,7 +51,7 @@ export default function ReportsPage() {
             {t.subtitle} {t.reportsSubDesc}
           </p>
         </div>
-        <div className="flex items-center gap-4 bg-zinc-900/50 p-2 rounded-2xl border border-zinc-800">
+        <div className="flex flex-wrap items-center gap-4 bg-zinc-900/50 p-2 rounded-2xl border border-zinc-800">
            <div className="px-4 py-2 text-center">
               <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">{t.totalAudits}</p>
               <p className="text-xl font-bold text-white">0</p>

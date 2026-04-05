@@ -227,7 +227,7 @@ export default function SettingsPage() {
         {/* Right Main Column: Content */}
         <div className="lg:col-span-8 space-y-8">
            {selectedClient ? (
-             <div className="grid gap-6 md:grid-cols-2">
+             <div className="grid gap-6 md:grid-cols-1 xl:grid-cols-2">
                 
                 {/* Brick 1: Public ID */}
                 <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 overflow-hidden flex flex-col h-full hover:border-lime-400/20 transition-colors"> 

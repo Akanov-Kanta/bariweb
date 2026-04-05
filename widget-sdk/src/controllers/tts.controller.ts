@@ -1,7 +1,7 @@
-﻿const TTS_STORAGE_KEY = 'bw-tts-enabled-v1';
+const TTS_STORAGE_KEY = 'bw-tts-enabled-v1';
 
 export class TtsController {
-  private enabled = true;
+  private enabled = false;
 
   constructor() {
     this.enabled = this.loadEnabled();
@@ -67,10 +67,10 @@ export class TtsController {
   private loadEnabled(): boolean {
     try {
       const raw = localStorage.getItem(TTS_STORAGE_KEY);
-      if (raw === null) return true;
+      if (raw === null) return false;
       return raw !== '0';
     } catch {
-      return true;
+      return false;
     }
   }
 

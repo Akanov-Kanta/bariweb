@@ -251,7 +251,7 @@ export class BariwebWidget extends LitElement {
   @state() private _inputValue = '';
   @state() private _isAdmin = false;
   @state() private _adminPassword = '';
-  @state() private _authError = '';
+  @state() private _authError = ''; // Keep it if intended for future use or remove if strict
   @state() private _currentScreenLabel = '';
   @state() private _sttState: 'idle' | 'recording' | 'processing' | 'error' = 'idle';
   @state() private _sttLanguageMode: SttLanguageMode = 'auto';
@@ -872,7 +872,11 @@ export class BariwebWidget extends LitElement {
             .value=${this._adminPassword}
             @input=${(e: any) => { this._adminPassword = e.target.value; }}
             @keydown=${(e: KeyboardEvent) => { if (e.key === 'Enter') this._handleAdminLogin(); }} />
+<<<<<<< HEAD
           ${this._authError ? html`<p class="auth-error">${this._authError}</p>` : ''}
+=======
+          ${this._authError ? html`<div class="auth-error">${this._authError}</div>` : ''}
+>>>>>>> fc079bc (added bariweb widget to landing)
           <button class="admin-login-btn" @click=${this._handleAdminLogin}>${t('adminLogin')}</button>
         `}
         <button class="admin-close-btn" @click=${() => { this._showAdminLogin = false; this._authError = ''; }}>

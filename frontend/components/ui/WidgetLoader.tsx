@@ -22,7 +22,7 @@ export function WidgetLoader() {
 
   return (
     <bw-widget 
-      client-id="test_client"
+      client-id="yj8x8HW5"
       style={{
         position: 'fixed',
         bottom: '24px',

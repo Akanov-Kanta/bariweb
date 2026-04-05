@@ -31,7 +31,7 @@ export interface ChatResponse {
     action: ChatAction | null;
 }
 
-export type SttLanguageMode = 'kz' | 'ru' | 'en';
+export type SttLanguageMode = 'kz' | 'ru' | 'en' | 'auto';
 
 export interface SttResponse {
     text: string;

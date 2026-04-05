@@ -1,6 +1,6 @@
 {
   "name": "bariweb-widget",
-  "version": "0.1.10",
+  "version": "0.1.14",
   "type": "module",
   "main": "./dist/bariweb.iife.js",
   "module": "./dist/bariweb.js",

@@ -439,6 +439,7 @@ export class ChatController implements ReactiveController {
                             { role: 'assistant', text: `${data.text}\n\n🛑 **Подтвердите действие:** нажать «${btnLabel}»?`, timestamp: Date.now() },
                         ];
                         this._saveMessages();
+                        this._tts.speak(data.text);
                         this.isLoading = false;
                         this.host.requestUpdate();
                         return; // Pause loop — user must call confirmAction() or cancelAction()
@@ -450,6 +451,7 @@ export class ChatController implements ReactiveController {
                     if (data.action.type === 'continue') {
                         this.messages = [...this.messages, { role: 'assistant', text: '🔄 Анализирую...', timestamp: Date.now() }];
                         this._saveMessages();
+                        this._tts.speak('Анализирую...');
                         this.host.requestUpdate();
                         await this._waitForDom(800);
                         currentQuery = "Страница обновилась. Продолжай задачу, прочитай DOM.";
@@ -461,6 +463,7 @@ export class ChatController implements ReactiveController {
                     if (causesNavigation) {
                         this.messages = [...this.messages, { role: 'assistant', text: displayText, timestamp: Date.now() }];
                         this._saveMessages();
+                        this._tts.speak(displayText);
                         this.host.requestUpdate();
                         await this._waitForDom(1500);
                         
@@ -477,6 +480,7 @@ export class ChatController implements ReactiveController {
 
                     this.messages = [...this.messages, { role: 'assistant', text: displayText, timestamp: Date.now() }];
                     this._saveMessages();
+                    this._tts.speak(displayText);
                     this.host.requestUpdate();
 
                     if (data.action.type === 'input_text' && data.action.element_id) {
@@ -514,6 +518,7 @@ export class ChatController implements ReactiveController {
                 { role: 'assistant', text: `❌ Ошибка: ${this.error}`, timestamp: Date.now() },
             ];
             this._saveMessages();
+            this._tts.speak(`Ошибка: ${this.error}`);
         } finally {
             this.isLoading = false;
             this.host.requestUpdate();
@@ -536,6 +541,7 @@ export class ChatController implements ReactiveController {
         const { result, causesNavigation } = this.executeAction(action);
         this.messages = [...this.messages, { role: 'assistant', text: result, timestamp: Date.now() }];
         this._saveMessages();
+        this._tts.speak(result);
         this.host.requestUpdate();
 
         if (causesNavigation) {
@@ -559,6 +565,7 @@ export class ChatController implements ReactiveController {
             { role: 'assistant', text: '🚫 Действие отменено. Чем ещё могу помочь?', timestamp: Date.now() },
         ];
         this._saveMessages();
+        this._tts.speak('Действие отменено. Чем ещё могу помочь?');
         this.host.requestUpdate();
     }
 

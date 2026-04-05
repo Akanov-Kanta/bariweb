@@ -426,18 +426,23 @@ export class BariwebWidget extends LitElement {
     this._isOpen = !this._isOpen;
     if (this._isOpen) {
       setTimeout(() => this._announce(this._t('announceVoiceInputAvailable')), 500);
+      this._scrollMessages();
     }
   }
 
   public setOpen(v: boolean) {
     this._isOpen = v;
-    if (v) this._announce(this._t('announceWidgetOpened'));
+    if (v) {
+      this._announce(this._t('announceWidgetOpened'));
+      this._scrollMessages();
+    }
   }
 
   private _setTab(tab: Tab) {
     this._activeTab = tab;
     if (tab === 'chat') {
       this._announce(this._t('announceSwitchedToChat'));
+      this._scrollMessages();
     }
   }
 
@@ -457,7 +462,9 @@ export class BariwebWidget extends LitElement {
     const q = this._inputValue.trim();
     if (!q || this._chat.isLoading || this._sttState !== 'idle') return;
     this._inputValue = '';
-    await this._chat.sendMessage(q, false);
+    const sendPromise = this._chat.sendMessage(q, false);
+    this._scrollMessages();
+    await sendPromise;
     this._scrollMessages();
   }
   private _scrollMessages() {

@@ -139,16 +139,20 @@ def discover_screen(
             description=existing.description,
         )
 
-    # Build a readable auto-label from tokens and URL
-    auto_label = "Auto-detected"
+    # Build structured label: "PageName | btn:func · btn:func"
+    # The | separates human page name (left) from agent tokens (right).
+    page_part = "Новая страница"
+    token_part = ""
     if body.page_url:
         path = body.page_url.rstrip("/").split("/")[-1]
-        if path:
-            auto_label = f"Auto: /{path}"
+        if path and not path.startswith("http"):
+            # Capitalize and de-slug the path segment
+            page_part = path.replace("-", " ").replace("_", " ").capitalize()
     if body.tokens:
-        hints = [t for t in body.tokens if len(t) > 2][:3]
-        if hints:
-            auto_label = f"Auto: {' · '.join(hints)}"
+        # Keep up to 5 tokens with their type prefix for the agent
+        token_part = " · ".join(body.tokens[:5])
+    
+    auto_label = f"{page_part} | {token_part}" if token_part else page_part
 
     screen = TrainedScreen(
         client_id=client_id,

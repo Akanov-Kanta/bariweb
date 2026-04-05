@@ -600,6 +600,37 @@ export const widgetStyles = css`
     gap: 8px;
   }
 
+  .settings-actions {
+    margin: 0 14px 14px;
+  }
+
+  .reset-settings-btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    border-radius: var(--bw-radius-sm);
+    border: 1.5px solid var(--bw-border);
+    background: var(--bw-bg);
+    color: var(--bw-fg);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.18s;
+  }
+  .reset-settings-btn:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: #fef2f2;
+  }
+  .reset-settings-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .trigger svg {
     width: 28px;
     height: 28px;

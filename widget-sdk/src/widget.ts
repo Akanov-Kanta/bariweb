@@ -238,6 +238,14 @@ export class BariwebWidget extends LitElement {
     return s.customContentHue || 0;
   }
 
+  private _resetWidgetSettings() {
+    this._a11y.reset();
+    if (this._aiA11y.simplifyEnabled) this._aiA11y.toggleSimplify();
+    if (this._aiA11y.autoA11yEnabled) this._aiA11y.toggleAutoA11y();
+    this._setSttLanguageMode('auto');
+    this.requestUpdate();
+  }
+
   // ─── STT ───────────────────────────────────
   private _clearSttTimers() {
     if (this._silenceIntervalId !== null) { window.clearInterval(this._silenceIntervalId); this._silenceIntervalId = null; }
@@ -585,6 +593,13 @@ export class BariwebWidget extends LitElement {
             <span class="ai-tool-badge ${this._aiA11y.autoA11yEnabled ? 'on' : ''}">
               ${this._aiA11y.autoA11yEnabled ? 'ВКЛ' : 'ВЫКЛ'}
             </span>
+          </button>
+        </div>
+
+        <div class="settings-actions">
+          <button class="reset-settings-btn" @click=${this._resetWidgetSettings} id="bw-reset-settings-btn">
+            ${Icons.refresh}
+            Сбросить настройки
           </button>
         </div>
       </div>

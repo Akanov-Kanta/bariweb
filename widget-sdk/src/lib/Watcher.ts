@@ -86,18 +86,28 @@ export class BariwebWatcher {
     get isDiscovering(): boolean { return this._isDiscovering; }
 
     getLiveSnapshot(): LiveSnapshot {
+        const _mask = (el: Element, text: string) => {
+            if (el.hasAttribute('bw-private') || el.hasAttribute('data-bw-private')) return '[MASKED]';
+            if (!text) return text;
+            // Mask Cards (13-16 digits, with potential spaces/dashes) -> ****
+            let m = text.replace(/(?:\d[ \-]*?){13,16}/g, '****');
+            // Mask IIN/BIN (12 consecutive digits) -> ****
+            m = m.replace(/\b\d{12}\b/g, '****');
+            return m;
+        };
+
         const headings = Array.from(document.querySelectorAll('h1, h2'))
-            .map(el => (el as HTMLElement).innerText?.trim())
+            .map(el => _mask(el, (el as HTMLElement).innerText?.trim() || ''))
             .filter(Boolean)
             .slice(0, 3);
 
         const els = Array.from(document.querySelectorAll('button, a[href], [role="button"]'))
             .map(el => {
                 const htmlEl = el as HTMLElement;
-                const text = (
+                const text = _mask(htmlEl, (
                     htmlEl.getAttribute('aria-label') ||
                     htmlEl.innerText || ''
-                ).trim().slice(0, 60);
+                ).trim().slice(0, 60));
                 return { id: htmlEl.id || '', text };
             })
             .filter(e => e.text.length > 0)
@@ -140,13 +150,47 @@ export class BariwebWatcher {
             const snapshot = this.getLiveSnapshot();
 
             if (this.isAutoDiscoveryEnabled) {
-                // Non-blocking — don't await
-                this._discover(newFingerprint, [...currentTokens]).catch(() => {});
+                // Build typed tokens: "btn:label", "a:label" — keep type prefix for the agent
+                const typedTokens = this._buildTypedTokens();
+                this._discover(newFingerprint, typedTokens).catch(() => {});
             }
 
             this._callbacks.forEach(cb => cb(snapshot));
         }
         // else: ignore — minor DOM noise (tooltip, badge, animation)
+    }
+
+    /**
+     * Build typed token list: "btn:Магазин наград", "a:Подробнее", "input:Email"
+     * These let the backend store structured function labels that the agent reads.
+     */
+    private _buildTypedTokens(): string[] {
+        const seen = new Set<string>();
+        const tokens: string[] = [];
+
+        const add = (prefix: string, text: string) => {
+            const clean = text.trim().slice(0, 40);
+            if (!clean || clean.length < 2) return;
+            const key = `${prefix}:${clean}`;
+            if (seen.has(key)) return;
+            seen.add(key);
+            tokens.push(key);
+        };
+
+        document.querySelectorAll('button, [role="button"]').forEach(el => {
+            const t = (el as HTMLElement).innerText?.trim();
+            if (t) add('btn', t);
+        });
+        document.querySelectorAll('a[href]').forEach(el => {
+            const t = ((el as HTMLElement).getAttribute('aria-label') || (el as HTMLElement).innerText)?.trim();
+            if (t) add('a', t);
+        });
+        document.querySelectorAll('input:not([type=hidden]), textarea, select').forEach(el => {
+            const t = (el as HTMLInputElement).placeholder || (el as HTMLInputElement).name;
+            if (t) add('input', t);
+        });
+
+        return tokens.slice(0, 8);
     }
 
     /**

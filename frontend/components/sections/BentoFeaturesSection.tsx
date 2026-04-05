@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MousePointer2, ScanText, ShieldCheck, Zap } from "lucide-react";
+import { CursorClick, Scan, ShieldCheck, Lightning } from "@phosphor-icons/react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { landingTranslations } from "@/lib/i18n/landingTranslations";
 
@@ -24,7 +24,7 @@ export default function BentoFeaturesSection() {
           {/* Feature 1 - Scanning (1 column, 2 rows) */}
           <div className="group glass-card md:row-span-2 flex flex-col justify-between">
             <div>
-              <ScanText className="mb-6 h-8 w-8 text-neutral-400 group-hover:text-white transition-colors" />
+              <Scan weight="thin" className="mb-6 h-8 w-8 text-neutral-400 group-hover:text-white transition-colors" />
               <h3 className="mb-3 text-2xl font-bold text-white">{t.scanTitle}</h3>
               <p className="text-neutral-400">
                 {t.scanDesc}
@@ -43,7 +43,7 @@ export default function BentoFeaturesSection() {
           {/* Feature 2 - Autopilot (2 columns, 1 row) */}
           <div className="group glass-card md:col-span-2 flex flex-col">
             <div className="relative z-10 flex h-full flex-col justify-center w-1/2">
-              <Zap className="mb-6 h-8 w-8 heading-accent" />
+              <Lightning weight="thin" className="mb-6 h-8 w-8 heading-accent" />
               <h3 className="mb-3 text-2xl font-bold text-white">{t.autoTitle}</h3>
               <p className="text-neutral-400">
                 {t.autoDesc}
@@ -77,7 +77,7 @@ export default function BentoFeaturesSection() {
                   }}
                   initial={{ x: 0, y: 0 }}
                 >
-                  <MousePointer2 className="h-8 w-8 fill-black text-white" />
+                  <CursorClick weight="thin" className="h-8 w-8 text-white" />
                   <div className="mt-2 rounded bg-neutral-800 px-2 py-1 text-[10px] text-white font-mono">{t.agentActive}</div>
                 </motion.div>
               </div>
@@ -87,7 +87,7 @@ export default function BentoFeaturesSection() {
           {/* Feature 3 - Compliance (1 column, 1 row) */}
           <div className="group glass-card flex flex-col justify-between">
             <div>
-              <ShieldCheck className="mb-6 h-8 w-8 text-neutral-400 group-hover:heading-accent transition-colors" />
+              <ShieldCheck weight="thin" className="mb-6 h-8 w-8 text-neutral-400 group-hover:heading-accent transition-colors" />
               <h3 className="mb-3 text-xl font-bold text-white">{t.codeTitle}</h3>
               <p className="text-sm text-neutral-400">
                 {t.codeDesc}

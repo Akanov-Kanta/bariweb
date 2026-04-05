@@ -9,6 +9,8 @@ import {
   Search, RefreshCw, ChevronDown, ChevronUp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { translations } from '@/lib/i18n/translations';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -32,6 +34,8 @@ interface Screen {
 type FilterStatus = 'all' | 'draft' | 'confirmed';
 
 function StatusBadge({ isDraft }: { isDraft: boolean }) {
+  const { lang } = useLanguage();
+  const t = translations[lang].dashboard.training;
   return (
     <span className={cn(
       'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest',
@@ -40,13 +44,15 @@ function StatusBadge({ isDraft }: { isDraft: boolean }) {
         : 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20'
     )}>
       {isDraft
-        ? <><Clock className="h-3 w-3" />Черновик</>
-        : <><CheckCircle2 className="h-3 w-3" />Обучено</>}
+        ? <><Clock className="h-3 w-3" />{t.draft}</>
+        : <><CheckCircle2 className="h-3 w-3" />{t.trained}</>}
     </span>
   );
 }
 
 function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: () => void }) {
+  const { lang } = useLanguage();
+  const t = translations[lang].dashboard.training;
   const [expanded, setExpanded] = useState(screen.is_draft);
   const [label, setLabel] = useState(screen.label);
   const [description, setDescription] = useState(screen.description || '');
@@ -55,7 +61,7 @@ function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: () => vo
   const [error, setError] = useState<string | null>(null);
 
   const handleConfirm = async () => {
-    if (!label.trim()) { setError('Screen Label обязателен'); return; }
+    if (!label.trim()) { setError(t.screenLabelRequired); return; }
     setSaving(true);
     setError(null);
     try {
@@ -70,10 +76,10 @@ function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: () => vo
         setTimeout(() => { setSaved(false); onUpdated(); }, 1400);
       } else {
         const d = await res.json().catch(() => ({}));
-        setError(d.detail || `Ошибка ${res.status}`);
+        setError(d.detail || `Error ${res.status}`);
       }
     } catch {
-      setError('Ошибка сети');
+      setError(t.errorNetwork);
     } finally {
       setSaving(false);
     }
@@ -126,19 +132,19 @@ function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: () => vo
             <Input
               value={label}
               onChange={e => setLabel(e.target.value)}
-              placeholder="e.g. Payment Form, User Profile"
+              placeholder={t.placeholderLabel}
               className="bg-zinc-950 border-zinc-800 text-zinc-100 h-10 text-sm"
             />
           </div>
 
           <div>
             <label className="block text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">
-              Описание для ИИ (необязательно)
+              {t.descriptionLabel}
             </label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
-              placeholder="Что может делать пользователь на этой странице? На что обратить внимание ИИ?"
+              placeholder={t.descriptionPlaceholder}
               rows={3}
               className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 resize-none outline-none focus:border-zinc-600 transition-colors"
             />
@@ -156,15 +162,15 @@ function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: () => vo
                 : 'bg-zinc-700 hover:bg-zinc-600 text-white'
             )}
           >
-            {saved ? <><CheckCircle2 className="h-4 w-4 mr-2" />Сохранено!</>
-              : saving ? '⏳ Сохраняем...'
-              : screen.is_draft ? <><CheckCircle2 className="h-4 w-4 mr-2" />Подтвердить и добавить в RAG</>
-              : <><FileEdit className="h-4 w-4 mr-2" />Обновить</>}
+            {saved ? <><CheckCircle2 className="h-4 w-4 mr-2" />{t.saved}</>
+              : saving ? t.saving
+              : screen.is_draft ? <><CheckCircle2 className="h-4 w-4 mr-2" />{t.confirmRag}</>
+              : <><FileEdit className="h-4 w-4 mr-2" />{t.update}</>}
           </Button>
 
           {screen.created_at && (
             <p className="text-[10px] text-zinc-600 text-right">
-              Создано: {new Date(screen.created_at).toLocaleString('ru-RU')}
+              {t.createdAt}: {new Date(screen.created_at).toLocaleString(lang === 'ru' ? 'ru-RU' : lang === 'kz' ? 'kk-KZ' : 'en-US')}
             </p>
           )}
         </div>
@@ -174,6 +180,8 @@ function ScreenCard({ screen, onUpdated }: { screen: Screen; onUpdated: () => vo
 }
 
 export default function TrainingPage() {
+  const { lang } = useLanguage();
+  const t = translations[lang].dashboard.training;
   const [clients, setClients] = useState<ClientInfo[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [screens, setScreens] = useState<Screen[]>([]);
@@ -226,9 +234,9 @@ export default function TrainingPage() {
     <div className="space-y-8 max-w-4xl">
       {/* Header */}
       <div>
-        <h2 className="text-4xl font-bold tracking-tight text-white mb-2">🧠 Training</h2>
+        <h2 className="text-4xl font-bold tracking-tight text-white mb-2">{t.title}</h2>
         <p className="text-zinc-400 text-lg">
-          Просмотр и подтверждение экранов. После подтверждения экран попадает в RAG (Milvus).
+          {t.subtitle}
         </p>
       </div>
 
@@ -237,7 +245,7 @@ export default function TrainingPage() {
         <Card className="dashboard-card border-zinc-800">
           <CardContent className="p-4">
             <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 mb-3">
-              🌐 Фильтр по домену
+              {t.domainFilter}
             </p>
             <div className="flex flex-wrap gap-2">
               {clients.map(c => (
@@ -262,9 +270,9 @@ export default function TrainingPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Всего', value: screens.length, color: 'text-zinc-300' },
-          { label: 'Черновики', value: draftsCount, color: 'text-amber-400' },
-          { label: 'В RAG', value: confirmedCount, color: 'text-emerald-400' },
+          { label: t.statsTotal, value: screens.length, color: 'text-zinc-300' },
+          { label: t.statsDrafts, value: draftsCount, color: 'text-amber-400' },
+          { label: t.statsInRag, value: confirmedCount, color: 'text-emerald-400' },
         ].map(s => (
           <Card key={s.label} className="dashboard-card border-zinc-800 bg-zinc-900/30">
             <CardContent className="p-4">
@@ -287,7 +295,7 @@ export default function TrainingPage() {
                 filter === f ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'
               )}
             >
-              {f === 'all' ? 'Все' : f === 'draft' ? 'Черновики' : 'В RAG'}
+              {f === 'all' ? t.filterAll : f === 'draft' ? t.statsDrafts : t.statsInRag}
             </button>
           ))}
         </div>
@@ -296,7 +304,7 @@ export default function TrainingPage() {
           <Input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Поиск по названию или URL..."
+            placeholder={t.searchPlaceholder}
             className="pl-9 h-9 bg-zinc-900 border-zinc-800 text-sm"
           />
         </div>
@@ -323,12 +331,12 @@ export default function TrainingPage() {
           <CardContent className="p-12 text-center">
             <p className="text-2xl mb-3">📭</p>
             <p className="text-zinc-400 font-bold">
-              {search ? 'Ничего не найдено' : 'Экранов пока нет'}
+              {search ? t.nothingFound : t.noScreensYet}
             </p>
             <p className="text-zinc-600 text-sm mt-1">
               {search
-                ? 'Попробуйте другой запрос'
-                : 'Войдите в Admin Mode через виджет и походите по сайту — экраны появятся автоматически'}
+                ? t.tryAnotherQuery
+                : t.adminModeInstruct}
             </p>
           </CardContent>
         </Card>
@@ -337,7 +345,7 @@ export default function TrainingPage() {
           {filtered.filter(s => s.is_draft).length > 0 && (
             <>
               <p className="text-xs font-bold uppercase tracking-widest text-amber-400/70 px-1">
-                📝 Черновики — ожидают подтверждения
+                {t.draftsPending}
               </p>
               {filtered.filter(s => s.is_draft).map(s => (
                 <ScreenCard key={s.id} screen={s} onUpdated={fetchScreens} />
@@ -347,7 +355,7 @@ export default function TrainingPage() {
           {filtered.filter(s => !s.is_draft).length > 0 && (
             <>
               <p className="text-xs font-bold uppercase tracking-widest text-emerald-400/70 px-1 mt-6">
-                ✅ Активно в RAG (Milvus)
+                {t.activeInRag}
               </p>
               {filtered.filter(s => !s.is_draft).map(s => (
                 <ScreenCard key={s.id} screen={s} onUpdated={fetchScreens} />

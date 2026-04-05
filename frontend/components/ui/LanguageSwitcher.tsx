@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Globe } from "lucide-react";
+import { Globe } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { Lang } from "@/lib/i18n/translations";
@@ -24,7 +24,7 @@ export default function LanguageSwitcher() {
         onClick={toggleOpen}
         className="flex items-center gap-2.5 rounded-full border border-neutral-800 bg-neutral-900/50 px-5 py-2.5 text-sm font-bold text-white transition-all hover:border-lime-400/50 hover:text-lime-400 active:scale-95"
       >
-        <Globe className="h-4 w-4 heading-accent" />
+        <Globe weight="thin" className="h-5 w-5 heading-accent" />
         <span className="uppercase tracking-wider">{lang}</span>
       </button>
 

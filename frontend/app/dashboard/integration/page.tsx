@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Copy, CheckCircle2 } from 'lucide-react';
+import { Copy, CheckCircle, Code, BracketsCurly, Info, ArrowUpRight, Package, Terminal } from '@phosphor-icons/react';
 import { Organizations } from '@/lib/api/sdk.gen';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { translations } from '@/lib/i18n/translations';
@@ -17,6 +17,7 @@ interface ClientData {
 
 export default function IntegrationPage() {
   const [copied, setCopied] = useState(false);
+  const [copiedNpm, setCopiedNpm] = useState(false);
   const [clients, setClients] = useState<ClientData[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,104 +46,208 @@ export default function IntegrationPage() {
     ? `<script src="https://widget.bariweb.org/bariweb.js" data-client-id="${selectedClientId}"></script>`
     : t.noDomainWarning;
 
-  const copyToClipboard = () => {
-    if (!selectedClientId) return;
-    navigator.clipboard.writeText(integrationCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const npmInstallCode = "npm install bariweb";
+  const npmUsageCode = `import { Bariweb } from 'bariweb';\n\n// Initialize in your root layout or app component\n<Bariweb clientId="${selectedClientId || 'YOUR_CLIENT_ID'}" />`;
+
+  const copyToClipboard = (text: string, type: 'script' | 'npm') => {
+    if (!selectedClientId && type === 'script') return;
+    navigator.clipboard.writeText(text);
+    if (type === 'script') {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } else {
+      setCopiedNpm(true);
+      setTimeout(() => setCopiedNpm(false), 2000);
+    }
   };
 
   return (
-    <div className="space-y-8 max-w-5xl">
-      <div>
-        <h2 className="text-4xl font-bold tracking-tight text-white mb-2">{t.title}</h2>
-        <p className="text-zinc-400 text-lg">
-          {t.subtitle}
-        </p>
+    <div className="space-y-10 max-w-6xl pb-20">
+      {/* Header with Status */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h2 className="text-4xl font-black tracking-tight text-white mb-2">{t.title}</h2>
+          <p className="text-zinc-500 text-lg max-w-2xl">
+            {t.subtitle} {t.integrationSubDesc}
+          </p>
+        </div>
+        <div className={`flex items-center gap-3 px-4 py-2 rounded-xl border transition-all ${
+          selectedClientId ? "bg-lime-400/5 border-lime-400/20 text-lime-400" : "bg-red-400/5 border-red-400/20 text-red-400"
+        }`}>
+          <div className={`w-2 h-2 rounded-full animate-pulse ${selectedClientId ? "bg-lime-400" : "bg-red-400"}`} />
+          <span className="text-xs font-black uppercase tracking-widest">
+            {selectedClientId ? t.readyToInstall : t.setupRequired}
+          </span>
+        </div>
       </div>
 
-      <Card className="dashboard-card">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold text-white">{t.step1Title}</CardTitle>
-          <CardDescription className="text-zinc-400">
-            {t.step1Desc}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {clients.length > 0 && (
-            <div className="mb-6">
-              <label htmlFor="domain-select" className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2 ml-1">
-                {t.selectDomain}
-              </label>
-              <select
-                id="domain-select"
-                className="w-full max-w-sm rounded-xl border border-[#1f1f23] bg-black/60 px-4 py-3 text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-lime-400 transition-all cursor-pointer"
-                value={selectedClientId || ''}
-                onChange={(e) => setSelectedClientId(e.target.value)}
-              >
-                {clients.map(c => (
-                  <option key={c.public_id} value={c.public_id}>{c.allowed_domains}</option>
-                ))}
-              </select>
+      <div className="grid gap-8 lg:grid-cols-12">
+        {/* Left Column: Code and Tools */}
+        <div className="lg:col-span-12 space-y-10">
+          
+          {/* SCRIPT TAG METHOD */}
+          <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 p-0 overflow-hidden">
+            <div className="flex items-center justify-between px-8 py-6 border-b border-zinc-800 bg-zinc-900/10">
+               <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-lime-400/10 border border-lime-400/30 flex items-center justify-center">
+                    <BracketsCurly weight="fill" className="w-6 h-6 text-lime-400" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-white text-lg font-bold">{t.universalScriptTitle}</CardTitle>
+                    <CardDescription className="text-xs text-zinc-500">{t.universalScriptDesc}</CardDescription>
+                  </div>
+               </div>
+               
+               {clients.length > 0 && (
+                  <div className="flex items-center gap-4">
+                    <select
+                      className="bg-zinc-950 border border-zinc-800 text-zinc-300 text-[10px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-lime-400/50 outline-none cursor-pointer transition-all"
+                      value={selectedClientId || ''}
+                      onChange={(e) => setSelectedClientId(e.target.value)}
+                    >
+                      {clients.map(c => (
+                        <option key={c.public_id} value={c.public_id}>{c.allowed_domains}</option>
+                      ))}
+                    </select>
+                  </div>
+               )}
             </div>
-          )}
 
-          <div className="relative rounded-2xl bg-black/60 border border-[#1f1f23] p-6 font-mono text-sm text-zinc-300 shadow-inner">
-            <div className="flex justify-between items-center mb-4 pb-4 border-b border-[#1f1f23]">
-              <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">{t.htmlLabel}</span>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={copyToClipboard}
-                disabled={!selectedClientId || loading}
-                className="h-9 px-4 text-zinc-400 hover:text-lime-400 hover:bg-lime-400/10 rounded-lg transition-all"
-              >
-                {copied ? (
-                  <>
-                    <CheckCircle2 className="mr-2 h-4 w-4 text-lime-400" />
-                    <span className="text-lime-400 font-bold">{t.copied}</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="mr-2 h-4 w-4" />
-                    {t.copyCode}
-                  </>
-                )}
-              </Button>
+            <CardContent className="p-8">
+               <div className="relative group">
+                  <div className="h-10 bg-[#1a1a23] rounded-t-2xl flex items-center px-4 gap-2 border-x border-t border-zinc-800">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-500/50" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/50" />
+                    <div className="ml-2 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em]">{t.scriptInjection}</div>
+                  </div>
+                  
+                  <div className="bg-[#05050a] border border-zinc-800 rounded-b-2xl p-8 font-mono text-[13px] leading-relaxed relative overflow-hidden group-hover:border-lime-400/20 transition-colors">
+                    <code className="text-lime-400/90 block break-all whitespace-pre-wrap">
+                      {loading ? t.fetchingSnippet : integrationCode}
+                    </code>
+                    
+                    <div className="absolute top-4 right-4 translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                       <Button 
+                         onClick={() => copyToClipboard(integrationCode, 'script')}
+                         disabled={!selectedClientId}
+                         className="bg-white/5 hover:bg-lime-400 text-white hover:text-black border border-white/10 rounded-xl px-5 h-11 transition-all font-black text-[10px] uppercase tracking-widest"
+                       >
+                         {copied ? <CheckCircle weight="bold" className="mr-2 h-4 w-4" /> : <Copy weight="fill" className="mr-2 h-4 w-4" />}
+                         {copied ? t.copied : t.copySnippet}
+                       </Button>
+                    </div>
+                  </div>
+               </div>
+
+               <div className="mt-10 grid md:grid-cols-2 gap-8">
+                  <div className="flex items-start gap-4">
+                    <div className="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[10px] font-black text-lime-400 shrink-0">1</div>
+                    <div>
+                      <h4 className="text-sm font-bold text-white mb-2">{t.codeInjectionTitle}</h4>
+                      <p className="text-[11px] text-zinc-500 leading-relaxed">
+                        {t.codeInjectionDesc}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[10px] font-black text-lime-400 shrink-0">2</div>
+                    <div>
+                      <h4 className="text-sm font-bold text-white mb-2">{t.autoActivationTitle}</h4>
+                      <p className="text-[11px] text-zinc-500 leading-relaxed">
+                        {t.autoActivationDesc}
+                      </p>
+                    </div>
+                  </div>
+               </div>
+            </CardContent>
+          </Card>
+
+          {/* NEW NPM / MODERN FRAMEWORKS METHOD */}
+          <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 p-0 overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-4">
+               <div className="px-3 py-1 rounded-full bg-lime-400/10 border border-lime-400/30 text-[9px] font-black text-lime-400 uppercase tracking-widest">{t.recommendedReact}</div>
             </div>
-            <pre className="overflow-x-auto p-2 scrollbar-thin">
-              <code className={selectedClientId ? "text-lime-400/90" : "text-zinc-600 italic"}>
-                {loading ? t.loading : integrationCode}
-              </code>
-            </pre>
+            
+            <div className="flex items-center justify-between px-8 py-6 border-b border-zinc-800 bg-zinc-900/10">
+               <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-400/10 border border-blue-400/30 flex items-center justify-center">
+                    <Package weight="fill" className="w-6 h-6 text-blue-400" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-white text-lg font-bold">{t.npmFrameworksTitle}</CardTitle>
+                    <CardDescription className="text-xs text-zinc-500">{t.npmFrameworksDesc}</CardDescription>
+                  </div>
+               </div>
+            </div>
+
+            <CardContent className="p-8 space-y-8">
+               <div className="space-y-4">
+                  <h4 className="text-xs font-black text-zinc-400 uppercase tracking-widest ml-1">{t.stepInstallPackage}</h4>
+                  <div className="group relative">
+                    <div className="flex items-center justify-between bg-[#05050a] border border-zinc-800 rounded-2xl px-6 py-4 font-mono text-[13px] group-hover:border-blue-400/30 transition-all duration-300">
+                      <div className="flex items-center gap-3">
+                         <Terminal weight="fill" className="text-zinc-600 h-4 w-4" />
+                         <span className="text-blue-400">$ </span>
+                         <span className="text-zinc-100">{npmInstallCode}</span>
+                      </div>
+                      <Button 
+                        onClick={() => copyToClipboard(npmInstallCode, 'npm')}
+                        className="bg-zinc-900 hover:bg-blue-500 text-zinc-500 hover:text-white border border-zinc-800 rounded-xl px-4 h-9 h-9 transition-all text-[10px] font-black uppercase"
+                      >
+                         {copiedNpm ? <CheckCircle weight="bold" className="mr-2 h-3.5 w-3.5" /> : <Copy weight="fill" className="mr-2 h-3.5 w-3.5" />}
+                         {copiedNpm ? t.copied : 'Copy'}
+                      </Button>
+                    </div>
+                  </div>
+               </div>
+
+               <div className="space-y-4">
+                  <h4 className="text-xs font-black text-zinc-400 uppercase tracking-widest ml-1">{t.stepInitializeApp}</h4>
+                  <div className="bg-[#05050a] border border-zinc-800 rounded-2xl p-6 font-mono text-[13px] leading-relaxed text-zinc-300">
+                    <pre className="whitespace-pre-wrap">
+                      {npmUsageCode}
+                    </pre>
+                  </div>
+               </div>
+            </CardContent>
+          </Card>
+
+          {/* Tips Section */}
+          <div className="grid md:grid-cols-2 gap-8">
+             <Card className="dashboard-card border-zinc-800 bg-zinc-900/20 p-8 flex items-start gap-6">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                  <Info weight="thin" className="w-6 h-6 text-amber-500" />
+                </div>
+                <div>
+                   <h4 className="text-white font-bold mb-2">{t.whereIsClientId}</h4>
+                   <p className="text-xs text-zinc-500 leading-relaxed mb-4">
+                     {t.clientIdHint}
+                   </p>
+                   <a href="/dashboard/settings" className="text-[10px] font-black uppercase tracking-widest text-lime-400 border-b border-lime-400/30 hover:border-lime-400 transition-colors inline-flex items-center gap-1 group">
+                      {t.manageDomains} <ArrowUpRight className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                   </a>
+                </div>
+             </Card>
+
+             <Card className="dashboard-card border-zinc-800 bg-zinc-900/20 p-8 flex items-start gap-6">
+                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+                  <Code weight="thin" className="w-6 h-6 text-blue-400" />
+                </div>
+                <div>
+                   <h4 className="text-white font-bold mb-2">{t.gtmTitle}</h4>
+                   <p className="text-xs text-zinc-500 leading-relaxed mb-4">
+                      {t.gtmDesc}
+                   </p>
+                   <button className="text-[10px] font-black uppercase tracking-widest text-blue-400 border-b border-blue-400/30 hover:border-blue-400 transition-colors">
+                      {t.gtmGuide}
+                   </button>
+                </div>
+             </Card>
           </div>
-          {!selectedClientId && !loading && (
-            <div className="mt-6 flex items-center gap-3 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl">
-              <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
-              <p className="text-sm text-amber-500/90 font-medium">
-                {t.noDomainWarning}
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
-      <Card className="dashboard-card">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold text-white">{t.step2Title}</CardTitle>
-          <CardDescription className="text-zinc-400">
-            {t.step2Desc}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-zinc-400 mb-6 leading-relaxed">
-            {t.settingsHint}
-          </p>
-          <Button className="dashboard-btn-primary" asChild>
-            <a href="/dashboard/settings">{t.goToSettings}</a>
-          </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import MagneticButton from "../ui/MagneticButton";
-import { Check } from "lucide-react";
+import { Check } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { landingTranslations } from "@/lib/i18n/landingTranslations";
@@ -67,7 +67,7 @@ export default function PricingSection() {
             <ul className="mb-8 space-y-4 text-neutral-400 flex-1">
               {t.starterFeatures.map((feature: string, i: number) => (
                 <li key={i} className="flex items-center gap-3">
-                  <Check className="h-5 w-5 heading-accent" /> {feature}
+                  <Check weight="bold" className="h-5 w-5 heading-accent" /> {feature}
                 </li>
               ))}
             </ul>
@@ -85,7 +85,7 @@ export default function PricingSection() {
             <ul className="mb-8 space-y-4 text-neutral-400 flex-1">
               {t.liteFeatures.map((feature: string, i: number) => (
                 <li key={i} className="flex items-center gap-3">
-                  <Check className="h-5 w-5 heading-accent" /> {feature}
+                  <Check weight="bold" className="h-5 w-5 heading-accent" /> {feature}
                 </li>
               ))}
             </ul>
@@ -104,7 +104,7 @@ export default function PricingSection() {
             <ul className="mb-8 space-y-4 text-neutral-300 flex-1">
               {t.businessFeatures.map((feature: string, i: number) => (
                 <li key={i} className="flex items-center gap-3">
-                  <Check className="h-5 w-5 heading-accent" /> {feature}
+                  <Check weight="bold" className="h-5 w-5 heading-accent" /> {feature}
                 </li>
               ))}
             </ul>
@@ -122,7 +122,7 @@ export default function PricingSection() {
             <ul className="mb-8 space-y-4 text-neutral-400 flex-1">
               {t.enterpriseFeatures.map((feature: string, i: number) => (
                 <li key={i} className="flex items-center gap-3">
-                  <Check className="h-5 w-5 heading-accent" /> {feature}
+                  <Check weight="bold" className="h-5 w-5 heading-accent" /> {feature}
                 </li>
               ))}
             </ul>

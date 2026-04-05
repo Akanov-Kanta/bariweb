@@ -58,6 +58,14 @@ export default function SettingsPage() {
     defaultValues: { domain: '' },
   });
 
+  const focusNewDomain = () => {
+    const input = document.getElementById('domain');
+    if (input) {
+      input.focus();
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
   useEffect(() => {
     fetchClients();
   }, []);
@@ -200,7 +208,7 @@ export default function SettingsPage() {
                   ))}
                   
                   <button 
-                    onClick={() => {}} 
+                    onClick={focusNewDomain} 
                     className="w-full flex items-center gap-4 p-5 text-zinc-600 hover:text-lime-400 transition-colors group"
                   >
                      <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 group-hover:border-lime-400/30 flex items-center justify-center">
@@ -226,21 +234,23 @@ export default function SettingsPage() {
 
         {/* Right Main Column: Content */}
         <div className="lg:col-span-8 space-y-8">
-           {selectedClient ? (
-             <div className="grid gap-6 md:grid-cols-1 xl:grid-cols-2">
-                
-                {/* Brick 1: Public ID */}
-                <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 overflow-hidden flex flex-col h-full hover:border-lime-400/20 transition-colors"> 
-                   <div className="px-6 py-5 border-b border-zinc-800 flex items-center gap-3 bg-zinc-900/10">
-                      <div className="w-10 h-10 rounded-xl bg-lime-400/10 border border-lime-400/20 flex items-center justify-center">
-                         <Browser weight="fill" className="w-5 h-5 text-lime-400" />
-                      </div>
-                      <div>
-                         <CardTitle className="text-white text-[15px] font-bold tracking-tight">{t.publicIdLabel}</CardTitle>
-                         <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider truncate">{selectedClient.allowed_domains}</p>
-                      </div>
-                   </div>
-                   <CardContent className="p-6 mt-auto">
+           <div className="grid gap-6 sm:grid-cols-2">
+              
+              {/* Brick 1: Public ID */}
+              <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 overflow-hidden flex flex-col h-full hover:border-lime-400/20 transition-colors"> 
+                 <div className="px-6 py-5 border-b border-zinc-800 flex items-center gap-3 bg-zinc-900/10">
+                    <div className="w-10 h-10 rounded-xl bg-lime-400/10 border border-lime-400/20 flex items-center justify-center">
+                       <Browser weight="fill" className="w-5 h-5 text-lime-400" />
+                    </div>
+                    <div>
+                       <CardTitle className="text-white text-[15px] font-bold tracking-tight">{t.publicIdLabel}</CardTitle>
+                       <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider truncate">
+                         {selectedClient ? selectedClient.allowed_domains : t.selectOrAdd}
+                       </p>
+                    </div>
+                 </div>
+                 <CardContent className="p-6 mt-auto">
+                    {selectedClient ? (
                       <div className="flex items-center gap-3">
                         <div className="flex-1 bg-zinc-950 border border-zinc-900 rounded-xl p-4 font-mono text-lime-400 text-sm shadow-inner truncate leading-none">
                            {selectedClient.public_id}
@@ -254,102 +264,107 @@ export default function SettingsPage() {
                           {copiedId === 'pubid' ? <CheckCircle weight="bold" className="h-5 w-5" /> : <Copy weight="fill" className="h-5 w-5" />}
                         </Button>
                       </div>
-                   </CardContent>
-                </Card>
+                    ) : (
+                      <div className="h-12 flex items-center justify-center border border-dashed border-zinc-900 rounded-xl text-zinc-700 text-[10px] uppercase font-bold tracking-widest">
+                        {t.selectOrAdd}
+                      </div>
+                    )}
+                 </CardContent>
+              </Card>
 
-                {/* Brick 2: Admin Keys */}
-                <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 overflow-hidden flex flex-col h-full hover:border-purple-400/20 transition-colors">
-                   <div className="px-6 py-5 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/10">
-                      <div className="flex items-center gap-3">
-                         <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-                            <Key weight="fill" className="w-5 h-5 text-purple-400" />
-                         </div>
-                         <CardTitle className="text-white text-[15px] font-bold tracking-tight">{t.accessControl}</CardTitle>
-                      </div>
-                      <div className={`w-2.5 h-2.5 rounded-full ${hasAdminKey ? 'bg-lime-400 shadow-[0_0_10px_#c8ff00]' : 'bg-red-500'}`} />
-                   </div>
-                   <CardContent className="p-6 mt-auto">
-                      <Button 
-                        onClick={generateAdminKey}
-                        disabled={keyLoading}
-                        className="w-full h-12 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white font-bold text-xs uppercase tracking-wider border border-zinc-800 transition-all shadow-sm"
-                      >
-                        {keyLoading ? '...' : hasAdminKey ? t.recycleKeys : t.generateKey}
-                      </Button>
-                   </CardContent>
-                </Card>
+              {/* Brick 2: Admin Keys */}
+              <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 overflow-hidden flex flex-col h-full hover:border-purple-400/20 transition-colors">
+                 <div className="px-6 py-5 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/10">
+                    <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                          <Key weight="fill" className="w-5 h-5 text-purple-400" />
+                       </div>
+                       <CardTitle className="text-white text-[15px] font-bold tracking-tight">{t.accessControl}</CardTitle>
+                    </div>
+                    <div className={`w-2.5 h-2.5 rounded-full ${selectedClient && hasAdminKey ? 'bg-lime-400 shadow-[0_0_10px_#c8ff00]' : 'bg-red-500'}`} />
+                 </div>
+                 <CardContent className="p-6 mt-auto">
+                    <Button 
+                      onClick={generateAdminKey}
+                      disabled={!selectedClient || keyLoading}
+                      className="w-full h-12 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white font-bold text-xs uppercase tracking-wider border border-zinc-800 transition-all shadow-sm"
+                    >
+                      {!selectedClient ? t.selectOrAdd : keyLoading ? '...' : hasAdminKey ? t.recycleKeys : t.generateKey}
+                    </Button>
+                 </CardContent>
+              </Card>
 
-                {/* Brick 3: COMPACT REGISTER FORM (Left) */}
-                <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 p-6 flex flex-col justify-center min-h-[170px] hover:border-lime-400/10 transition-colors">
-                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                      <div className="flex items-center gap-2 mb-1 pl-1">
-                         <Plus weight="bold" className="w-4 h-4 text-lime-400" />
-                         <h3 className="text-xs font-bold text-white uppercase tracking-tight">{t.registerProperty}</h3>
-                      </div>
-                      <div className="flex flex-col gap-3">
-                         <div className="relative group/input">
-                            <Globe weight="thin" className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 w-5 h-5 group-focus-within/input:text-lime-400 transition-colors py-2" />
-                            <Input 
-                              id="domain" 
-                              placeholder={t.domainPlaceholder} 
-                              className="h-11 bg-zinc-950 border-zinc-900 rounded-xl pl-14 pr-4 text-sm text-white placeholder:text-zinc-700/50 focus:ring-1 focus:ring-lime-400/30 transition-all font-medium" 
-                              {...form.register('domain')} 
-                            />
-                         </div>
-                         <Button type="submit" className="h-11 rounded-xl font-bold bg-lime-400 text-black text-[11px] uppercase tracking-tight hover:bg-lime-500 transition-all w-full shadow-lg shadow-lime-400/5" disabled={form.formState.isSubmitting}>
-                            {form.formState.isSubmitting ? '...' : t.addToProtection}
-                         </Button>
-                      </div>
-                   </form>
-                </Card>
+              {/* Brick 3: COMPACT REGISTER FORM (Left) */}
+              <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 p-6 flex flex-col justify-center min-h-[170px] hover:border-lime-400/10 transition-colors">
+                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <div className="flex items-center gap-2 mb-1 pl-1">
+                       <Plus weight="bold" className="w-4 h-4 text-lime-400" />
+                       <h3 className="text-xs font-bold text-white uppercase tracking-tight">{t.registerProperty}</h3>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                       <div className="relative group/input">
+                          <Globe weight="thin" className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 w-5 h-5 group-focus-within/input:text-lime-400 transition-colors py-2" />
+                          <Input 
+                            id="domain" 
+                            placeholder={t.domainPlaceholder} 
+                            className="h-11 bg-zinc-950 border-zinc-900 rounded-xl pl-14 pr-4 text-sm text-white placeholder:text-zinc-700/50 focus:ring-1 focus:ring-lime-400/30 transition-all font-medium" 
+                            {...form.register('domain')} 
+                          />
+                       </div>
+                       <Button type="submit" className="h-11 rounded-xl font-bold bg-lime-400 text-black text-[11px] uppercase tracking-tight hover:bg-lime-500 transition-all w-full shadow-lg shadow-lime-400/5" disabled={form.formState.isSubmitting}>
+                          {form.formState.isSubmitting ? '...' : t.addToProtection}
+                       </Button>
+                    </div>
+                 </form>
+              </Card>
 
-                {/* Brick 4: STREAMLINED DOMAIN DETAILS (Right) */}
-                <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 overflow-hidden flex flex-col min-h-[170px] hover:border-blue-400/10 transition-colors">
-                   <div className="px-6 py-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/10">
-                      <div className="flex items-center gap-3 overflow-hidden">
-                         <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-400/20 flex items-center justify-center shrink-0">
-                            <ShieldCheck weight="fill" className="w-5 h-5 text-blue-400" />
-                         </div>
-                         <div className="min-w-0">
-                            <h4 className="text-[12px] font-bold text-white truncate leading-tight">{selectedClient.allowed_domains}</h4>
-                            <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">{t.propertySite}</p>
-                         </div>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        onClick={() => removeClient(selectedClient.id)} 
-                        className="h-9 w-9 p-0 text-zinc-700 hover:text-red-400 hover:bg-red-400/5 rounded-lg transition-all"
-                      >
-                        <Trash weight="thin" className="h-5 w-5" />
-                      </Button>
-                   </div>
-                   <CardContent className="p-6 flex-1 flex flex-col justify-end gap-4">
-                      <div className="flex items-center justify-between bg-zinc-950 border border-zinc-900 p-3.5 rounded-xl transition-all hover:border-lime-400/20">
-                         <div className="flex items-center gap-3">
-                            <div className="w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
-                            <span className="text-xs text-white font-bold tracking-tight">{t.keyActive}</span>
-                         </div>
-                         <a href="/dashboard/integration" className="text-[11px] font-black text-lime-400 hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1">
-                            {t.script} <ArrowRight size={12} weight="bold" />
-                         </a>
-                      </div>
-                      {newKey && (
-                        <div className="p-3 border border-lime-400/20 bg-lime-400/5 rounded-lg animate-in fade-in slide-in-from-bottom-2">
-                           <p className="text-[10px] font-mono text-lime-400 break-all select-all text-center">{newKey}</p>
+              {/* Brick 4: STREAMLINED DOMAIN DETAILS (Right) */}
+              <Card className="dashboard-card border-zinc-800/50 bg-[#0c0c12]/60 overflow-hidden flex flex-col min-h-[170px] hover:border-blue-400/10 transition-colors">
+                 {selectedClient ? (
+                   <>
+                    <div className="px-6 py-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/10">
+                        <div className="flex items-center gap-3 overflow-hidden">
+                           <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-400/20 flex items-center justify-center shrink-0">
+                              <ShieldCheck weight="fill" className="w-5 h-5 text-blue-400" />
+                           </div>
+                           <div className="min-w-0">
+                              <h4 className="text-[12px] font-bold text-white truncate leading-tight">{selectedClient.allowed_domains}</h4>
+                              <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">{t.propertySite}</p>
+                           </div>
                         </div>
-                      )}
-                   </CardContent>
-                </Card>
-             </div>
-           ) : (
-             <div className="h-[400px] flex flex-col items-center justify-center p-20 text-center border-2 border-dashed border-zinc-900 rounded-3xl opacity-50 bg-[#0c0c12]/20">
-                <Globe weight="thin" className="w-16 h-16 text-zinc-700 mb-6" />
-                <h3 className="text-xl font-bold text-zinc-500 mb-2">{t.selectOrAdd}</h3>
-                <p className="text-sm text-zinc-700 max-w-xs leading-relaxed">
-                   {t.settingsLinkDesc}
-                </p>
-             </div>
-           )}
+                        <Button 
+                          variant="ghost" 
+                          onClick={() => removeClient(selectedClient.id)} 
+                          className="h-9 w-9 p-0 text-zinc-700 hover:text-red-400 hover:bg-red-400/5 rounded-lg transition-all"
+                        >
+                          <Trash weight="thin" className="h-5 w-5" />
+                        </Button>
+                     </div>
+                     <CardContent className="p-6 flex-1 flex flex-col justify-end gap-4">
+                        <div className="flex items-center justify-between bg-zinc-950 border border-zinc-900 p-3.5 rounded-xl transition-all hover:border-lime-400/20">
+                           <div className="flex items-center gap-3">
+                              <div className="w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
+                              <span className="text-xs text-white font-bold tracking-tight">{t.keyActive}</span>
+                           </div>
+                           <a href="/dashboard/integration" className="text-[11px] font-black text-lime-400 hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1">
+                              {t.script} <ArrowRight size={12} weight="bold" />
+                           </a>
+                        </div>
+                        {newKey && (
+                          <div className="p-3 border border-lime-400/20 bg-lime-400/5 rounded-lg animate-in fade-in slide-in-from-bottom-2">
+                             <p className="text-[10px] font-mono text-lime-400 break-all select-all text-center">{newKey}</p>
+                          </div>
+                        )}
+                     </CardContent>
+                   </>
+                 ) : (
+                   <div className="p-8 flex flex-col items-center justify-center text-center h-full opacity-40">
+                      <ShieldCheck weight="thin" className="w-10 h-10 text-zinc-600 mb-2" />
+                      <p className="text-[10px] font-black text-zinc-700 uppercase tracking-widest">{t.selectOrAdd}</p>
+                   </div>
+                 )}
+              </Card>
+           </div>
         </div>
       </div>
     </div>

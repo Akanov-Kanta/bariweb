@@ -160,7 +160,7 @@ export const landingTranslations: Record<string, any> = {
     },
     docsPage: {
       title: "Документация по интеграции",
-      desc: "Внедрите Bariweb в вашу инфраструктуру за 2 минуты. Здесь собраны инструкции по установке и настройке параметров виджета.",
+      desc: "Внедрите Bariweb в вашу инфраструктуру за 2 минуты. Шаг 1: Скопируйте ваш client_id из дашборда. Шаг 2: Выберите фреймворк. Шаг 3: Вставьте код в ваш проект.",
       quickStart: "Примеры кода",
       html: "HTML / Vanilla JS",
       react: "React / Next.js",
@@ -200,18 +200,18 @@ export const landingTranslations: Record<string, any> = {
         },
         vanilla: {
           title: "Установка для HTML / Vanilla",
-          body: "Для статических сайтов и CMS (WordPress, Tilda) вставьте скрипт прямо перед закрывающимся тегом </head>:",
-          code: "<!-- Bariweb Script -->\n<script src=\"https://cdn.bariweb.kz/v2.js\" client_id=\"YOUR_API_KEY\"></script>"
+          body: "Для статических сайтов и CMS скопируйте ваш client_id в дашборде и вставьте следующий скрипт перед закрывающимся тегом </head>:",
+          code: "<!-- Bariweb Script -->\n<script \n  src=\"https://unpkg.com/bariweb-widget@latest/dist/bariweb.iife.js\" \n  client-id=\"ВАШ_CLIENT_ID\"\n></script>"
         },
         react: {
           title: "Установка для React / Next.js",
-          body: "В Next.js мы рекомендуем использовать встроенный компонент next/script со стратегией beforeInteractive.",
-          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.bariweb.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
+          body: "Для SPA (React / Next.js) установите пакет через NPM (npm install bariweb-widget), скопируйте ваш client_id и добавьте компонент в корневой файл.",
+          code: "// Терминал: npm install bariweb-widget\n\nimport 'bariweb-widget';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <body>\n        {children}\n        <bw-widget client-id=\"ВАШ_CLIENT_ID\"></bw-widget>\n      </body>\n    </html>\n  );\n}"
         },
         vue: {
           title: "Установка для Vue / Nuxt",
-          body: "Для Vue.js или Nuxt.js добавьте директиву в nuxt.config.ts или напрямую в index.html.",
-          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.bariweb.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
+          body: "Для Vue.js / Nuxt проектов установите пакет (npm install bariweb-widget), импортируйте его в точку входа и добавьте тег виджета, указав ваш client_id.",
+          code: "<!-- Терминал: npm install bariweb-widget -->\n\n<template>\n  <div>\n    <NuxtPage />\n    <bw-widget client-id=\"ВАШ_CLIENT_ID\"></bw-widget>\n  </div>\n</template>\n\n<script setup>\nimport 'bariweb-widget';\n</script>"
         },
         config: {
           title: "Объект конфигурации",
@@ -392,7 +392,7 @@ export const landingTranslations: Record<string, any> = {
     },
     docsPage: {
       title: "Интеграциялық құжаттама",
-      desc: "Bariweb жүйесін 2 минут ішінде орнатыңыз. Бұл жерде виджетті орнату және баптау нұсқаулары жинақталған.",
+      desc: "Bariweb жүйесін 2 минут ішінде орнатыңыз. 1-қадам: дашбордтан client_id көшіріп алыңыз. 2-қадам: Жоба тілін таңдаңыз. 3-қадам: Кодты жобаңызға қосыңыз.",
       quickStart: "Код мысалдары",
       html: "HTML / Vanilla JS",
       react: "React / Next.js",
@@ -432,18 +432,18 @@ export const landingTranslations: Record<string, any> = {
         },
         vanilla: {
           title: "HTML / Vanilla үшін орнату",
-          body: "Статикалық сайттар мен CMS (WordPress, Tilda) үшін скриптті </head> жабылатын тегінің алдына енгізіңіз:",
-          code: "<!-- Bariweb Script -->\n<script src=\"https://cdn.bariweb.kz/v2.js\" client_id=\"Сіздің_КІЛТІҢІЗ\"></script>"
+          body: "Статикалық сайттар мен CMS үшін дашбордтан client_id көшіріп алып, мына скриптті </head> жабылатын тегінің алдына енгізіңіз:",
+          code: "<!-- Bariweb Script -->\n<script \n  src=\"https://unpkg.com/bariweb-widget@latest/dist/bariweb.iife.js\" \n  client-id=\"СІЗДІҢ_CLIENT_ID\"\n></script>"
         },
         react: {
           title: "React / Next.js үшін орнату",
-          body: "Next.js-те beforeInteractive стратегиясы бар кірістірілген next/script компонентін пайдалануды ұсынамыз.",
-          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.bariweb.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
+          body: "SPA (React / Next.js) үшін NPM арқылы пакетті орнатыңыз (npm install bariweb-widget), өзіңіздің client_id-іңізді көшіріңіз және компонентті негізгі файлға қосыңыз.",
+          code: "// Терминал: npm install bariweb-widget\n\nimport 'bariweb-widget';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <body>\n        {children}\n        <bw-widget client-id=\"СІЗДІҢ_CLIENT_ID\"></bw-widget>\n      </body>\n    </html>\n  );\n}"
         },
         vue: {
           title: "Vue / Nuxt үшін орнату",
-          body: "Vue.js немесе Nuxt.js үшін nuxt.config.ts файлында немесе тікелей index.html ішіне қосыңыз.",
-          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.bariweb.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
+          body: "Vue.js / Nuxt жобалары үшін пакетті орнатыңыз (npm install bariweb-widget), оны кіру нүктесіне импорттаңыз және client_id көрсете отырып, виджет тегін қосыңыз.",
+          code: "<!-- Терминал: npm install bariweb-widget -->\n\n<template>\n  <div>\n    <NuxtPage />\n    <bw-widget client-id=\"СІЗДІҢ_CLIENT_ID\"></bw-widget>\n  </div>\n</template>\n\n<script setup>\nimport 'bariweb-widget';\n</script>"
         },
         config: {
           title: "Конфигурация объектісі",
@@ -624,7 +624,7 @@ export const landingTranslations: Record<string, any> = {
     },
     docsPage: {
       title: "Integration Documentation",
-      desc: "Deploy Bariweb onto your infrastructure in 2 minutes flat. Explore installation guides and advanced configuration parameters.",
+      desc: "Deploy Bariweb onto your infrastructure in 2 minutes flat. Step 1: Copy your client_id from the dashboard. Step 2: Choose your tech stack. Step 3: Insert the code into your project.",
       quickStart: "Code Examples",
       html: "HTML / Vanilla JS",
       react: "React / Next.js",
@@ -664,18 +664,18 @@ export const landingTranslations: Record<string, any> = {
         },
         vanilla: {
           title: "HTML / Vanilla Setup",
-          body: "For static websites and CMS platforms (WordPress, Shopify), insert the script immediately preceding your closing </head> tag:",
-          code: "<!-- Bariweb Script -->\n<script src=\"https://cdn.bariweb.kz/v2.js\" client_id=\"YOUR_API_KEY\"></script>"
+          body: "For static websites and CMS platforms, copy your client_id from the dashboard and insert the following script immediately preceding your closing </head> tag:",
+          code: "<!-- Bariweb Script -->\n<script \n  src=\"https://unpkg.com/bariweb-widget@latest/dist/bariweb.iife.js\" \n  client-id=\"YOUR_CLIENT_ID\"\n></script>"
         },
         react: {
           title: "React / Next.js Setup",
-          body: "For Next.js implementations, utilize the native next/script component specifying a beforeInteractive loading strategy.",
-          code: "import Script from 'next/script';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <head>\n        <Script src=\"https://cdn.bariweb.kz/v2.js\" strategy=\"beforeInteractive\" client_id=\"APP_KEY\" />\n      </head>\n      <body>{children}</body>\n    </html>\n  );\n}"
+          body: "For Single Page Applications (React / Next.js), install the NPM package (npm install bariweb-widget), copy your client_id, and mount the component in your root layout.",
+          code: "// Terminal: npm install bariweb-widget\n\nimport 'bariweb-widget';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <body>\n        {children}\n        <bw-widget client-id=\"YOUR_CLIENT_ID\"></bw-widget>\n      </body>\n    </html>\n  );\n}"
         },
         vue: {
           title: "Vue / Nuxt Setup",
-          body: "In Vue / Nuxt architectures, simply configure the directive dynamically inside nuxt.config.ts or globally in your index.html definition.",
-          code: "export default defineNuxtConfig({\n  app: {\n    head: {\n      script: [{ src: 'https://cdn.bariweb.kz/v2.js', 'client_id': 'YOUR_API_KEY' }]\n    }\n  }\n})"
+          body: "For Vue / Nuxt, install the NPM package (npm install bariweb-widget), import it at your entry point, and place the widget tag with your client_id in the layout.",
+          code: "<!-- Terminal: npm install bariweb-widget -->\n\n<template>\n  <div>\n    <NuxtPage />\n    <bw-widget client-id=\"YOUR_CLIENT_ID\"></bw-widget>\n  </div>\n</template>\n\n<script setup>\nimport 'bariweb-widget';\n</script>"
         },
         config: {
           title: "Configuration Object",

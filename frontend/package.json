@@ -18,7 +18,7 @@
     "@react-three/fiber": "^9.5.0",
     "@splinetool/react-spline": "^4.1.0",
     "@types/three": "^0.183.1",
-    "bariweb-widget": "^0.1.13",
+    "bariweb-widget": "^0.1.15",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.7.0",

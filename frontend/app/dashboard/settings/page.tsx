@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Trash2, Globe, Plus, Copy, CheckCircle2, Zap } from 'lucide-react';
 import { Organizations } from '@/lib/api/sdk.gen';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { translations } from '@/lib/i18n/translations';
 
 const domainSchema = z.object({
   domain: z.string().min(1, 'Domain is required').url('Must be a valid URL or hostname').or(
@@ -31,6 +33,8 @@ export default function SettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const { lang } = useLanguage();
+  const t = translations[lang].dashboard.settings;
 
   const form = useForm<DomainFormValues>({
     resolver: zodResolver(domainSchema),
@@ -116,15 +120,15 @@ export default function SettingsPage() {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64 text-zinc-500">Loading settings...</div>;
+    return <div className="flex items-center justify-center h-64 text-zinc-500">{t.loading}</div>;
   }
 
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-zinc-100">Settings</h2>
+        <h2 className="text-3xl font-bold tracking-tight text-zinc-100">{t.title}</h2>
         <p className="text-zinc-400 mt-1">
-          Manage your account preferences and security configuration.
+          {t.subtitle}
         </p>
       </div>
 
@@ -133,10 +137,10 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="text-blue-400 flex items-center gap-2">
               <Zap className="h-5 w-5" />
-              Your Client ID
+              {t.clientIdTitle}
             </CardTitle>
             <CardDescription className="text-zinc-400">
-              This is your unique identifier for the Bariweb widget. Keep it safe.
+              {t.clientIdDesc}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -154,22 +158,22 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Whitelisted Domains</CardTitle>
+          <CardTitle>{t.whitelistedDomains}</CardTitle>
           <CardDescription>
-            The Bariweb widget will ONLY load on domains listed below. Attempts to load the widget on unauthorized domains will be blocked.
+            {t.domainsDesc}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-end gap-4 max-w-md">
             <div className="space-y-2 flex-1">
               <label className="text-sm font-medium leading-none text-zinc-200" htmlFor="domain">
-                Add New Domain
+                {t.addNewDomain}
               </label>
               <div className="relative">
                 <Globe className="absolute left-3 top-2.5 h-4 w-4 text-zinc-500" />
                 <Input
                   id="domain"
-                  placeholder="e.g. example.com"
+                  placeholder={t.domainPlaceholder}
                   className="pl-9"
                   {...form.register('domain')}
                 />
@@ -180,7 +184,7 @@ export default function SettingsPage() {
             </div>
             <Button type="submit" variant="glow" disabled={form.formState.isSubmitting}>
               <Plus className="mr-2 h-4 w-4" />
-              Add
+              {t.addButton}
             </Button>
           </form>
 
@@ -193,7 +197,7 @@ export default function SettingsPage() {
           <div className="rounded-lg border border-zinc-800 bg-zinc-950/50">
             {domains.length === 0 ? (
               <div className="p-8 text-center text-sm text-zinc-500">
-                No domains whitelisted yet. The widget will not load anywhere.
+                {t.noDomains}
               </div>
             ) : (
               <ul className="divide-y divide-zinc-800">
@@ -210,7 +214,7 @@ export default function SettingsPage() {
                       className="text-zinc-500 hover:text-red-400 hover:bg-red-500/10 h-8"
                     >
                       <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Remove {domain}</span>
+                      <span className="sr-only">{t.removeDomain} {domain}</span>
                     </Button>
                   </li>
                 ))}
@@ -222,13 +226,13 @@ export default function SettingsPage() {
       
       <Card>
         <CardHeader>
-          <CardTitle>API Configuration</CardTitle>
+          <CardTitle>{t.apiConfig}</CardTitle>
           <CardDescription>
-            Your active connection strings for custom server-to-server integration.
+            {t.apiDesc}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-zinc-500">Advanced API settings are restricted to the Enterprise plan.</p>
+          <p className="text-sm text-zinc-500">{t.enterpriseOnly}</p>
         </CardContent>
       </Card>
     </div>

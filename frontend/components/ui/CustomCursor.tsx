@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function CustomCursor() {
@@ -14,28 +14,29 @@ export default function CustomCursor() {
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
 
+
+  const moveCursor = useCallback((e: MouseEvent) => {
+    cursorX.set(e.clientX);
+    cursorY.set(e.clientY);
+
+    // Efficiently check for interactive elements without triggering reflows
+    const target = e.target as HTMLElement;
+    if (!target) return;
+
+    // Use a simpler tag-based check which is much faster than getComputedStyle
+    const isInteractive = 
+      target.closest("button") || 
+      target.closest("a") || 
+      target.closest("input") || 
+      target.closest("textarea") ||
+      target.closest("select") ||
+      target.style.cursor === 'pointer' ||
+      target.classList.contains('cursor-pointer');
+    
+    setIsHovered(!!isInteractive);
+  }, [cursorX, cursorY]);
+
   useEffect(() => {
-    // Hide default cursor if not already hidden by CSS
-    document.body.style.cursor = 'none';
-
-    const moveCursor = (e: MouseEvent) => {
-      cursorX.set(e.clientX);
-      cursorY.set(e.clientY);
-
-      // Check if hovering over interactive element
-      const target = e.target as HTMLElement;
-      if (!target) return;
-
-      const isInteractive = 
-        target.closest("button") || 
-        target.closest("a") || 
-        target.closest("input") || 
-        target.closest("textarea") ||
-        window.getComputedStyle(target).cursor === "pointer";
-      
-      setIsHovered(!!isInteractive);
-    };
-
     const handleMouseEnter = () => setIsVisible(true);
     const handleMouseLeave = () => setIsVisible(false);
 
@@ -43,7 +44,6 @@ export default function CustomCursor() {
     document.addEventListener("mouseenter", handleMouseEnter);
     document.addEventListener("mouseleave", handleMouseLeave);
     
-    // Set initial visibility
     setIsVisible(true);
 
     return () => {
@@ -51,13 +51,13 @@ export default function CustomCursor() {
       document.removeEventListener("mouseenter", handleMouseEnter);
       document.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [cursorX, cursorY]);
+  }, [moveCursor]);
 
   if (!isVisible) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[99999]">
-      {/* Small dot */}
+    <div className="pointer-events-none fixed inset-0 z-[99999] overflow-hidden">
+      {/* Small dot - Real-time position */}
       <motion.div
         className="absolute left-0 top-0 h-2 w-2 rounded-full bg-lime-400 shadow-[0_0_10px_rgba(163,230,53,0.5)]"
         animate={{
@@ -71,7 +71,7 @@ export default function CustomCursor() {
           translateY: "-50%",
         }}
       />
-      {/* Trailing circle */}
+      {/* Trailing circle - Spring animation */}
       <motion.div
         className="absolute left-0 top-0 rounded-full border border-lime-400/50 bg-lime-400/10"
         animate={{
@@ -79,6 +79,11 @@ export default function CustomCursor() {
           height: isHovered ? 60 : 32,
           backgroundColor: isHovered ? "rgba(163, 230, 53, 0.2)" : "rgba(163, 230, 53, 0.1)",
           borderColor: isHovered ? "rgba(163, 230, 53, 0.8)" : "rgba(163, 230, 53, 0.5)",
+        }}
+        transition={{
+          type: "spring",
+          damping: 25,
+          stiffness: 300,
         }}
         style={{
           x: cursorXSpring,

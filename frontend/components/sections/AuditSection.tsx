@@ -4,10 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import MagneticButton from "../ui/MagneticButton";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { landingTranslations } from "@/lib/i18n/landingTranslations";
 
 export default function AuditSection() {
   const [url, setUrl] = useState("");
   const router = useRouter();
+  const { lang } = useLanguage();
+  const t = landingTranslations[lang].audit;
 
   const handleAudit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,10 +33,10 @@ export default function AuditSection() {
           transition={{ duration: 0.8 }}
         >
           <h2 className="mb-6 text-4xl font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
-            Проверьте свой сайт на <span className="heading-accent">уязвимости</span>
+            {t.title}<span className="heading-accent">{t.titleHighlight}</span>
           </h2>
           <p className="mx-auto mb-12 max-w-2xl text-lg text-neutral-400">
-            Введите адрес вашего сайта, и наш ИИ проведет мгновенный аудит на соответствие Цифровому кодексу РК.
+            {t.desc}
           </p>
         </motion.div>
 
@@ -47,7 +51,7 @@ export default function AuditSection() {
           <div className="relative w-full">
             <input
               type="url"
-              placeholder="https://vash-site.kz"
+              placeholder={t.placeholder}
               required
               value={url}
               onChange={(e) => setUrl(e.target.value)}
@@ -58,7 +62,7 @@ export default function AuditSection() {
             intensity={20}
             className="btn-primary w-full whitespace-nowrap px-10 py-6 text-lg tracking-wide sm:w-auto"
           >
-            Запустить скан
+            {t.button}
           </MagneticButton>
         </motion.form>
       </div>

@@ -29,33 +29,36 @@ export default function Footer() {
         <div>
           <h4 className="mb-4 text-white font-medium">{t.product}</h4>
           <ul className="space-y-2 text-sm">
-            <li><a href="https://a1-gitlab3.alem.ai/aidyn/arifalta" target="_blank" rel="noopener noreferrer" className="nav-link nav-link-accent">GitLab</a></li>
-            <li><a href="https://alem.plus" target="_blank" rel="noopener noreferrer" className="nav-link nav-link-accent">Витрина alem.plus</a></li>
-            <li><a href="#" className="nav-link nav-link-accent">Фичи</a></li>
-            <li><a href="#" className="nav-link nav-link-accent">Интеграция</a></li>
-            <li><a href="#" className="nav-link nav-link-accent">Цены</a></li>
-            <li><a href="#" className="nav-link nav-link-accent">Changelog</a></li>
+            <li><a href="https://a1-gitlab3.alem.ai/aidyn/arifalta" target="_blank" rel="noopener noreferrer" className="nav-link nav-link-accent">{t.gitLab}</a></li>
+            <li><a href="https://alem.plus" target="_blank" rel="noopener noreferrer" className="nav-link nav-link-accent">{t.vitrine}</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">{t.features}</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">{t.integration}</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">{t.pricing}</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">{t.changelog}</a></li>
           </ul>
         </div>
 
         <div>
           <h4 className="mb-4 text-white font-medium">{t.docs}</h4>
           <ul className="space-y-2 text-sm">
-            <li><a href="#" className="nav-link nav-link-accent">API Docs</a></li>
-            <li><a href="#" className="nav-link nav-link-accent">WCAG 2.1 Guide</a></li>
-            <li><a href="#" className="nav-link nav-link-accent">Калькулятор штрафов</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">{t.apiDocs}</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">{t.wcagGuide}</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">{t.calcPenalty}</a></li>
           </ul>
         </div>
 
         <div>
           <h4 className="mb-4 text-white font-medium">{t.company}</h4>
           <ul className="space-y-2 text-sm">
-            <li><a href="#" className="nav-link nav-link-accent">О нас</a></li>
-            <li><a href="#" className="nav-link nav-link-accent">Блог</a></li>
-            <li><a href="#" className="nav-link nav-link-accent">Контакты</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">{t.about}</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">{t.blog}</a></li>
+            <li><a href="#" className="nav-link nav-link-accent">{t.contacts}</a></li>
           </ul>
         </div>
 
+      </div>
+      <div className="mx-auto max-w-7xl mt-12 pt-8 border-t border-neutral-900 text-xs opacity-50 font-mono text-center">
+        {t.copyright}
       </div>
     </footer>
   );

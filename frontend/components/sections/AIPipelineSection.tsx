@@ -2,33 +2,18 @@
 
 import { motion } from "framer-motion";
 import { Mic, Brain, Search, Cpu, ArrowRight } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { landingTranslations } from "@/lib/i18n/landingTranslations";
 
 export default function AIPipelineSection() {
-  const steps = [
-    {
-      title: "Голос пользователя",
-      subtitle: "Speech-to-text",
-      icon: <Mic className="h-6 w-6" />,
-      desc: "Распознавание казахской и русской речи в реальном времени.",
-    },
-    {
-      title: "Анализ намерения",
-      subtitle: "KazLLM / Qwen",
-      icon: <Brain className="h-6 w-6" />,
-      desc: "Определение цели пользователя и планирование действий.",
-    },
-    {
-      title: "Поиск элементов",
-      subtitle: "RAGFlow + Milvus",
-      icon: <Search className="h-6 w-6" />,
-      desc: "Мгновенная навигация по структуре сайта через векторный поиск.",
-    },
-    {
-      title: "Автономное действие",
-      subtitle: "Web Component UI",
-      icon: <Cpu className="h-6 w-6" />,
-      desc: "Выполнение задачи: от заполнения форм до оформления заказов.",
-    },
+  const { lang } = useLanguage();
+  const t = landingTranslations[lang].aipipeline;
+
+  const icons = [
+    <Mic className="h-6 w-6" />,
+    <Brain className="h-6 w-6" />,
+    <Search className="h-6 w-6" />,
+    <Cpu className="h-6 w-6" />,
   ];
 
   return (
@@ -36,18 +21,18 @@ export default function AIPipelineSection() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-20 text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-white md:text-5xl">
-            Как мыслит <span className="heading-accent">ИИ-агент</span>
+            {t.title}<span className="heading-accent">{t.titleHighlight}</span>
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-neutral-400">
-            Под капотом Bariweb работает сложная сеть AI-агентов, обеспечивающая бесшовную доступность.
+            {t.desc}
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {steps.map((step, index) => (
+          {t.steps.map((step: any, index: number) => (
             <div key={index} className="relative group">
               {/* Connector Arrow for desktop */}
-              {index < steps.length - 1 && (
+              {index < t.steps.length - 1 && (
                 <div className="absolute left-[calc(100%_-_1rem)] top-12 z-10 hidden lg:block">
                   <ArrowRight className="h-8 w-8 text-neutral-800 transition-colors group-hover:text-lime-500/50" />
                 </div>
@@ -61,7 +46,7 @@ export default function AIPipelineSection() {
                 className="h-full rounded-3xl border border-neutral-800 bg-[#0a0a0f] p-8 transition-all hover:border-lime-500/30 hover:shadow-[0_0_30px_rgba(200,255,0,0.05)]"
               >
                 <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-900 text-lime-400 group-hover:bg-lime-500 group-hover:text-black transition-colors">
-                  {step.icon}
+                  {icons[index]}
                 </div>
                 <h3 className="mb-1 text-xl font-bold text-white leading-tight">
                   {step.title}

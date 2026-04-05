@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import { motion, HTMLMotionProps } from "framer-motion";
 
 interface MagneticButtonProps extends Omit<HTMLMotionProps<"button">, "ref"> {
@@ -16,11 +16,20 @@ export default function MagneticButton({
   ...props 
 }: MagneticButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const rectRef = useRef<DOMRect | null>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
+  const handleMouseEnter = () => {
+    if (buttonRef.current) {
+      rectRef.current = buttonRef.current.getBoundingClientRect();
+    }
+  };
+
   const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!rectRef.current) return;
+    
     const { clientX, clientY } = e;
-    const { height, width, left, top } = buttonRef.current!.getBoundingClientRect();
+    const { height, width, left, top } = rectRef.current;
     
     const middleX = clientX - (left + width / 2);
     const middleY = clientY - (top + height / 2);
@@ -33,11 +42,13 @@ export default function MagneticButton({
 
   const reset = () => {
     setPosition({ x: 0, y: 0 });
+    rectRef.current = null;
   };
 
   return (
     <motion.button
       ref={buttonRef}
+      onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={reset}
       animate={{ x: position.x, y: position.y }}

@@ -10,20 +10,15 @@ import {
   CreditCard,
   Settings,
   LogOut,
-  User
+  User,
+  Globe
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { translations } from '@/lib/i18n/translations';
 
 import Logo from '@/components/ui/Logo';
-
-const navigation = [
-  { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Integration', href: '/dashboard/integration', icon: Code },
-  { name: 'Compliance Reports', href: '/dashboard/reports', icon: FileText },
-  { name: 'Billing', href: '/payment', icon: CreditCard },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
-];
 
 export default function DashboardLayout({
   children,
@@ -33,6 +28,16 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { lang, setLang } = useLanguage();
+  const t = translations[lang].dashboard.sidebar;
+
+  const navigation = [
+    { name: t.overview, href: '/dashboard', icon: LayoutDashboard },
+    { name: t.integration, href: '/dashboard/integration', icon: Code },
+    { name: t.reports, href: '/dashboard/reports', icon: FileText },
+    { name: t.billing, href: '/payment', icon: CreditCard },
+    { name: t.settings, href: '/dashboard/settings', icon: Settings },
+  ];
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -82,6 +87,30 @@ export default function DashboardLayout({
           })}
         </nav>
 
+        {/* Language Switcher in Sidebar */}
+        <div className="border-t border-zinc-800 p-4">
+          <div className="flex items-center gap-2 text-xs font-medium text-zinc-500 uppercase tracking-widest mb-3 ml-1">
+            <Globe className="h-3 w-3" />
+            <span>Language</span>
+          </div>
+          <div className="flex gap-1">
+            {(['ru', 'kz', 'en'] as const).map((l) => (
+              <button
+                key={l}
+                onClick={() => setLang(l)}
+                className={cn(
+                  "flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all border",
+                  lang === l 
+                    ? "bg-lime-400/10 border-lime-400/30 text-lime-400" 
+                    : "border-zinc-800 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300"
+                )}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* User Profile Footer */}
         <div className="border-t border-zinc-800 p-4">
           <div className="flex items-center group">
@@ -89,8 +118,8 @@ export default function DashboardLayout({
               <User className="h-5 w-5 text-zinc-400" />
             </div>
             <div className="ml-3 flex-1 overflow-hidden">
-              <p className="text-sm font-medium text-zinc-200 truncate">SaaS Client</p>
-              <p className="text-xs text-zinc-500 truncate uppercase tracking-widest font-bold">Pro Plan</p>
+              <p className="text-sm font-medium text-zinc-200 truncate">{t.clientName}</p>
+              <p className="text-xs text-zinc-500 truncate uppercase tracking-widest font-bold">{t.planType}</p>
             </div>
           </div>
           <button
@@ -99,7 +128,7 @@ export default function DashboardLayout({
             className="mt-4 flex w-full items-center px-3 py-2.5 text-sm font-medium text-red-400 rounded-md hover:bg-red-500/10 hover:text-red-300 transition-all border border-transparent hover:border-red-500/20"
           >
             <LogOut className="mr-3 h-5 w-5 text-red-500/70" />
-            {isLoggingOut ? 'Logging out...' : 'Sign out'}
+            {isLoggingOut ? t.loggingOut : t.signout}
           </button>
         </div>
       </div>

@@ -5,11 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Copy, CheckCircle2 } from 'lucide-react';
 import { Organizations } from '@/lib/api/sdk.gen';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { translations } from '@/lib/i18n/translations';
 
 export default function IntegrationPage() {
   const [copied, setCopied] = useState(false);
   const [clientId, setClientId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { lang } = useLanguage();
+  const t = translations[lang].dashboard.integration;
 
   useEffect(() => {
     const fetchClient = async () => {
@@ -29,7 +33,7 @@ export default function IntegrationPage() {
 
   const integrationCode = clientId 
     ? `<script src="https://widget.bariweb.org/bariweb.js" data-client-id="${clientId}"></script>`
-    : '<!-- Register your domain in Settings to get your Client ID -->';
+    : t.noDomainWarning;
 
   const copyToClipboard = () => {
     if (!clientId) return;
@@ -41,23 +45,23 @@ export default function IntegrationPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-zinc-100">Integration</h2>
+        <h2 className="text-3xl font-bold tracking-tight text-zinc-100">{t.title}</h2>
         <p className="text-zinc-400 mt-1">
-          Install the Bariweb widget on your website to instantly enable AI accessibility features.
+          {t.subtitle}
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>1. Add to your HTML</CardTitle>
+          <CardTitle>{t.step1Title}</CardTitle>
           <CardDescription>
-            Copy the script tag below and paste it just before the closing <code>&lt;/body&gt;</code> tag of every page where you want the widget to appear.
+            {t.step1Desc}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="relative rounded-lg bg-zinc-950 border border-zinc-800 p-4 font-mono text-sm text-zinc-300">
             <div className="flex justify-between items-center mb-2 pb-2 border-b border-zinc-800/50">
-              <span className="text-zinc-500 text-xs">HTML</span>
+              <span className="text-zinc-500 text-xs">{t.htmlLabel}</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -68,23 +72,23 @@ export default function IntegrationPage() {
                 {copied ? (
                   <>
                     <CheckCircle2 className="mr-2 h-4 w-4 text-green-500" />
-                    Copied!
+                    {t.copied}
                   </>
                 ) : (
                   <>
                     <Copy className="mr-2 h-4 w-4" />
-                    Copy Code
+                    {t.copyCode}
                   </>
                 )}
               </Button>
             </div>
             <pre className="overflow-x-auto p-2">
-              <code>{loading ? 'Loading...' : integrationCode}</code>
+              <code>{loading ? t.loading : integrationCode}</code>
             </pre>
           </div>
           {!clientId && !loading && (
             <p className="mt-4 text-sm text-amber-500 font-medium">
-              ⚠️ You need to add at least one domain in Settings to generate your Client ID.
+              {t.noDomainWarning}
             </p>
           )}
         </CardContent>
@@ -92,17 +96,17 @@ export default function IntegrationPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>2. Whitelist your domains</CardTitle>
+          <CardTitle>{t.step2Title}</CardTitle>
           <CardDescription>
-            For security reasons, the widget will only load on domains that have been whitelisted in your account.
+            {t.step2Desc}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-zinc-400 mb-4">
-            Head over to your settings to manage allowed domains. The widget will be completely invisible on any unauthorized domains.
+            {t.settingsHint}
           </p>
           <Button variant="outline" asChild>
-            <a href="/dashboard/settings">Go to Domain Settings</a>
+            <a href="/dashboard/settings">{t.goToSettings}</a>
           </Button>
         </CardContent>
       </Card>

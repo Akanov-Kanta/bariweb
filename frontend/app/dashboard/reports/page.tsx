@@ -5,10 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { FileText, Loader2, Download, AlertCircle } from 'lucide-react';
 import { Organizations } from '@/lib/api/sdk.gen';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { translations } from '@/lib/i18n/translations';
 
 export default function ReportsPage() {
   const [loading, setLoading] = useState(true);
   const [hasClients, setHasClients] = useState(false);
+  const { lang } = useLanguage();
+  const t = translations[lang].dashboard.reports;
 
   useEffect(() => {
     const checkClients = async () => {
@@ -29,9 +33,9 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-white italic">Compliance Reports</h2>
+        <h2 className="text-3xl font-bold tracking-tight text-white italic">{t.title}</h2>
         <p className="text-zinc-400 mt-1">
-          View and download accessibility audit reports for your domains.
+          {t.subtitle}
         </p>
       </div>
 
@@ -39,17 +43,17 @@ export default function ReportsPage() {
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <FileText className="h-5 w-5 text-blue-500" />
-            WCAG 2.1 Audit History
+            {t.historyTitle}
           </CardTitle>
           <CardDescription className="text-zinc-400">
-            Reports are automatically generated once we collect enough interaction data.
+            {t.historyDesc}
           </CardDescription>
         </CardHeader>
         <CardContent className="min-h-[300px] flex flex-col items-center justify-center text-center p-12">
           {loading ? (
             <div className="space-y-4">
               <Loader2 className="h-10 w-10 animate-spin text-blue-500 mx-auto" />
-              <p className="text-sm text-zinc-500 font-mono">SCANNING DATABASE...</p>
+              <p className="text-sm text-zinc-500 font-mono">{t.scanning}</p>
             </div>
           ) : !hasClients ? (
             <div className="space-y-6">
@@ -57,13 +61,13 @@ export default function ReportsPage() {
                 <AlertCircle className="h-8 w-8 text-zinc-600" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-lg font-medium text-white">No Sites Integrated</h3>
+                <h3 className="text-lg font-medium text-white">{t.noSites}</h3>
                 <p className="text-sm text-zinc-500 max-w-xs mx-auto">
-                  You need to integrate Bariweb on at least one domain to start generating compliance reports.
+                  {t.noSitesDesc}
                 </p>
               </div>
               <Button asChild variant="glow">
-                <a href="/dashboard/integration">Start Integration</a>
+                <a href="/dashboard/integration">{t.startIntegration}</a>
               </Button>
             </div>
           ) : (
@@ -72,17 +76,17 @@ export default function ReportsPage() {
                 <Loader2 className="h-8 w-8 text-blue-500 animate-[spin_3s_linear_infinite]" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-lg font-medium text-white">Generating First Report</h3>
+                <h3 className="text-lg font-medium text-white">{t.generating}</h3>
                 <p className="text-sm text-zinc-500 max-w-sm mx-auto">
-                  Data collection is in progress. Our AI agents are currently auditing your sites for WCAG 2.1 / Section 508 compliance.
+                  {t.generatingDesc}
                 </p>
               </div>
               <div className="flex gap-4 justify-center">
                 <Button variant="outline" disabled className="border-zinc-800">
-                  <Download className="h-4 w-4 mr-2" /> PDF Report
+                  <Download className="h-4 w-4 mr-2" /> {t.pdfReport}
                 </Button>
                 <Button variant="outline" disabled className="border-zinc-800">
-                  <Download className="h-4 w-4 mr-2" /> JSON Export
+                  <Download className="h-4 w-4 mr-2" /> {t.jsonExport}
                 </Button>
               </div>
             </div>
@@ -93,7 +97,7 @@ export default function ReportsPage() {
       <Card className="border-zinc-800 bg-zinc-900/50 backdrop-blur-xl border-dashed opacity-50">
         <CardContent className="py-6">
           <p className="text-xs text-center text-zinc-500 font-mono italic">
-            SECURE AUDIT LOG CHANNEL #0712 - NO EXTERNAL LEAKS DETECTED
+            {t.secureAuditLog}
           </p>
         </CardContent>
       </Card>

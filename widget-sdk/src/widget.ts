@@ -63,7 +63,7 @@ const UI_TEXT: Record<UiLang, Record<string, string>> = {
     decrease: 'Уменьшить',
     hue: 'Оттенок',
     increase: 'Увеличить',
-    recognitionLanguage: 'Язык распознавания',
+    recognitionLanguage: 'Язык',
     changeRecognitionLanguage: 'Изменить язык распознавания',
     languageAuto: 'Автоопределение',
     languageKz: 'Казахский',
@@ -84,7 +84,7 @@ const UI_TEXT: Record<UiLang, Record<string, string>> = {
     inclusion: 'Инклюзия',
     tabChat: 'Чат',
     tabSettings: 'Настройки',
-    madeInKazakhstan: 'Сделано в Казахстане 🇰🇿',
+    madeInKazakhstan: 'Сделано в Казахстане',
     closeWidgetAria: 'Закрыть',
     widgetDialogAria: 'BariWeb Accessibility Widget',
     triggerAria: 'Открыть/Закрыть меню доступности',
@@ -135,7 +135,7 @@ const UI_TEXT: Record<UiLang, Record<string, string>> = {
     decrease: 'Азайту',
     hue: 'Реңк',
     increase: 'Көбейту',
-    recognitionLanguage: 'Тану тілі',
+    recognitionLanguage: 'Тіл',
     changeRecognitionLanguage: 'Тану тілін өзгерту',
     languageAuto: 'Автоанықтау',
     languageKz: 'Қазақша',
@@ -156,7 +156,7 @@ const UI_TEXT: Record<UiLang, Record<string, string>> = {
     inclusion: 'Инклюзия',
     tabChat: 'Чат',
     tabSettings: 'Баптаулар',
-    madeInKazakhstan: 'Қазақстанда жасалған 🇰🇿',
+    madeInKazakhstan: 'Қазақстанда жасалған',
     closeWidgetAria: 'Жабу',
     widgetDialogAria: 'BariWeb қолжетімділік виджеті',
     triggerAria: 'Қолжетімділік мәзірін ашу/жабу',
@@ -207,7 +207,7 @@ const UI_TEXT: Record<UiLang, Record<string, string>> = {
     decrease: 'Decrease',
     hue: 'Hue',
     increase: 'Increase',
-    recognitionLanguage: 'Recognition language',
+    recognitionLanguage: 'Language',
     changeRecognitionLanguage: 'Change recognition language',
     languageAuto: 'Auto detect',
     languageKz: 'Kazakh',
@@ -228,7 +228,7 @@ const UI_TEXT: Record<UiLang, Record<string, string>> = {
     inclusion: 'Inclusion',
     tabChat: 'Chat',
     tabSettings: 'Settings',
-    madeInKazakhstan: 'Made in Kazakhstan 🇰🇿',
+    madeInKazakhstan: 'Made in Kazakhstan',
     closeWidgetAria: 'Close',
     widgetDialogAria: 'BariWeb Accessibility Widget',
     triggerAria: 'Open/close accessibility menu',
@@ -698,7 +698,7 @@ export class BariwebWidget extends LitElement {
               @click=${() => { this._chat.setTtsEnabled(!this._chat.isTtsEnabled()); this.requestUpdate(); }}
               id="bw-tts-btn"
               aria-label=${this._chat.isTtsEnabled() ? t('ttsDisableAria') : t('ttsEnableAria')}>
-              ${this._chat.isTtsEnabled() ? 'ON' : 'OFF'}
+              ${this._chat.isTtsEnabled() ? Icons.volumeOn : Icons.volumeOff}
             </button>
 
             <button class="chat-send-btn" @click=${this._handleSend}
@@ -796,8 +796,8 @@ export class BariwebWidget extends LitElement {
 
         <div class="ai-tools-section" style="margin-top: 16px;">
           <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--bw-bg-subtle, #f8fafc); border-radius: var(--bw-radius, 14px); margin-bottom: 12px;">
-            <div style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; color: var(--bw-fg, #1e293b);">
-               ${Icons.languages} ${t('recognitionLanguage')}
+            <div class="lang-row-label" style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; color: var(--bw-fg, #1e293b);">
+               <span class="lang-row-icon">${Icons.languages}</span>${t('recognitionLanguage')}
             </div>
             <select style="height: 34px; padding: 0 8px; border: 1px solid var(--bw-border); border-radius: 8px; background: #fff; cursor: pointer; outline: none; font-size: 13px;"
               .value=${this._sttLanguageMode}
@@ -845,7 +845,7 @@ export class BariwebWidget extends LitElement {
     const t = (key: string) => this._t(key);
     return html`
       <div class="admin-overlay">
-        <div class="admin-icon">🔐</div>
+        <div class="admin-icon">${Icons.shield}</div>
         <h4>${this._isAdmin ? t('adminMode') : t('adminAccess')}</h4>
         ${this._isAdmin ? html`
           <p class="admin-status">${t('adminLoggedIn')}</p>
@@ -890,12 +890,12 @@ export class BariwebWidget extends LitElement {
             <button class="bw-tab" ?active=${this._activeTab === 'chat'}
               @click=${() => this._setTab('chat')} role="tab"
               aria-selected=${this._activeTab === 'chat'} id="bw-tab-chat">
-              💬 ${t('tabChat')}
+              ${Icons.chat} ${t('tabChat')}
             </button>
             <button class="bw-tab" ?active=${this._activeTab === 'a11y'}
               @click=${() => this._setTab('a11y')} role="tab"
               aria-selected=${this._activeTab === 'a11y'} id="bw-tab-settings">
-              ♿ ${t('tabSettings')}
+              ${Icons.settings} ${t('tabSettings')}
             </button>
           </div>
 

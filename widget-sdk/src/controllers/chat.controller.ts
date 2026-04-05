@@ -630,9 +630,6 @@ export class ChatController implements ReactiveController {
 
     setTtsEnabled(value: boolean): void {
         this._tts.setEnabled(value);
-        if (value) {
-            this._tts.speak('TTS enabled');
-        }
         this.host.requestUpdate();
     }
 

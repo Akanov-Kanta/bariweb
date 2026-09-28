@@ -9,3 +9,5 @@ pymilvus
 langfuse<4.0.0
 passlib[bcrypt]
 bcrypt==4.3.0
+psycopg2-binary
+requests

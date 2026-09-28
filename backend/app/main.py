@@ -51,6 +51,7 @@ app.include_router(org_router, prefix="/clients")
 app.include_router(chat_router, prefix="")
 app.include_router(training_router, prefix="/v1/training")
 app.include_router(agent_router, prefix="")
-# Serve Frontend Static Files
+# Serve Frontend Static Files (Docker build only; on Vercel the frontend is a separate service)
 static_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "static")
-app.mount("/", StaticFiles(directory=static_path, html=True), name="static")
+if os.path.isdir(static_path):
+    app.mount("/", StaticFiles(directory=static_path, html=True), name="static")

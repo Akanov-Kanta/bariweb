@@ -24,3 +24,6 @@ rag-pipeline/index/*.json
 .env.local
 .env.dev
 .env.prod
+.vercel
+.env*
+!.env.example

@@ -1,0 +1,16 @@
+# Never upload local secrets or build junk from CLI deploys
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+**/node_modules
+**/.venv
+**/__pycache__
+**/.next
+**/out
+rag-pipeline/*.db
+rag-pipeline/results
+rag-pipeline/results_enriched
+rag-pipeline/output

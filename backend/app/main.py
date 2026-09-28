@@ -34,7 +34,11 @@ def on_startup():
     with Session(engine) as session:
         init_db(session)
     
-    milvus_manager.initialize()
+    # Don't block the whole API when Milvus is unreachable; the client retries lazily on first use
+    try:
+        milvus_manager.initialize()
+    except Exception:
+        pass
     langfuse_manager.initialize()
 
 

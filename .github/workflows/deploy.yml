@@ -38,7 +38,7 @@ jobs:
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
       - name: Point bariweb.vercel.app at the new deployment
-        run: vercel alias set "${{ steps.deploy.outputs.url }}" bariweb.vercel.app --token "$VERCEL_TOKEN"
+        run: vercel alias set "${{ steps.deploy.outputs.url }}" bariweb.vercel.app --scope nazars-projects-ededf71b --token "$VERCEL_TOKEN"
 
       - name: Smoke test
         run: |
